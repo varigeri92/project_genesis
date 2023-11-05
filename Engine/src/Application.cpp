@@ -10,23 +10,6 @@
 #include "Rendering/Material.h"
 #include "InputDefines.h"
 
-const std::vector<gns::Vertex> vertices = {
-	{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-	{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-	{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-	{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-
-	{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-	{{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-	{{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-	{{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
-};
-
-const std::vector<uint32_t> indices = {
-	0, 1, 2, 2, 3, 0,
-	4, 5, 6, 6, 7, 4
-};
-
 gns::Application::Application()
 {
 	m_window = new Window();
@@ -67,8 +50,8 @@ void gns::Application::Run()
 {
 	std::shared_ptr<Texture> vikingRoomTexture = std::make_shared<Texture>(R"(D:\GenesisEngine\Engine\Assets\Textures\viking_room.png)");
 	std::shared_ptr<Texture> defaultTexture = std::make_shared<Texture>(R"(D:\GenesisEngine\Engine\Assets\Textures\PrototypeGridTexture.jpg)");
-	std::shared_ptr<gns::Mesh> planeMesh = AssetLoader::LoadMesh(R"(D:\GenesisEngine\Engine\Assets\Meshes\plane.obj)"); //std::make_shared<Mesh>(vertices, indices);
-	std::shared_ptr<gns::Mesh> vikingRoomMesh = AssetLoader::LoadMesh(R"(D:\GenesisEngine\Engine\Assets\Meshes\viking_room.obj)"); //std::make_shared<Mesh>(vertices, indices);
+	std::shared_ptr<gns::Mesh> planeMesh = AssetLoader::LoadMesh(R"(D:\GenesisEngine\Engine\Assets\Meshes\plane.obj)");
+	std::shared_ptr<gns::Mesh> vikingRoomMesh = AssetLoader::LoadMesh(R"(D:\GenesisEngine\Engine\Assets\Meshes\viking_room.obj)");
 	Material vikingRoomMaterial("VikingRoom_Material", "DefaultShader", vikingRoomTexture);
 	Material defaultMaterial("DefaultMaterial", "DefaultShader", defaultTexture);
 
@@ -83,7 +66,6 @@ void gns::Application::Run()
 	m_renderer->CreateIndexBuffer(vikingRoomMesh.get());
 
 	uint32_t imageIndex = 0;
-
 
 	while (!m_close)
 	{
