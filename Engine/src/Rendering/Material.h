@@ -57,7 +57,7 @@ namespace gns::rendering
 		Material(std::string name, std::string shaderName) : name {name}
 		{
 			guid = 100;//core::Guid::GetNewGuid();
-			shader = std::make_shared<Shader>(R"(D:\GenesisEngine\Engine\Assets\Shaders\default)", shaderName);
+			shader = std::make_shared<Shader>(R"(D:\project_genesis\Engine\Assets\Shaders\default)", shaderName);
 			LOG_INFO("Material Created: " << name << " / guid: " << guid);
 
 		}
@@ -65,9 +65,15 @@ namespace gns::rendering
 		Material(std::string name, std::string shaderName, std::shared_ptr<Texture> texture) : name{ name }, texture{ texture }
 		{
 			guid = core::Guid::GetNewGuid();
-			shader = std::make_shared<Shader>(R"(D:\GenesisEngine\Engine\Assets\Shaders\default)", shaderName);
+			shader = std::make_shared<Shader>(R"(D:\project_genesis\Engine\Assets\Shaders\default)", shaderName);
 			LOG_INFO("Material Created: " << name << " / guid: " << guid);
 			
+		}
+
+		Material(std::string name, std::shared_ptr<Shader> shader) : name{ name }, shader { shader }
+		{
+			guid = core::Guid::GetNewGuid();
+			LOG_INFO("Material Created: " << name << " / guid: " << guid);
 		}
 	};
 }

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 namespace gns
 {
@@ -14,33 +15,36 @@ namespace gns::core
 {
 	struct EntityComponent
 	{
+		EntityComponent(std::string name) : name{ name } {};
 		std::string name;
 		bool isEnabled;
 		bool isStatic;
 	};
 
-	struct Position
-	{
-		glm::vec3 vector;
-	};
-
-	struct Rotation
-	{
-		glm::vec3 vector;
-	};
-
-	struct Scale
-	{
-		glm::vec3 vector;
-	};
-
 	struct Transform
 	{
+		glm::vec3 position;
+		glm::vec3 rotation;
+		glm::vec3 scale;
+
 		glm::mat4 matrix;
+
+		Transform() : position{0,0,0}, rotation { 0,0,0 }, scale { 1,1,1 }
+		{
+			matrix = glm::mat4();
+			matrix = glm::translate(matrix, glm::vec3(0.f));
+			matrix = glm::scale(matrix, glm::vec3(1.f));
+			matrix = glm::rotate(matrix, 0.f, glm::vec3(0.f, 1.f, 0.f));
+		};
+
+		operator glm::mat4 () { return matrix; }
+		operator const glm::mat4& () { return matrix; }
 	};
 
 	struct MeshComponent
 	{
 		std::shared_ptr<Mesh> mesh;
+		operator std::shared_ptr<Mesh> () { return mesh; }
+		operator const std::shared_ptr<Mesh>& () { return mesh; }
 	};
 }

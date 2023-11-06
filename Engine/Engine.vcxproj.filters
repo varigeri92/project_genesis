@@ -75,226 +75,235 @@
     <ClInclude Include="src\Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\config\config.h">
+    <ClInclude Include="API\EnTT\config\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\config\macro.h">
+    <ClInclude Include="API\EnTT\config\macro.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\config\version.h">
+    <ClInclude Include="API\EnTT\config\version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\container\dense_map.hpp">
+    <ClInclude Include="API\EnTT\container\dense_map.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\container\dense_set.hpp">
+    <ClInclude Include="API\EnTT\container\dense_set.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\container\fwd.hpp">
+    <ClInclude Include="API\EnTT\container\fwd.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\algorithm.hpp">
+    <ClInclude Include="API\EnTT\core\algorithm.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\any.hpp">
+    <ClInclude Include="API\EnTT\core\any.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\attribute.h">
+    <ClInclude Include="API\EnTT\core\attribute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\compressed_pair.hpp">
+    <ClInclude Include="API\EnTT\core\compressed_pair.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\enum.hpp">
+    <ClInclude Include="API\EnTT\core\enum.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\family.hpp">
+    <ClInclude Include="API\EnTT\core\family.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\fwd.hpp">
+    <ClInclude Include="API\EnTT\core\fwd.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\hashed_string.hpp">
+    <ClInclude Include="API\EnTT\core\hashed_string.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\ident.hpp">
+    <ClInclude Include="API\EnTT\core\ident.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\iterator.hpp">
+    <ClInclude Include="API\EnTT\core\iterator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\memory.hpp">
+    <ClInclude Include="API\EnTT\core\memory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\monostate.hpp">
+    <ClInclude Include="API\EnTT\core\monostate.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\tuple.hpp">
+    <ClInclude Include="API\EnTT\core\tuple.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\type_info.hpp">
+    <ClInclude Include="API\EnTT\core\type_info.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\type_traits.hpp">
+    <ClInclude Include="API\EnTT\core\type_traits.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\core\utility.hpp">
+    <ClInclude Include="API\EnTT\core\utility.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entity\component.hpp">
+    <ClInclude Include="API\EnTT\entity\component.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entity\entity.hpp">
+    <ClInclude Include="API\EnTT\entity\entity.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entity\fwd.hpp">
+    <ClInclude Include="API\EnTT\entity\fwd.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entity\group.hpp">
+    <ClInclude Include="API\EnTT\entity\group.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entity\handle.hpp">
+    <ClInclude Include="API\EnTT\entity\handle.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entity\helper.hpp">
+    <ClInclude Include="API\EnTT\entity\helper.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entity\mixin.hpp">
+    <ClInclude Include="API\EnTT\entity\mixin.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entity\observer.hpp">
+    <ClInclude Include="API\EnTT\entity\observer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entity\organizer.hpp">
+    <ClInclude Include="API\EnTT\entity\organizer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entity\registry.hpp">
+    <ClInclude Include="API\EnTT\entity\registry.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entity\runtime_view.hpp">
+    <ClInclude Include="API\EnTT\entity\runtime_view.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entity\snapshot.hpp">
+    <ClInclude Include="API\EnTT\entity\snapshot.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entity\sparse_set.hpp">
+    <ClInclude Include="API\EnTT\entity\sparse_set.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entity\storage.hpp">
+    <ClInclude Include="API\EnTT\entity\storage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entity\view.hpp">
+    <ClInclude Include="API\EnTT\entity\view.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\graph\adjacency_matrix.hpp">
+    <ClInclude Include="API\EnTT\graph\adjacency_matrix.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\graph\dot.hpp">
+    <ClInclude Include="API\EnTT\graph\dot.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\graph\flow.hpp">
+    <ClInclude Include="API\EnTT\graph\flow.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\graph\fwd.hpp">
+    <ClInclude Include="API\EnTT\graph\fwd.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\locator\locator.hpp">
+    <ClInclude Include="API\EnTT\locator\locator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\meta\adl_pointer.hpp">
+    <ClInclude Include="API\EnTT\meta\adl_pointer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\meta\container.hpp">
+    <ClInclude Include="API\EnTT\meta\container.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\meta\context.hpp">
+    <ClInclude Include="API\EnTT\meta\context.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\meta\factory.hpp">
+    <ClInclude Include="API\EnTT\meta\factory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\meta\fwd.hpp">
+    <ClInclude Include="API\EnTT\meta\fwd.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\meta\meta.hpp">
+    <ClInclude Include="API\EnTT\meta\meta.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\meta\node.hpp">
+    <ClInclude Include="API\EnTT\meta\node.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\meta\pointer.hpp">
+    <ClInclude Include="API\EnTT\meta\pointer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\meta\policy.hpp">
+    <ClInclude Include="API\EnTT\meta\policy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\meta\range.hpp">
+    <ClInclude Include="API\EnTT\meta\range.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\meta\resolve.hpp">
+    <ClInclude Include="API\EnTT\meta\resolve.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\meta\template.hpp">
+    <ClInclude Include="API\EnTT\meta\template.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\meta\type_traits.hpp">
+    <ClInclude Include="API\EnTT\meta\type_traits.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\meta\utility.hpp">
+    <ClInclude Include="API\EnTT\meta\utility.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\platform\android-ndk-r17.hpp">
+    <ClInclude Include="API\EnTT\platform\android-ndk-r17.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\poly\fwd.hpp">
+    <ClInclude Include="API\EnTT\poly\fwd.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\poly\poly.hpp">
+    <ClInclude Include="API\EnTT\poly\poly.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\process\fwd.hpp">
+    <ClInclude Include="API\EnTT\process\fwd.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\process\process.hpp">
+    <ClInclude Include="API\EnTT\process\process.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\process\scheduler.hpp">
+    <ClInclude Include="API\EnTT\process\scheduler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\resource\cache.hpp">
+    <ClInclude Include="API\EnTT\resource\cache.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\resource\fwd.hpp">
+    <ClInclude Include="API\EnTT\resource\fwd.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\resource\loader.hpp">
+    <ClInclude Include="API\EnTT\resource\loader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\resource\resource.hpp">
+    <ClInclude Include="API\EnTT\resource\resource.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\signal\delegate.hpp">
+    <ClInclude Include="API\EnTT\signal\delegate.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\signal\dispatcher.hpp">
+    <ClInclude Include="API\EnTT\signal\dispatcher.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\signal\emitter.hpp">
+    <ClInclude Include="API\EnTT\signal\emitter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\signal\fwd.hpp">
+    <ClInclude Include="API\EnTT\signal\fwd.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\signal\sigh.hpp">
+    <ClInclude Include="API\EnTT\signal\sigh.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\entt.hpp">
+    <ClInclude Include="API\EnTT\entt.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\fwd.hpp">
+    <ClInclude Include="API\EnTT\fwd.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Components.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AssetDatabase\path.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECS\Entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECS\ECSManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -345,6 +354,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\InputDefines.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ECS\Entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ECS\ECSManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

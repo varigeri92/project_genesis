@@ -124,8 +124,9 @@ namespace gns::rendering
 	}
 
 	float rotate = 0;
-	void Renderer::UpdateUniformBuffer(uint32_t currentImage)
+	void Renderer::UpdateUniformBuffer(uint32_t currentImage, UniformBufferObject& ubo)
 	{
+		/*
 		rotate += Time::GetDelta()/5.f;
 		UniformBufferObject ubo{};
 		ubo.model = glm::rotate(glm::mat4(1.0f), rotate * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -133,6 +134,7 @@ namespace gns::rendering
 		ubo.proj = glm::perspective(glm::radians(45.0f),
 			(float)m_device->GetSwapchainExtent().width / (float)m_device->GetSwapchainExtent().height, 0.1f, 100.0f);
 		ubo.proj[1][1] *= -1;
+		*/
 
 		memcpy(m_pipelineBuilder->m_uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 	}
@@ -153,7 +155,7 @@ namespace gns::rendering
 
 		//RecordCommandBuffer(m_commandBuffers[m_currentFrame], imageIndex);
 
-		UpdateUniformBuffer(m_currentFrame);
+		//UpdateUniformBuffer(m_currentFrame);
 
 		EndFrame(imageIndex);
 	}

@@ -9,6 +9,14 @@
 #include "AssetDatabase/AssetLoader.h"
 #include "Rendering/Material.h"
 #include "InputDefines.h"
+#include "Core/Scene.h"
+#include "ECS/ECSManager.h"
+#include "Camera.h"
+
+
+#include "Rendering/PipelineBuilder.h"
+#include "glm/gtc/matrix_transform.hpp"
+#include "Core/Components.h";
 
 gns::Application::Application()
 {
@@ -48,10 +56,10 @@ gns::Application::~Application()
 
 void gns::Application::Run()
 {
-	std::shared_ptr<Texture> vikingRoomTexture = std::make_shared<Texture>(R"(D:\GenesisEngine\Engine\Assets\Textures\viking_room.png)");
-	std::shared_ptr<Texture> defaultTexture = std::make_shared<Texture>(R"(D:\GenesisEngine\Engine\Assets\Textures\PrototypeGridTexture.jpg)");
-	std::shared_ptr<gns::Mesh> planeMesh = AssetLoader::LoadMesh(R"(D:\GenesisEngine\Engine\Assets\Meshes\plane.obj)");
-	std::shared_ptr<gns::Mesh> vikingRoomMesh = AssetLoader::LoadMesh(R"(D:\GenesisEngine\Engine\Assets\Meshes\viking_room.obj)");
+	std::shared_ptr<Texture> vikingRoomTexture = std::make_shared<Texture>(R"(D:\project_genesis\Engine\Assets\Textures\viking_room.png)");
+	std::shared_ptr<Texture> defaultTexture = std::make_shared<Texture>(R"(D:\project_genesis\Engine\Assets\Textures\PrototypeGridTexture.jpg)");
+	std::shared_ptr<gns::Mesh> planeMesh = AssetLoader::LoadMesh(R"(D:\project_genesis\Engine\Assets\Meshes\plane.obj)");
+	std::shared_ptr<gns::Mesh> vikingRoomMesh = AssetLoader::LoadMesh(R"(D:\project_genesis\Engine\Assets\Meshes\viking_room.obj)");
 	Material vikingRoomMaterial("VikingRoom_Material", "DefaultShader", vikingRoomTexture);
 	Material defaultMaterial("DefaultMaterial", "DefaultShader", defaultTexture);
 
@@ -67,10 +75,35 @@ void gns::Application::Run()
 
 	uint32_t imageIndex = 0;
 
+	//Create Scene
+	std::shared_ptr<core::Scene> scene = std::make_shared<core::Scene>("Start Scene");
+	
+	// Camera:
+	Entity camera_entity = core::ECSManager::CreateEntity("Camera", scene);
+	int w, h;
+	m_window->GetExtent(w, h);
+	auto transform = camera_entity.GetComponent<core::Transform>();
+	Camera& camera = camera_entity.AddComponet<Camera>(0.03f, 1000.f, 60.f, (float)w, (float)h);
+	
+	//HACKY ENTITIES:
+	Entity vikingRoomEntity = core::ECSManager::CreateEntity("Viking Room", scene);
+	core::Transform vikingroomTransform = vikingRoomEntity.GetComponent<core::Transform>();
+	vikingroomTransform.matrix = glm::rotate(glm::mat4(1.0f), 1 * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	Entity floorPlane = core::ECSManager::CreateEntity("Floor Plane", scene);
+	core::Transform floorPlaneTransform = floorPlane.GetComponent<core::Transform>();
+	floorPlaneTransform.matrix = glm::rotate(glm::mat4(1.0f), 1 * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+
+	//UBO:
+	UniformBufferObject ubo = {};
+	
 	while (!m_close)
 	{
 		Time::StartFrameTime();
 		HandleEvents();
+
+		ubo.view = camera.GetView();
+		ubo.proj = camera.GetProjection();
 
 		if (gns::Input::GetKeyDown(SDLK_1))
 			LOG_INFO("Key: 'W' was pressed!");
@@ -82,10 +115,16 @@ void gns::Application::Run()
 			LOG_INFO("Key: 'W' was released!");
 
 		if (!m_renderer->BeginFrame(imageIndex)) continue;
-		m_renderer->UpdateUniformBuffer(imageIndex);
+
 		m_renderer->BeginDraw(imageIndex);
+		m_renderer->UpdateUniformBuffer(imageIndex, ubo);
+		
+		ubo.model = vikingroomTransform.matrix;
 		m_renderer->DrawMesh(vikingRoomMesh.get(), imageIndex, vikingRoomMaterial);
+
+		ubo.model = floorPlaneTransform.matrix;
 		m_renderer->DrawMesh(planeMesh.get(), imageIndex, defaultMaterial);
+		
 		m_renderer->EndDraw(imageIndex);
 		m_renderer->EndFrame(imageIndex);
 		Time::EndFrameTime();

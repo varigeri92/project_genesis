@@ -77,7 +77,7 @@ namespace gns::rendering
 		void EndFrame(uint32_t& imageIndex);
 		void CreateVertexBuffer(Mesh* mesh);
 		void CreateIndexBuffer(Mesh* mesh);
-		void UpdateUniformBuffer(uint32_t currentImage);
+		void UpdateUniformBuffer(uint32_t currentImage, UniformBufferObject& ubo);
 		void DeleteMesh(Mesh* mesh);
 
 	private:
