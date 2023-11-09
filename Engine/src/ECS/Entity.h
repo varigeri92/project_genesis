@@ -14,6 +14,8 @@ namespace gns {
 			scene	{ scene } 
 		{};
 		
+		Entity() = default;
+
 		template<typename T, typename... Args>
 		T& AddComponet(Args&& ... args)
 		{

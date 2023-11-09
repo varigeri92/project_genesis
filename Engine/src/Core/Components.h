@@ -6,9 +6,11 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-namespace gns
-{
+namespace gns{
 	struct Mesh;
+}
+namespace gns::rendering {
+	struct Material;
 }
 
 namespace gns::core
@@ -17,8 +19,8 @@ namespace gns::core
 	{
 		EntityComponent(std::string name) : name{ name } {};
 		std::string name;
-		bool isEnabled;
-		bool isStatic;
+		bool isEnabled = true;
+		bool isStatic = false;
 	};
 
 	struct Transform
@@ -31,20 +33,40 @@ namespace gns::core
 
 		Transform() : position{0,0,0}, rotation { 0,0,0 }, scale { 1,1,1 }
 		{
-			matrix = glm::mat4();
+			matrix = glm::mat4(1.f);
 			matrix = glm::translate(matrix, glm::vec3(0.f));
 			matrix = glm::scale(matrix, glm::vec3(1.f));
 			matrix = glm::rotate(matrix, 0.f, glm::vec3(0.f, 1.f, 0.f));
 		};
 
-		operator glm::mat4 () { return matrix; }
-		operator const glm::mat4& () { return matrix; }
+		Transform(
+			glm::vec3 position, glm::vec3 rotation, glm::vec3 scale) 
+			: position{ position }, rotation{rotation }, scale{ scale }
+		{
+			matrix = glm::mat4(1.f);
+			matrix = glm::translate(matrix, glm::vec3(0.f));
+			matrix = glm::scale(matrix, glm::vec3(1.f));
+			matrix = glm::rotate(matrix, 0.f, glm::vec3(0.f, 1.f, 0.f));
+		};
+
+		void UpdateMatrix() {
+			matrix = glm::mat4(1.f);
+			matrix = glm::translate(matrix, position);
+			matrix = glm::scale(matrix, scale);
+			matrix = glm::rotate(matrix, 0.f, glm::vec3(0.f, 0.f, 1.f));
+		}
 	};
 
 	struct MeshComponent
 	{
 		std::shared_ptr<Mesh> mesh;
 		operator std::shared_ptr<Mesh> () { return mesh; }
-		operator const std::shared_ptr<Mesh>& () { return mesh; }
+		MeshComponent(std::shared_ptr<Mesh> mesh) : mesh{ mesh } {};
+	};
+
+	struct MaterialComponent {
+		std::shared_ptr<gns::rendering::Material> material;
+		operator std::shared_ptr<gns::rendering::Material>() { return material; }
+		MaterialComponent(std::shared_ptr<gns::rendering::Material> material) : material{ material } {};
 	};
 }

@@ -33,7 +33,9 @@ namespace gns::rendering
 			VkRenderPass renderPass = VK_NULL_HANDLE;
 			VkPipelineShaderStageCreateInfo vertShaderStageInfo;
 			VkPipelineShaderStageCreateInfo fragShaderStageInfo;
+			VkDescriptorSetLayout descriptorSetLayout;
 		};
+
 	public:
 		PipelineBuilder() = delete;
 		PipelineBuilder(Device* device);
@@ -49,6 +51,7 @@ namespace gns::rendering
 		//VkShaderModule m_vertexModule = VK_NULL_HANDLE;
 		//VkShaderModule m_fragmentModule = VK_NULL_HANDLE;
 		//VkRenderPass m_renderPass;
+		//VkDescriptorSetLayout m_descriptorSetLayout;
 
 		VkRenderPass GetRenderPass()
 		{
@@ -72,7 +75,7 @@ namespace gns::rendering
 		VkDeviceMemory m_depthImageMemory;
 		VkImageView m_depthImageView;
 
-		VkDescriptorSetLayout m_descriptorSetLayout;
+		
 		std::vector<VkBuffer> m_uniformBuffers;
 		std::vector<VkDeviceMemory> m_uniformBuffersMemory;
 		std::vector<void*> m_uniformBuffersMapped;
@@ -92,15 +95,30 @@ namespace gns::rendering
 		void CreateVertexInputInfo(uint32_t bindingDescriptionCount, VkVertexInputBindingDescription* bindingDescription,
 			uint32_t attributeDescriptionCount, VkVertexInputAttributeDescription* attributeDescription);
 
+		VkPipelineDynamicStateCreateInfo CreateDynamicStates(uint32_t size, const VkDynamicState* states);
+		VkPipelineInputAssemblyStateCreateInfo CrateInputAssemblyInfo();
+
+		VkPipelineViewportStateCreateInfo CreateViewportState();
+		VkPipelineRasterizationStateCreateInfo CreateRasterizationState();
+		VkPipelineMultisampleStateCreateInfo CreateMultisampleState();
+		VkPipelineColorBlendAttachmentState CreateColorBlendAttachment();
+		VkPipelineColorBlendStateCreateInfo CreateBlendState(VkPipelineColorBlendAttachmentState& colorBlendAttachment);
+		VkPipelineDepthStencilStateCreateInfo CreateDepthStencilState();
+
 		void CreateDescriptorSetLayout();
+		void CreatePipelineLayout();
+
+		void BildPipeline_Internal();
+
+
 		void CreateDescriptorPool();
 		void CreateDescriptorSets(VkImageView textureImageView, VkSampler textureSampler, Texture& texture);
 		void CreateUniformBuffers();
 
 		void CleanupPipeline();
 
-
 		void CreateDepthResources();
+		void CleanupDepthResources();
 		VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, 
 			VkFormatFeatureFlags features);
 		VkFormat FindDepthFormat();

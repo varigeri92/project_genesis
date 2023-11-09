@@ -75,6 +75,8 @@ namespace gns::rendering
 			guid = core::Guid::GetNewGuid();
 			LOG_INFO("Material Created: " << name << " / guid: " << guid);
 		}
+
+		Material() = default;
 	};
 }
 

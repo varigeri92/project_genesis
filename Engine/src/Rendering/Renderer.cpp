@@ -26,37 +26,18 @@ namespace gns::rendering
 
 	void Renderer::CreateRenderer(Material& material)
 	{
-		auto bindingDescription = Vertex::getBindingDescription();
-		auto attributeDescriptions = Vertex::getAttributeDescriptions();
-		m_pipelineBuilder->CreateVertexInputInfo(1, &bindingDescription,
-			static_cast<uint32_t>(attributeDescriptions.size()), attributeDescriptions.data());
-		m_pipelineBuilder->CreateUniformBuffers();
-		m_pipelineBuilder->CreateDescriptorPool();
-		m_pipelineBuilder->CreateDepthResources();
-		//========================================//
-
-
 		CreateCommandPool();
 		CreateCommandBuffers();
 		CreateSyncObjects();
+		//========================================//
 		m_pipelineBuilder->BuildPipeline(material);
+
 		CreateFranmeBuffers();
-
-
-		//CreateTexture(*material.texture.get());
 	}
 
 	Renderer::~Renderer()
 	{
 		vkDeviceWaitIdle(m_device->GetDevice());
-		/* 
-		vkDestroySampler(m_device->GetDevice(), m_textureSampler, nullptr);
-		vkDestroyImageView(m_device->GetDevice(), m_textureImageView, nullptr);
-		vkDestroyImage(m_device->GetDevice(), m_textureImage, nullptr);
-		vkFreeMemory(m_device->GetDevice(), m_textureImageMemory, nullptr);
-		texture_1->CleanupTexture(m_device);
-		texture_2->CleanupTexture(m_device);
-		*/
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 			vkDestroySemaphore(m_device->GetDevice(), m_renderFinishedSemaphores[i], nullptr);
@@ -126,16 +107,6 @@ namespace gns::rendering
 	float rotate = 0;
 	void Renderer::UpdateUniformBuffer(uint32_t currentImage, UniformBufferObject& ubo)
 	{
-		/*
-		rotate += Time::GetDelta()/5.f;
-		UniformBufferObject ubo{};
-		ubo.model = glm::rotate(glm::mat4(1.0f), rotate * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		ubo.proj = glm::perspective(glm::radians(45.0f),
-			(float)m_device->GetSwapchainExtent().width / (float)m_device->GetSwapchainExtent().height, 0.1f, 100.0f);
-		ubo.proj[1][1] *= -1;
-		*/
-
 		memcpy(m_pipelineBuilder->m_uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 	}
 	void Renderer::DeleteMesh(Mesh* mesh)
@@ -147,82 +118,35 @@ namespace gns::rendering
 		vkFreeMemory(m_device->GetDevice(), mesh->m_indexBufferMemory, nullptr);
 	}
 
+	void Renderer::DeleteTexture(Texture* texture)
+	{
+		texture->CleanupTexture(m_device);
+	}
+
 	void Renderer::DrawFrame()
 	{
 		uint32_t imageIndex = 0;
 		if(!BeginFrame(imageIndex))
 			return;
 
-		//RecordCommandBuffer(m_commandBuffers[m_currentFrame], imageIndex);
-
-		//UpdateUniformBuffer(m_currentFrame);
-
 		EndFrame(imageIndex);
-	}
-
-	void Renderer::BeginDraw(uint32_t imageIndex)
-	{
-		VkCommandBufferBeginInfo beginInfo{};
-		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		beginInfo.flags = 0; // Optional
-		beginInfo.pInheritanceInfo = nullptr; // Optional
-
-		_VK_CHECK(vkBeginCommandBuffer(m_commandBuffers[m_currentFrame], &beginInfo), "failed to begin recording command buffer!")
-
-			std::array<VkClearValue, 2> clearValues{};
-		clearValues[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
-		clearValues[1].depthStencil = { 1.0f, 0 };
-
-		VkRenderPassBeginInfo renderPassInfo{};
-		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassInfo.renderPass = m_pipelineBuilder->GetRenderPass();
-		renderPassInfo.framebuffer = m_frameBuffers[imageIndex];
-		renderPassInfo.renderArea.offset = { 0, 0 };
-		renderPassInfo.renderArea.extent = m_device->GetSwapchainExtent();
-		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-		renderPassInfo.pClearValues = clearValues.data();
-
-
-		vkCmdBeginRenderPass(m_commandBuffers[m_currentFrame], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-		vkCmdBindPipeline(m_commandBuffers[m_currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineBuilder->GetPipeline());
-
-		VkViewport viewport{};
-		viewport.x = 0.0f;
-		viewport.y = 0.0f;
-		viewport.width = static_cast<float>(m_device->GetSwapchainExtent().width);
-		viewport.height = static_cast<float>(m_device->GetSwapchainExtent().height);
-		viewport.minDepth = 0.0f;
-		viewport.maxDepth = 1.0f;
-		vkCmdSetViewport(m_commandBuffers[m_currentFrame], 0, 1, &viewport);
-
-		VkRect2D scissor{};
-		scissor.offset = { 0, 0 };
-		scissor.extent = m_device->GetSwapchainExtent();
-		vkCmdSetScissor(m_commandBuffers[m_currentFrame], 0, 1, &scissor);
 	}
 
 	void Renderer::DrawMesh(Mesh* mesh, uint32_t imageIndex, Material& material)
 	{
-		//RecordCommandBuffer(m_commandBuffers[m_currentFrame], imageIndex, mesh, material);
+		vkCmdBindPipeline(CommandBuffers.drawBuffers[m_currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineBuilder->GetPipeline());
 
 		VkBuffer vertexBuffers[] = { mesh->m_vertexBuffer };
 		VkDeviceSize offsets[] = { 0 };
-		vkCmdBindVertexBuffers(m_commandBuffers[m_currentFrame], 0, 1, vertexBuffers, offsets);
-		vkCmdBindIndexBuffer(m_commandBuffers[m_currentFrame], mesh->m_indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+		vkCmdBindVertexBuffers(CommandBuffers.drawBuffers[m_currentFrame], 0, 1, vertexBuffers, offsets);
+		vkCmdBindIndexBuffer(CommandBuffers.drawBuffers[m_currentFrame], mesh->m_indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
-		vkCmdBindDescriptorSets(m_commandBuffers[m_currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineBuilder->GetPipelineLayout(),
+		vkCmdBindDescriptorSets(CommandBuffers.drawBuffers[m_currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineBuilder->GetPipelineLayout(),
 			0, 1, &material.texture->m_descriptorSets[m_currentFrame], 0, nullptr);
 
-		vkCmdDrawIndexed(m_commandBuffers[m_currentFrame], static_cast<uint32_t>(mesh->Indices.size()),
+		vkCmdDrawIndexed(CommandBuffers.drawBuffers[m_currentFrame], static_cast<uint32_t>(mesh->Indices.size()),
 			1, 0, 0, 0);
 	}
-
-	void Renderer::EndDraw(uint32_t imageIndex)
-	{
-		vkCmdEndRenderPass(m_commandBuffers[m_currentFrame]);
-		_VK_CHECK(vkEndCommandBuffer(m_commandBuffers[m_currentFrame]), "failed to End command buffer!")
-	}
-
 
 	bool Renderer::BeginFrame(uint32_t& imageIndex)
 	{
@@ -243,12 +167,91 @@ namespace gns::rendering
 		}
 
 		vkResetFences(m_device->GetDevice(), 1, &m_inFlightFences[m_currentFrame]);
-		vkResetCommandBuffer(m_commandBuffers[m_currentFrame], 0);
+		vkResetCommandBuffer(CommandBuffers.drawBuffers[m_currentFrame], 0);
+
+		VkCommandBufferBeginInfo beginInfo{};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags = 0; // Optional
+		beginInfo.pInheritanceInfo = nullptr; // Optional
+		_VK_CHECK(vkBeginCommandBuffer(CommandBuffers.drawBuffers[m_currentFrame], &beginInfo), "failed to begin recording command buffer!");
+
+		VkViewport viewport{};
+		viewport.x = 0.0f;
+		viewport.y = 0.0f;
+		viewport.width = static_cast<float>(m_device->GetSwapchainExtent().width);
+		viewport.height = static_cast<float>(m_device->GetSwapchainExtent().height);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+		vkCmdSetViewport(CommandBuffers.drawBuffers[m_currentFrame], 0, 1, &viewport);
+
+		VkRect2D scissor{};
+		scissor.offset = { 0, 0 };
+		scissor.extent = m_device->GetSwapchainExtent();
+		vkCmdSetScissor(CommandBuffers.drawBuffers[m_currentFrame], 0, 1, &scissor);
+
+		std::array<VkClearValue, 2> clearValues{};
+		clearValues[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+		clearValues[1].depthStencil = { 1.0f, 0 };
+
+		VkRenderPassBeginInfo renderPassInfo{};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassInfo.renderPass = m_pipelineBuilder->GetRenderPass();
+		renderPassInfo.framebuffer = m_frameBuffers[imageIndex];
+		renderPassInfo.renderArea.offset = { 0, 0 };
+		renderPassInfo.renderArea.extent = m_device->GetSwapchainExtent();
+		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+		renderPassInfo.pClearValues = clearValues.data();
+		vkCmdBeginRenderPass(CommandBuffers.drawBuffers[m_currentFrame], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
 		return true;
+	}
+
+	void Renderer::BeginDraw(Material* material)
+	{
+		if (!m_isPipelineBound)
+			vkCmdBindPipeline(CommandBuffers.drawBuffers[m_currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineBuilder->GetPipeline());
+		
+		vkCmdBindDescriptorSets(CommandBuffers.drawBuffers[m_currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineBuilder->GetPipelineLayout(),
+			0, 1, &material->texture->m_descriptorSets[m_currentFrame], 0, nullptr);
+
+		m_isPipelineBound = true;
+	}
+
+	void Renderer::Submit(Mesh* mesh)
+	{
+
+		VkBuffer vertexBuffers[] = { mesh->m_vertexBuffer };
+		VkDeviceSize offsets[] = { 0 };
+		vkCmdBindVertexBuffers(CommandBuffers.drawBuffers[m_currentFrame], 0, 1, vertexBuffers, offsets);
+		vkCmdBindIndexBuffer(CommandBuffers.drawBuffers[m_currentFrame], mesh->m_indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+
+
+		vkCmdDrawIndexed(CommandBuffers.drawBuffers[m_currentFrame], static_cast<uint32_t>(mesh->Indices.size()),
+			1, 0, 0, 0);
+	}
+
+	void Renderer::GroupSubmit(std::vector<Mesh> meshes)
+	{
+
+		VkBuffer vertexBuffers[] = { meshes[0].m_vertexBuffer, meshes[1].m_vertexBuffer};
+		VkDeviceSize offsets[] = { 0, meshes[0].Vertices.size()};
+		vkCmdBindVertexBuffers(CommandBuffers.drawBuffers[m_currentFrame], 0, 1, vertexBuffers, offsets);
+		vkCmdBindIndexBuffer(CommandBuffers.drawBuffers[m_currentFrame], meshes[0].m_indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+		vkCmdBindIndexBuffer(CommandBuffers.drawBuffers[m_currentFrame], meshes[1].m_indexBuffer, meshes[0].Indices.size(), VK_INDEX_TYPE_UINT32);
+
+
+		vkCmdDrawIndexed(CommandBuffers.drawBuffers[m_currentFrame], static_cast<uint32_t>(meshes[0].Indices.size() + meshes[1].Indices.size()),
+			1, 0, 0, 0);
+	}
+
+	void Renderer::EndDraw(uint32_t imageIndex)
+	{
 	}
 
 	void Renderer::EndFrame(uint32_t& imageIndex)
 	{
+		vkCmdEndRenderPass(CommandBuffers.drawBuffers[m_currentFrame]);
+		_VK_CHECK(vkEndCommandBuffer(CommandBuffers.drawBuffers[m_currentFrame]), "failed to End command buffer!")
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
@@ -258,7 +261,7 @@ namespace gns::rendering
 		submitInfo.pWaitSemaphores = waitSemaphores;
 		submitInfo.pWaitDstStageMask = waitStages;
 		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &m_commandBuffers[m_currentFrame];
+		submitInfo.pCommandBuffers = &CommandBuffers.drawBuffers[m_currentFrame];
 
 		VkSemaphore signalSemaphores[] = { m_renderFinishedSemaphores[m_currentFrame] };
 		submitInfo.signalSemaphoreCount = 1;
@@ -288,6 +291,7 @@ namespace gns::rendering
 		}
 
 		m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+		m_isPipelineBound = false;
 	}
 
 	void Renderer::CreateFranmeBuffers()
@@ -326,15 +330,25 @@ namespace gns::rendering
 
 	void Renderer::CreateCommandBuffers()
 	{
-		m_commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+		CommandBuffers.drawBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocInfo.commandPool = m_commandPool;
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		allocInfo.commandBufferCount = static_cast<uint32_t>(m_commandBuffers.size());
+		allocInfo.commandBufferCount = static_cast<uint32_t>(CommandBuffers.drawBuffers.size());
 
-		_VK_CHECK(vkAllocateCommandBuffers(m_device->GetDevice(), &allocInfo, m_commandBuffers.data()),
+		_VK_CHECK(vkAllocateCommandBuffers(m_device->GetDevice(), &allocInfo, CommandBuffers.drawBuffers.data()),
+			"failed to allocate command buffers!")
+
+		CommandBuffers.compositeBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+
+		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		allocInfo.commandPool = m_commandPool;
+		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_SECONDARY;
+		allocInfo.commandBufferCount = static_cast<uint32_t>(CommandBuffers.compositeBuffers.size());
+
+		_VK_CHECK(vkAllocateCommandBuffers(m_device->GetDevice(), &allocInfo, CommandBuffers.compositeBuffers.data()),
 			"failed to allocate command buffers!")
 	}
 
@@ -423,6 +437,7 @@ namespace gns::rendering
 		vkDeviceWaitIdle(m_device->GetDevice());
 		CleanupSwapChain();
 		m_device->RecreateSwapChain(m_window);
+		m_pipelineBuilder->CleanupDepthResources();
 		m_pipelineBuilder->CreateDepthResources();
 		CreateFranmeBuffers();
 		m_frameBufferResized = false;
@@ -449,42 +464,6 @@ namespace gns::rendering
 		m_pipelineBuilder->CreateDescriptorSets(texture.m_imageView, texture.m_sampler, texture);
 	}
 
-	//OLD Function
-	void Renderer::CreateTexture_Internal()
-	{
-		/*
-		std::string path = "D:\\GenesisEngine\\Engine\\Assets\\Textures\\viking_room.png";
-		int texWidth, texHeight, texChannels;
-		stbi_uc* pixels = stbi_load(path.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-		VkDeviceSize imageSize = texWidth * texHeight * 4;
-
-		if (!pixels) {
-			LOG_ERROR("Failed to load image: " << path.c_str());
-		}
-
-		VkBuffer stagingBuffer;
-		VkDeviceMemory stagingBufferMemory;
-
-		BufferHelper::CreateBuffer(m_device, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			stagingBuffer, stagingBufferMemory);
-
-		void* data;
-		vkMapMemory(m_device->GetDevice(), stagingBufferMemory, 0, imageSize, 0, &data);
-		memcpy(data, pixels, static_cast<size_t>(imageSize));
-		vkUnmapMemory(m_device->GetDevice(), stagingBufferMemory);
-
-		stbi_image_free(pixels);
-		VulkanImage::CreateImage(m_device, texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, 
-			VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-			m_textureImage, m_textureImageMemory);
-		TransitionImageLayout(m_textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-		CopyBufferToImage(stagingBuffer, m_textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
-		TransitionImageLayout(m_textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-		vkDestroyBuffer(m_device->GetDevice(), stagingBuffer, nullptr);
-		vkFreeMemory(m_device->GetDevice(), stagingBufferMemory, nullptr);
-		*/
-	}
 
 	void Renderer::CreateTexture_Internal(Texture& texture)
 	{

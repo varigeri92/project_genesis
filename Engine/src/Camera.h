@@ -1,7 +1,13 @@
 #pragma once
 #include <glm/glm.hpp>
+namespace gns::core {
+	class CameraSystem;
+}
+
 class Camera
 {
+	friend class gns::core::CameraSystem;
+
 public:
 	Camera() = default;
 	Camera(float _near, float _far, float fov, float width, float height);

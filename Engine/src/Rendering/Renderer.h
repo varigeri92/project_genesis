@@ -58,9 +58,15 @@ namespace gns
 
 namespace gns::rendering
 {
+	class Texture;
 	class Renderer
 	{
 		friend class Window;
+		struct {
+			std::vector<VkCommandBuffer> drawBuffers;
+			std::vector<VkCommandBuffer> compositeBuffers;
+		}CommandBuffers;
+
 	public:
 		Renderer(Window* window);
 		~Renderer();
@@ -71,7 +77,8 @@ namespace gns::rendering
 		void CreateTexture(Texture& texture);
 		bool BeginFrame(uint32_t& imageIndex);
 		void DrawFrame();
-		void BeginDraw( uint32_t imageIndex);
+		void BeginDraw(Material* material);
+		void Submit(Mesh* mesh);
 		void DrawMesh(Mesh* mesh, uint32_t imageIndex, Material& material);
 		void EndDraw(uint32_t imageIndex);
 		void EndFrame(uint32_t& imageIndex);
@@ -79,7 +86,9 @@ namespace gns::rendering
 		void CreateIndexBuffer(Mesh* mesh);
 		void UpdateUniformBuffer(uint32_t currentImage, UniformBufferObject& ubo);
 		void DeleteMesh(Mesh* mesh);
+		void DeleteTexture(Texture* texture);
 
+		bool m_isPipelineBound = false;
 	private:
 		inline static bool m_frameBufferResized = false;
 		inline static bool m_frameBufferMinimized = false;
@@ -91,7 +100,7 @@ namespace gns::rendering
 
 		std::vector<VkFramebuffer> m_frameBuffers;
 		VkCommandPool m_commandPool;
-		std::vector<VkCommandBuffer> m_commandBuffers;
+		//std::vector<VkCommandBuffer> m_drawCommandBuffers;
 
 		std::vector<VkSemaphore> m_imageAvailableSemaphores;
 		std::vector<VkSemaphore> m_renderFinishedSemaphores;
@@ -111,8 +120,6 @@ namespace gns::rendering
 		void RecreateSwapChain();
 		void CleanupSwapChain();
 
-		
-		void CreateTexture_Internal();
 		void CreateTexture_Internal(Texture& texture);
 		void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 		void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);

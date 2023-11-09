@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <memory>
 #include "EnTT/entt.hpp"
 namespace gns::core
 {
@@ -15,11 +16,10 @@ namespace gns::core
 	public:
 		SceneManager() = default;
 		~SceneManager() = default;
-		Scene CreateScene();
-		Scene LoadScene();
+		std::shared_ptr<Scene> CreateScene(std::string name);
 		Scene GetScene();
-		void Update();
 	private:
+		std::vector<std::shared_ptr<Scene>> m_scenes;
 	};
 }
 
