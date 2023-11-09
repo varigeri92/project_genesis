@@ -225,22 +225,7 @@ namespace gns::rendering
 		vkCmdBindVertexBuffers(CommandBuffers.drawBuffers[m_currentFrame], 0, 1, vertexBuffers, offsets);
 		vkCmdBindIndexBuffer(CommandBuffers.drawBuffers[m_currentFrame], mesh->m_indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
-
 		vkCmdDrawIndexed(CommandBuffers.drawBuffers[m_currentFrame], static_cast<uint32_t>(mesh->Indices.size()),
-			1, 0, 0, 0);
-	}
-
-	void Renderer::GroupSubmit(std::vector<Mesh> meshes)
-	{
-
-		VkBuffer vertexBuffers[] = { meshes[0].m_vertexBuffer, meshes[1].m_vertexBuffer};
-		VkDeviceSize offsets[] = { 0, meshes[0].Vertices.size()};
-		vkCmdBindVertexBuffers(CommandBuffers.drawBuffers[m_currentFrame], 0, 1, vertexBuffers, offsets);
-		vkCmdBindIndexBuffer(CommandBuffers.drawBuffers[m_currentFrame], meshes[0].m_indexBuffer, 0, VK_INDEX_TYPE_UINT32);
-		vkCmdBindIndexBuffer(CommandBuffers.drawBuffers[m_currentFrame], meshes[1].m_indexBuffer, meshes[0].Indices.size(), VK_INDEX_TYPE_UINT32);
-
-
-		vkCmdDrawIndexed(CommandBuffers.drawBuffers[m_currentFrame], static_cast<uint32_t>(meshes[0].Indices.size() + meshes[1].Indices.size()),
 			1, 0, 0, 0);
 	}
 
