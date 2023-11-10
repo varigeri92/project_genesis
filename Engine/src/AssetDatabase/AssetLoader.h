@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
-#include "../Rendering/Renderer.h"
+#include <string>
+
 namespace gns
 {
 	struct Mesh;

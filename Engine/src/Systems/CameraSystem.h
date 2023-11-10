@@ -2,7 +2,7 @@
 #include "../Core/Components.h"
 #include "../Camera.h"
 
-namespace gns::core {
+namespace gns {
 	class CameraSystem
 	{
 		float m_cameraMoveSpeed = 3.f;

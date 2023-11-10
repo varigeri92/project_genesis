@@ -150,8 +150,8 @@ C:\VulkanSDK\1.3.261.1\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\defaul
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>C:\VulkanSDK\1.3.261.1\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\default.vert" -o "$(SolutionDir)Engine\Assets\Shaders\default.vert.spv"
-C:\VulkanSDK\1.3.261.1\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\default.frag" -o "$(SolutionDir)Engine\Assets\Shaders\default.frag.spv"</Command>
+      <Command>C:\VulkanSDK\1.3.261.0\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\default.vert" -o "$(SolutionDir)Engine\Assets\Shaders\default.vert.spv"
+C:\VulkanSDK\1.3.261.0\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\default.frag" -o "$(SolutionDir)Engine\Assets\Shaders\default.frag.spv"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -178,8 +178,8 @@ C:\VulkanSDK\1.3.261.1\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\defaul
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>C:\VulkanSDK\1.3.261.1\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\default.vert" -o "$(SolutionDir)Engine\Assets\Shaders\default.vert.spv"
-C:\VulkanSDK\1.3.261.1\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\default.frag" -o "$(SolutionDir)Engine\Assets\Shaders\default.frag.spv"</Command>
+      <Command>C:\VulkanSDK\1.3.261.0\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\default.vert" -o "$(SolutionDir)Engine\Assets\Shaders\default.vert.spv"
+C:\VulkanSDK\1.3.261.0\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\default.frag" -o "$(SolutionDir)Engine\Assets\Shaders\default.frag.spv"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -265,22 +265,15 @@ C:\VulkanSDK\1.3.261.1\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\defaul
     <ClInclude Include="API\EnTT\signal\fwd.hpp" />
     <ClInclude Include="API\EnTT\signal\sigh.hpp" />
     <ClInclude Include="src\Input.h" />
-    <ClInclude Include="src\Rendering\Material.h" />
     <ClInclude Include="src\AssetDatabase\AssetLoader.h" />
     <ClInclude Include="src\AssetDatabase\tiny_obj_loader.h" />
     <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\AssetDatabase\Guid.h" />
     <ClInclude Include="src\Core\Scene.h" />
     <ClInclude Include="src\mesh.h" />
-    <ClInclude Include="src\Rendering\BufferHelper.hpp" />
-    <ClInclude Include="src\Rendering\Renderer.h" />
-    <ClInclude Include="src\Rendering\PipelineBuilder.h" />
-    <ClInclude Include="src\Rendering\Device.h" />
     <ClInclude Include="src\Application.h" />
-    <ClInclude Include="src\Rendering\stb_image.h" />
     <ClInclude Include="src\Window\Window.h" />
     <ClInclude Include="src\Core\Time.h" />
-    <ClInclude Include="src\Rendering\Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="API\vklog.h" />
@@ -290,18 +283,11 @@ C:\VulkanSDK\1.3.261.1\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\defaul
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\InputDefines.h" />
-    <ClCompile Include="src\Rendering\Material.cpp" />
     <ClCompile Include="src\AssetDatabase\AssetLoader.cpp" />
-    <ClCompile Include="src\Random.cpp" />
     <ClCompile Include="src\Core\Scene.cpp" />
-    <ClCompile Include="src\Rendering\Renderer.cpp" />
-    <ClCompile Include="src\Rendering\PipelineBuilder.cpp" />
-    <ClCompile Include="src\Rendering\Device.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Engine.cpp" />
-    <ClCompile Include="src\Rendering\VulkanImage.h" />
     <ClCompile Include="src\Window\Window.cpp" />
-    <ClCompile Include="src\Rendering\Texture.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

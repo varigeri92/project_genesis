@@ -1,10 +1,20 @@
 #include "AssetLoader.h"
+
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+
 #include "Log.h"
 #include "tiny_obj_loader.h"
 #include "../mesh.h"
 
 namespace gns
 {
+    struct Vertex
+    {
+        glm::vec3 position;
+        glm::vec3 color;
+        glm::vec2 texCoord;
+    };
     std::shared_ptr<Mesh> AssetLoader::LoadMesh(std::string path)
     {
         tinyobj::attrib_t attrib;
@@ -41,7 +51,7 @@ namespace gns
                 indices.push_back(indices.size());
             }
         }
-        //fill vectors up here
-        return std::make_shared<Mesh>(std::move(vertices), std::move(indices));
+
+        return std::make_shared<Mesh>();
     }
 }

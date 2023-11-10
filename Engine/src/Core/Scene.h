@@ -2,7 +2,7 @@
 #include <string>
 #include <memory>
 #include "EnTT/entt.hpp"
-namespace gns::core
+namespace gns
 {
 	struct Scene
 	{

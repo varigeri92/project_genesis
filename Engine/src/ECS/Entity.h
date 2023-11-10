@@ -7,9 +7,9 @@
 namespace gns {
 	struct Entity
 	{
-		std::shared_ptr<core::Scene> scene;
+		std::shared_ptr<Scene> scene;
 		entt::entity entity;
-		Entity(entt::entity entity, std::shared_ptr<core::Scene> scene) :
+		Entity(entt::entity entity, std::shared_ptr<Scene> scene) :
 			entity	{ entity },
 			scene	{ scene } 
 		{};

@@ -1,5 +1,5 @@
 #include "Scene.h"
-namespace gns::core {
+namespace gns {
 
 	std::shared_ptr<Scene> SceneManager::CreateScene(std::string name)
 	{

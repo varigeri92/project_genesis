@@ -6,15 +6,10 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-namespace gns{
-	struct Mesh;
-}
-namespace gns::rendering {
-	struct Material;
-}
-
-namespace gns::core
+namespace gns
 {
+	struct Mesh;
+	struct Material;
 	struct EntityComponent
 	{
 		EntityComponent(std::string name) : name{ name } {};
@@ -65,8 +60,8 @@ namespace gns::core
 	};
 
 	struct MaterialComponent {
-		std::shared_ptr<gns::rendering::Material> material;
-		operator std::shared_ptr<gns::rendering::Material>() { return material; }
-		MaterialComponent(std::shared_ptr<gns::rendering::Material> material) : material{ material } {};
+		std::shared_ptr<Material> material;
+		operator std::shared_ptr<Material>() { return material; }
+		MaterialComponent(std::shared_ptr<Material> material) : material{ material } {};
 	};
 }

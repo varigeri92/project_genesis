@@ -1,7 +1,6 @@
 #include "Window.h"
 #include "vklog.h"
 #include "../Input.h"
-#include "../Rendering/Renderer.h"
 
 
 gns::Window::Window()
@@ -50,27 +49,6 @@ void gns::Window::DestroyWindow()
 
 bool gns::Window::PollEvents()
 {
-	/*
-	
-	while (SDL_PollEvent(&sdl_event)) {
-		if (sdl_event.type == SDL_QUIT) {
-			return true;
-		}
-		if(sdl_event.window.event == SDL_WINDOWEVENT_RESIZED)
-		{
-			gns::rendering::Renderer::m_frameBufferResized = true;
-		}
-		if(sdl_event.window.event == SDL_WINDOWEVENT_MINIMIZED)
-		{
-			gns::rendering::Renderer::m_frameBufferMinimized = true;
-		}
-		if (sdl_event.window.event == SDL_WINDOWEVENT_RESTORED)
-		{
-			gns::rendering::Renderer::m_frameBufferMinimized = false;
-		}
-	}
-	return false;
-	*/
 	return Input::ProcessInput(sdl_event);
 }
 

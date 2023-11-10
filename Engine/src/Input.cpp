@@ -1,8 +1,6 @@
 #include <SDL2/SDL.h>
 #include "Input.h"
-
 #include <string>
-
 #include "Log.h"
 #include "Window/Window.h"
 
