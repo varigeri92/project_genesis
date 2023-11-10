@@ -2,6 +2,11 @@
 #include "Core/Scene.h"
 #include "Core/Components.h"
 #include "Systems/CameraSystem.h"
+
+namespace gns::rendering
+{
+	class Renderer;
+}
 namespace gns
 {
 	class Window;
@@ -16,6 +21,7 @@ namespace gns
 		Window* m_window;
 		bool m_close;
 		CameraSystem* camerasystem = nullptr;
+		rendering::Renderer* m_renderer;
 		void CloseApplication();
 		void Render(std::shared_ptr<Scene> scene);
 		void UpdateSystems();

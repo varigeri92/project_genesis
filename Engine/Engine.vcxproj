@@ -185,6 +185,12 @@ C:\VulkanSDK\1.3.261.0\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\defaul
   <ItemGroup>
     <ClInclude Include="API\GenAPI.h" />
     <ClInclude Include="API\Log.h" />
+    <ClInclude Include="src\Rendering\PipelineBuilder.h" />
+    <ClInclude Include="src\Rendering\Helpers\Buffer.h" />
+    <ClInclude Include="src\Rendering\Device.h" />
+    <ClInclude Include="src\Rendering\Renderer.h" />
+    <ClInclude Include="src\Rendering\rendererfwd.h" />
+    <ClInclude Include="src\Rendering\rendererInclude.h" />
     <ClInclude Include="src\Systems\CameraSystem.h" />
     <ClInclude Include="src\ECS\ECSManager.h" />
     <ClInclude Include="src\ECS\Entity.h" />
@@ -277,6 +283,10 @@ C:\VulkanSDK\1.3.261.0\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\defaul
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="API\vklog.h" />
+    <ClCompile Include="src\Rendering\PipelineBuilder.cpp" />
+    <ClCompile Include="src\Rendering\Helpers\Buffer.cpp" />
+    <ClCompile Include="src\Rendering\Device.cpp" />
+    <ClCompile Include="src\Rendering\Renderer.cpp" />
     <ClCompile Include="src\Systems\CameraSystem.cpp" />
     <ClCompile Include="src\ECS\ECSManager.cpp" />
     <ClCompile Include="src\ECS\Entity.cpp" />

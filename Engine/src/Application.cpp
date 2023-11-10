@@ -5,11 +5,13 @@
 #include "Core/Scene.h"
 #include "Log.h"
 
+#include "Rendering/Renderer.h";
+
 gns::Application::Application()
 {
 	m_window = new Window();
 	m_close = false;
-
+	m_renderer = new rendering::Renderer(m_window);
 	/*Testing Randoms*/
 	#pragma region Random_Test
 	gns::core::guid _guid = gns::core::Guid::GetNewGuid();
@@ -38,6 +40,7 @@ gns::Application::Application()
 
 gns::Application::~Application()
 {
+	delete(m_renderer);
 	delete(m_window);
 }
 

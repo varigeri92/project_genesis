@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace gns
 {
@@ -9,5 +10,7 @@ namespace gns
 	{
 	public:
 		static std::shared_ptr<Mesh> LoadMesh(std::string path);
+		static std::vector<char> LoadFile(std::string path);
+		static void* LoadImage(std::string path);
 	};
 }
