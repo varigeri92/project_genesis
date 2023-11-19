@@ -6,10 +6,14 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-namespace gns
+namespace gns::rendering
 {
 	struct Mesh;
 	struct Material;
+}
+using namespace gns::rendering;
+namespace gns
+{
 	struct EntityComponent
 	{
 		EntityComponent(std::string name) : name{ name } {};

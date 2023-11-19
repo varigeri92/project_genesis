@@ -1,20 +1,13 @@
 #include "AssetLoader.h"
-
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-
+#include <fstream>
 #include "Log.h"
 #include "tiny_obj_loader.h"
-#include "../mesh.h"
+#include <glm/glm.hpp>
+#include "../Rendering/DataObjects/Mesh.h"
 
+using namespace gns::rendering;
 namespace gns
 {
-    struct Vertex
-    {
-        glm::vec3 position;
-        glm::vec3 color;
-        glm::vec2 texCoord;
-    };
     std::shared_ptr<Mesh> AssetLoader::LoadMesh(std::string path)
     {
         tinyobj::attrib_t attrib;
@@ -27,31 +20,65 @@ namespace gns
             LOG_ERROR(warn + err);
         }
 
-
-        std::vector<Vertex> vertices = {};
+        auto mesh = std::make_shared<Mesh>();
 	    std::vector<uint32_t> indices = {};
-        for (const auto& shape : shapes) {
-            for (const auto& index : shape.mesh.indices) {
-                gns::Vertex vertex{};
+        for (size_t s = 0; s < shapes.size(); s++) {
+            // Loop over faces(polygon)
+            size_t index_offset = 0;
+            for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
 
-                vertex.position = {
-                    attrib.vertices[3 * index.vertex_index + 0],
-                    attrib.vertices[3 * index.vertex_index + 1],
-                    attrib.vertices[3 * index.vertex_index + 2]
-                };
+                //hardcode loading to triangles
+                int fv = 3;
 
-                vertex.texCoord = {
-				    attrib.texcoords[2 * index.texcoord_index + 0],
-				    1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
-                };
+                // Loop over vertices in the face.
+                for (size_t v = 0; v < fv; v++) {
+                    // access to vertex
+                    tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
 
-                vertex.color = { 1.0f, 1.0f, 1.0f };
+                    //vertex position
+                    tinyobj::real_t vx = attrib.vertices[3 * idx.vertex_index + 0];
+                    tinyobj::real_t vy = attrib.vertices[3 * idx.vertex_index + 1];
+                    tinyobj::real_t vz = attrib.vertices[3 * idx.vertex_index + 2];
+                    //vertex normal
+                    tinyobj::real_t nx = attrib.normals[3 * idx.normal_index + 0];
+                    tinyobj::real_t ny = attrib.normals[3 * idx.normal_index + 1];
+                    tinyobj::real_t nz = attrib.normals[3 * idx.normal_index + 2];
 
-                vertices.push_back(vertex);
-                indices.push_back(indices.size());
+                    //copy it into our vertex
+                    Vertex new_vert;
+                    new_vert.position.x = vx;
+                    new_vert.position.y = vy;
+                    new_vert.position.z = vz;
+
+                    new_vert.normal.x = nx;
+                    new_vert.normal.y = ny;
+                    new_vert.normal.z = nz;
+
+                    //we are setting the vertex color as the vertex normal. This is just for display purposes
+                    new_vert.color = new_vert.normal;
+
+
+                    mesh->_vertices.push_back(new_vert);
+                }
+                index_offset += fv;
             }
         }
+        return mesh;
+    }
 
-        return std::make_shared<Mesh>();
+    std::vector<uint32_t> AssetLoader::LoadShader(std::string path)
+    {
+        std::ifstream file(path, std::ios::ate | std::ios::binary);
+        if (!file.is_open()) {
+            LOG_ERROR("Failed To open File: " << path);
+            return {};
+        }
+        size_t fileSize = (size_t)file.tellg();
+        std::vector<uint32_t> buffer(fileSize / sizeof(uint32_t));
+        file.seekg(0);
+        file.read((char*)buffer.data(), fileSize);
+        file.close();
+        return buffer;
+
     }
 }

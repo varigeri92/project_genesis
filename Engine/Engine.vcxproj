@@ -138,6 +138,8 @@ C:\VulkanSDK\1.3.261.1\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\defaul
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.261.1\Include;C:\VulkanSDK\1.3.261.0\Include;$(ProjectDir)API;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>core.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,8 +152,15 @@ C:\VulkanSDK\1.3.261.1\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\defaul
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>C:\VulkanSDK\1.3.261.0\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\default.vert" -o "$(SolutionDir)Engine\Assets\Shaders\default.vert.spv"
-C:\VulkanSDK\1.3.261.0\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\default.frag" -o "$(SolutionDir)Engine\Assets\Shaders\default.frag.spv"</Command>
+      <Command>@echo off
+set VULKAN_SDK=C:\VulkanSDK\1.3.261.0\Bin
+set SHADER_DIR=$(SolutionDir)Engine\Assets\Shaders\
+
+for %%f in (%SHADER_DIR%*.frag %SHADER_DIR%*.vert) do (
+    "%VULKAN_SDK%\glslc.exe" "%%f" -o "%%f.spv"
+)
+
+echo Shader compilation complete.</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -164,6 +173,8 @@ C:\VulkanSDK\1.3.261.0\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\defaul
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.261.1\Include;C:\VulkanSDK\1.3.261.0\Include;$(ProjectDir)API;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>core.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -178,21 +189,34 @@ C:\VulkanSDK\1.3.261.0\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\defaul
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>C:\VulkanSDK\1.3.261.0\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\default.vert" -o "$(SolutionDir)Engine\Assets\Shaders\default.vert.spv"
-C:\VulkanSDK\1.3.261.0\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\default.frag" -o "$(SolutionDir)Engine\Assets\Shaders\default.frag.spv"</Command>
+      <Command>@echo off
+set VULKAN_SDK=C:\VulkanSDK\1.3.261.0\Bin
+set SHADER_DIR=$(SolutionDir)Engine\Assets\Shaders\
+
+for %%f in (%SHADER_DIR%*.frag %SHADER_DIR%*.vert) do (
+    "%VULKAN_SDK%\glslc.exe" "%%f" -o "%%f.spv"
+)
+
+echo Shader compilation complete.</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="API\GenAPI.h" />
+    <ClInclude Include="API\core.h" />
+    <ClInclude Include="API\gnsAPI.h" />
     <ClInclude Include="API\Log.h" />
+    <ClInclude Include="src\Rendering\DataObjects\DisposableVkObject.h" />
+    <ClInclude Include="src\Rendering\DataObjects\Material.h" />
+    <ClInclude Include="src\Rendering\DataObjects\Mesh.h" />
+    <ClInclude Include="src\Rendering\Helpers\PipelineHelper.h" />
     <ClInclude Include="src\Rendering\PipelineBuilder.h" />
     <ClInclude Include="src\Rendering\Helpers\Buffer.h" />
     <ClInclude Include="src\Rendering\Device.h" />
     <ClInclude Include="src\Rendering\Renderer.h" />
     <ClInclude Include="src\Rendering\rendererfwd.h" />
     <ClInclude Include="src\Rendering\rendererInclude.h" />
+    <ClInclude Include="src\Rendering\vkb\VkBootstrap.h" />
+    <ClInclude Include="src\Rendering\vkb\VkBootstrapDispatch.h" />
     <ClInclude Include="src\Systems\CameraSystem.h" />
-    <ClInclude Include="src\ECS\ECSManager.h" />
     <ClInclude Include="src\ECS\Entity.h" />
     <ClInclude Include="src\AssetDatabase\path.h" />
     <ClInclude Include="src\Camera.h" />
@@ -276,28 +300,33 @@ C:\VulkanSDK\1.3.261.0\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\defaul
     <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\AssetDatabase\Guid.h" />
     <ClInclude Include="src\Core\Scene.h" />
-    <ClInclude Include="src\mesh.h" />
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\Window\Window.h" />
     <ClInclude Include="src\Core\Time.h" />
+    <ClInclude Include="src\Rendering\Helpers\VkInitializer.h" />
+    <ClInclude Include="src\ECS\SystemBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="API\vklog.h" />
+    <ClCompile Include="src\Rendering\DataObjects\Material.cpp" />
+    <ClCompile Include="src\Rendering\DataObjects\Mesh.cpp" />
+    <ClCompile Include="src\Rendering\Helpers\PipelineHelper.cpp" />
     <ClCompile Include="src\Rendering\PipelineBuilder.cpp" />
     <ClCompile Include="src\Rendering\Helpers\Buffer.cpp" />
     <ClCompile Include="src\Rendering\Device.cpp" />
     <ClCompile Include="src\Rendering\Renderer.cpp" />
+    <ClCompile Include="src\Rendering\vkb\VkBootstrap.cpp" />
     <ClCompile Include="src\Systems\CameraSystem.cpp" />
-    <ClCompile Include="src\ECS\ECSManager.cpp" />
     <ClCompile Include="src\ECS\Entity.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Input.cpp" />
-    <ClCompile Include="src\InputDefines.h" />
     <ClCompile Include="src\AssetDatabase\AssetLoader.cpp" />
     <ClCompile Include="src\Core\Scene.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\Window\Window.cpp" />
+    <ClCompile Include="src\Rendering\Helpers\VkInitializer.cpp" />
+    <ClCompile Include="src\ECS\SystemBase.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

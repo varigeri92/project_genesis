@@ -3,13 +3,14 @@
 #include <EnTT/entt.hpp>
 #include <memory>
 #include "../Core/Scene.h"
+#include "../Core/Components.h"
 
 namespace gns {
 	struct Entity
 	{
-		std::shared_ptr<Scene> scene;
+		Scene* scene;
 		entt::entity entity;
-		Entity(entt::entity entity, std::shared_ptr<Scene> scene) :
+		Entity(entt::entity entity, Scene* scene) :
 			entity	{ entity },
 			scene	{ scene } 
 		{};
@@ -35,6 +36,11 @@ namespace gns {
 		{
 			component = scene->registry.get<T>(entity);
 			return true;
+		}
+
+		Transform& GetTransform()
+		{
+			return GetComponent<Transform>();
 		}
 	};
 }

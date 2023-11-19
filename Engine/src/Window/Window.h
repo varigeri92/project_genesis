@@ -17,8 +17,8 @@ namespace gns
 		HWND hwndHandle;
 		HINSTANCE hinstance;
 	private:
-		uint32_t WINDOW_WIDTH = 800;
-		uint32_t WINDOW_HEIGHT = 600;
+		uint32_t WINDOW_WIDTH = 1700;
+		uint32_t WINDOW_HEIGHT = 900;
 
 		Sint32 width = 800;
 		Sint32 height = 600;

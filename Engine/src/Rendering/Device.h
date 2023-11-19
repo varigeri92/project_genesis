@@ -1,7 +1,10 @@
 #pragma once
-#include <optional>
 #include <vulkan/vulkan.h>
+#include <vma/vk_mem_alloc.h>
+#include "vkb/VkBootstrap.h"
 #include <vector>
+#include "Helpers/Buffer.h"
+
 
 namespace gns
 {
@@ -10,24 +13,26 @@ namespace gns
 
 namespace gns::rendering
 {
+	struct Mesh;
+	struct Material;
 	class Renderer;
-	struct QueueFamilyIndices {
-		std::optional<uint32_t> graphicsFamily;
-		std::optional<uint32_t> presentFamily;
+	class PipelineBuilder;
 
-		bool IsComplete() const {
-			return graphicsFamily.has_value() && presentFamily.has_value();
-		}
-	};
+	typedef struct FrameData {
+		VkSemaphore _presentSemaphore;
+		VkSemaphore _renderSemaphore;
+		VkFence _renderFence;
 
-	struct SwapChainSupportDetails {
-		VkSurfaceCapabilitiesKHR capabilities;
-		std::vector<VkSurfaceFormatKHR> formats;
-		std::vector<VkPresentModeKHR> presentModes;
-	};
+		VkCommandPool _commandPool;
+		VkCommandBuffer _mainCommandBuffer;
+	} FrameData;
+
 	class Device
 	{
+		friend struct Material;
+		friend struct Mesh;
 		friend class Renderer;
+		friend class PipelineBuilder;
 	public:
 		Device() = delete;
 		Device(Window* window);
@@ -35,57 +40,58 @@ namespace gns::rendering
 		Device operator=(const Device& other) = delete;
 
 	private:
-		
-		bool VALIDATION_ENABLED = true;
-		VkDebugUtilsMessengerEXT debugMessenger;
-
-		std::vector<const char*> m_layers = {};
-		std::vector<const char*> m_deviceExtensions = {
-			VK_KHR_SWAPCHAIN_EXTENSION_NAME
-		};
-
-		VkInstance m_instance;
-
-		VkSurfaceKHR m_surface;
-
-		VkPhysicalDevice m_physicalDevice;
-		VkPhysicalDeviceProperties m_deviceProperties{};
-		VkDevice m_device;
-
-		QueueFamilyIndices m_indices;
-
-		VkQueue m_graphicsQueue;
-		VkQueue m_presentQueue;
+		VmaAllocator m_allocator;
 
 		uint32_t m_imageCount;
-		VkSwapchainKHR  m_swapChain;
-		std::vector<VkImage> m_swapChainImages;
-		std::vector<VkImageView> m_swapChainImageViews;
-		VkFormat m_swapChainImageFormat;
-		VkExtent2D m_swapChainExtent;
+		uint32_t m_imageIndex;
+		vkb::Instance m_vkb_instance;
+		VkInstance m_instance;
+		VkSurfaceKHR m_surface;
 
-		void CreateInstance(Window* window);
-		std::vector<const char*> GetRequiredExtensions(Window* window) const;
-		void SetupDebugMessenger();
+		vkb::Device m_vkb_device;
+		VkPhysicalDevice m_physicalDevice;
+		VkDevice m_device;
+
+		VkQueue m_graphicsQueue;
+		uint32_t m_graphicsFamilyIndex;
+		VkQueue m_transferQueue;
+		uint32_t m_transferFamilyIndex;
+		VkQueue m_presentQueue;
+		uint32_t m_presentFamilyIndex;
+		VkQueue m_computeQueue;
+		uint32_t m_computeFamilyIndex;
+
+
+		vkb::Swapchain m_vkb_swapchain;
+		VkSwapchainKHR m_swapchain;
+		VkFormat m_swapchainFormat;
+		std::vector<VkImageView> m_imageViews;
+
+		VkImageView _depthImageView;
+		VulkanImage _depthImage;
+
+		std::vector<FrameData> m_frames;
+
+		VkRenderPass m_renderPass;
+		std::vector<VkFramebuffer> m_frameBuffers;
+
+		//the format for the depth image
+		VkFormat m_depthFormat;
+
+
+		bool InitVulkan(Window* window);
 		void CreateSurface(Window* window);
+		void CreateSwapchain(Window* window);
+		void RebuildSwapchain();
 
-		void PickPhysicalDevice();
-		bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
-		void FindQueueFamilies(VkPhysicalDevice device);
-		SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
-		VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-		VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
-		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, Window* window);
+		void CreateCommandPool();
 
-		bool IsDeviceSuitable(VkPhysicalDevice device);
-		uint32_t EvaluateDevice(VkPhysicalDevice physical_device);
+		void InitDefaultRenderPass();
 
-		bool CheckLayerSupport();
-
-		void CreateLogicalDevice();
-		void CreateSwapChain(Window* window);
-		void CreateImageViews();
-		void RecreateSwapChain(Window* window);
+		void InitFrameBuffers();
+		void InitSyncStructures();
+		void EndFrame();
+		FrameData& GetCurrentFrame();
 	};
 }
 
