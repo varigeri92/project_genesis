@@ -5,6 +5,7 @@
 #include <vector>
 #include "Helpers/Buffer.h"
 
+#include "glm/glm.hpp"
 
 namespace gns
 {
@@ -13,10 +14,17 @@ namespace gns
 
 namespace gns::rendering
 {
+	constexpr size_t MAX_OBJECTS = 1000;
 	struct Mesh;
 	struct Material;
 	class Renderer;
 	class PipelineBuilder;
+
+	struct alignas(64) GPUCameraData {
+		glm::mat4 view;
+		glm::mat4 proj;
+		glm::mat4 viewproj;
+	};
 
 	typedef struct FrameData {
 		VkSemaphore _presentSemaphore;
@@ -25,7 +33,26 @@ namespace gns::rendering
 
 		VkCommandPool _commandPool;
 		VkCommandBuffer _mainCommandBuffer;
+
+		Buffer _cameraBuffer;
+		VkDescriptorSet _globalDescriptor;
+
+		Buffer _objectBuffer;
+		VkDescriptorSet _objectDescriptor;
+
 	} FrameData;
+
+	struct alignas(64) GPUSceneData {
+		glm::vec4 fogColor; // w is for exponent
+		glm::vec4 fogDistances; //x for min, y for max, zw unused.
+		glm::vec4 ambientColor;
+		glm::vec4 sunlightDirection; //w for sun power
+		glm::vec4 sunlightColor;
+	};
+
+	struct GPUObjectData {
+		glm::mat4 modelMatrix;
+	};
 
 	class Device
 	{
@@ -33,6 +60,7 @@ namespace gns::rendering
 		friend struct Mesh;
 		friend class Renderer;
 		friend class PipelineBuilder;
+		friend class Buffer;
 	public:
 		Device() = delete;
 		Device(Window* window);
@@ -50,6 +78,7 @@ namespace gns::rendering
 
 		vkb::Device m_vkb_device;
 		VkPhysicalDevice m_physicalDevice;
+		VkPhysicalDeviceProperties m_gpuProperties;
 		VkDevice m_device;
 
 		VkQueue m_graphicsQueue;
@@ -78,6 +107,13 @@ namespace gns::rendering
 		//the format for the depth image
 		VkFormat m_depthFormat;
 
+		VkDescriptorSetLayout m_globalSetLayout;
+		VkDescriptorSetLayout m_objectSetLayout;
+		VkDescriptorPool m_descriptorPool;
+
+		GPUSceneData m_sceneParameters = {};
+		Buffer m_sceneParameterBuffer;
+
 
 		bool InitVulkan(Window* window);
 		void CreateSurface(Window* window);
@@ -90,6 +126,8 @@ namespace gns::rendering
 
 		void InitFrameBuffers();
 		void InitSyncStructures();
+		void InitDescriptors();
+		size_t PadUniformBufferSize(size_t originalSize);
 		void EndFrame();
 		FrameData& GetCurrentFrame();
 	};

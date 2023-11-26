@@ -3,6 +3,7 @@
 namespace gns::rendering
 {
 	class Device;
+
 	class Disposeable
 	{
 	public:

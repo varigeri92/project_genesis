@@ -94,11 +94,15 @@ void Renderer::CreatePipelineForMaterial(std::shared_ptr<Material> material)
 	push_constant.size = sizeof(MeshPushConstants);
 	push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-	VkPipelineLayoutCreateInfo mesh_pipeline_layout_info = PipelineLayoutCreateInfo();
-	mesh_pipeline_layout_info.pPushConstantRanges = &push_constant;
-	mesh_pipeline_layout_info.pushConstantRangeCount = 1;
+	std::vector<VkDescriptorSetLayout> setLayouts = {m_device->m_globalSetLayout };
 
-	_VK_CHECK(vkCreatePipelineLayout(m_device->m_device, &mesh_pipeline_layout_info, nullptr, &material->pipelineLayout),
+	VkPipelineLayoutCreateInfo layoutInfo = PipelineLayoutCreateInfo();
+	layoutInfo.pPushConstantRanges = &push_constant;
+	layoutInfo.pushConstantRangeCount = 1;
+	layoutInfo.setLayoutCount = static_cast<uint32_t>(setLayouts.size());
+	layoutInfo.pSetLayouts = setLayouts.data();
+
+	_VK_CHECK(vkCreatePipelineLayout(m_device->m_device, &layoutInfo, nullptr, &material->pipelineLayout),
 		"Failed To create pipeline Layout");
 
 	pipelineBuilder._pipelineLayout = material->pipelineLayout;
@@ -116,12 +120,12 @@ void Renderer::DisposeObject(std::shared_ptr<Disposeable> object)
 
 void Renderer::BeginFrame(uint32_t& swapchainImageIndex)
 {
+	m_frameNumber++;
 	//wait until the GPU has finished rendering the last frame. Timeout of 1 second
 	_VK_CHECK(vkWaitForFences(m_device->m_device, 1, &m_device->GetCurrentFrame()._renderFence, true, 1000000000), "--");
 	_VK_CHECK(vkResetFences(m_device->m_device, 1, &m_device->GetCurrentFrame()._renderFence), "--");
 
 	//request image from the swapchain, one second timeout
-	swapchainImageIndex;
 	_VK_CHECK(
 		vkAcquireNextImageKHR(m_device->m_device, m_device->m_swapchain, 1000000000, m_device->GetCurrentFrame()._presentSemaphore, nullptr, &swapchainImageIndex), "XXX");
 
@@ -169,12 +173,29 @@ void Renderer::BeginFrame(uint32_t& swapchainImageIndex)
 	vkCmdBeginRenderPass(m_device->GetCurrentFrame()._mainCommandBuffer, &rpInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
-void Renderer::Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material)
+void Renderer::Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, int index)
 {
-	vkCmdBindPipeline(m_device->GetCurrentFrame()._mainCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, material->pipeline);
+	if(m_material_ptr != material)
+	{
+		m_material_ptr = material;
+		vkCmdBindPipeline(m_device->GetCurrentFrame()._mainCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, material->pipeline);
+		uint32_t uniform_offset = m_device->PadUniformBufferSize(sizeof(GPUSceneData)) * m_device->m_imageIndex;
+		vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer, 
+			VK_PIPELINE_BIND_POINT_GRAPHICS, material->pipelineLayout, 0, 1, 
+			&m_device->GetCurrentFrame()._globalDescriptor, 1, &uniform_offset);
+		/*
+		//object data descriptor
+		vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer, 
+			VK_PIPELINE_BIND_POINT_GRAPHICS, material->pipelineLayout, 1, 1, 
+			&m_device->GetCurrentFrame()._objectDescriptor, 0, nullptr);
+		*/
+	}
+
 	VkDeviceSize offset = 0;
-	vkCmdBindVertexBuffers(m_device->GetCurrentFrame()._mainCommandBuffer, 0, 1, &mesh->_vertexBuffer._buffer, &offset);
-	vkCmdDraw(m_device->GetCurrentFrame()._mainCommandBuffer, mesh->_vertices.size(), 1, 0, 0);
+	vkCmdBindVertexBuffers(m_device->GetCurrentFrame()._mainCommandBuffer, 
+		0, 1, &mesh->_vertexBuffer._buffer, &offset);
+	vkCmdDraw(m_device->GetCurrentFrame()._mainCommandBuffer, 
+		mesh->_vertices.size(), 1, 0, 0);
 }
 
 void Renderer::EndFrame(uint32_t& swapchainImageIndex)
@@ -225,7 +246,6 @@ void Renderer::EndFrame(uint32_t& swapchainImageIndex)
 
 	_VK_CHECK(vkQueuePresentKHR(m_device->m_graphicsQueue, &presentInfo), "Failed to present");
 
-	m_frameNumber = (m_frameNumber++) % FRAME_OVERLAP;
 }
 
 VkShaderModule Renderer::CreateShaderModule(std::vector<uint32_t> buffer)
@@ -238,7 +258,6 @@ VkShaderModule Renderer::CreateShaderModule(std::vector<uint32_t> buffer)
 	createInfo.pCode = buffer.data();
 
 	VkShaderModule shaderModule;
-
 	if (vkCreateShaderModule(m_device->m_device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
 		return VK_NULL_HANDLE;
 	}
@@ -249,20 +268,44 @@ VkShaderModule Renderer::CreateShaderModule(std::vector<uint32_t> buffer)
 void Renderer::UpdatePushConstant( glm::mat4 modelMatrix, std::shared_ptr<Material> material)
 {
 	MeshPushConstants push_constants = {};
-	glm::vec3 camPos = { 0.f,-6.f,-10.f };
-
+	glm::vec3 camPos = { 0.f,-6.f,-20.f };
 	glm::mat4 view = glm::translate(glm::mat4(1.f), camPos);
-	//camera projection
-	glm::mat4 projection = glm::perspective(glm::radians(70.f), 1700.f / 900.f, 0.1f, 200.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(70.f), 1700.f / 900.f, 0.1f, 1000.0f);
 	projection[1][1] *= -1;
-	//model rotation
-	m_rotation += Time::GetDelta() * m_rotationSpeed;
-	//calculate final mesh matrix
-	glm::mat4 mesh_matrix = projection * view * modelMatrix;
 
-	push_constants.render_matrix = mesh_matrix;
+	glm::mat4 matrix = projection * view;
+
+	push_constants.model_matrix = modelMatrix;
+	push_constants.camera_matrix = matrix;
 	vkCmdPushConstants(m_device->GetCurrentFrame()._mainCommandBuffer, material->pipelineLayout,
-		VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MeshPushConstants), 
-		&push_constants);
+		VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MeshPushConstants), &push_constants);
+}
+
+void Renderer::UpdateGlobalUbo(GPUCameraData src_bufferData)
+{
+	void* data;
+	vmaMapMemory(m_device->m_allocator, m_device->GetCurrentFrame()._cameraBuffer._allocation, &data);
+	memcpy(data, &src_bufferData, sizeof(GPUCameraData));
+	vmaUnmapMemory(m_device->m_allocator, m_device->GetCurrentFrame()._cameraBuffer._allocation);
+}
+
+void Renderer::UpdateSceneDataUbo()
+{
+	float framed = (m_frameNumber / 120.f);
+	m_device->m_sceneParameters.ambientColor = { sin(framed),0,cos(framed),1 };
+	int frameIndex = m_frameNumber % m_device->m_imageCount;
+	char* sceneData;
+	vmaMapMemory(m_device->m_allocator, m_device->m_sceneParameterBuffer._allocation, (void**)&sceneData);
+	sceneData += m_device->PadUniformBufferSize(sizeof(GPUSceneData)) * frameIndex;
+	memcpy(sceneData, &m_device->m_sceneParameters, sizeof(GPUSceneData));
+	vmaUnmapMemory(m_device->m_allocator, m_device ->m_sceneParameterBuffer._allocation);
+}
+
+void Renderer::UpdateObjectData(void* src_data, size_t size)
+{
+	void* objectData;
+	vmaMapMemory(m_device->m_allocator, m_device->GetCurrentFrame()._objectBuffer._allocation, &objectData);
+	memcpy(objectData, src_data, size);
+	vmaUnmapMemory(m_device->m_allocator, m_device->GetCurrentFrame()._objectBuffer._allocation);
 }
 }

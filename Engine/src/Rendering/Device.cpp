@@ -49,6 +49,9 @@ namespace gns::rendering
         allocatorInfo.instance = m_instance;
         vmaCreateAllocator(&allocatorInfo, &m_allocator);
 
+        m_gpuProperties = m_vkb_device.physical_device.properties;
+        LOG_INFO("The GPU has a minimum buffer alignment of " << m_gpuProperties.limits.minUniformBufferOffsetAlignment);
+
         CreateSwapchain(window);
         m_frames.resize(m_imageCount);
 
@@ -56,24 +59,30 @@ namespace gns::rendering
         InitDefaultRenderPass();
         InitFrameBuffers();
         InitSyncStructures();
+        InitDescriptors();
         
 	}
 
 	Device::~Device()
 	{
         LOG_INFO("Clenup Device");
+        vkDestroyDescriptorPool(m_device, m_descriptorPool, nullptr);
+        vkDestroyDescriptorSetLayout(m_device, m_globalSetLayout, nullptr);
+        vkDestroyDescriptorSetLayout(m_device, m_objectSetLayout, nullptr);
         vkDestroyRenderPass(m_device, m_renderPass, nullptr);
         for (int i = 0; i < m_frameBuffers.size(); i++) {
             vkDestroyFramebuffer(m_device, m_frameBuffers[i], nullptr);
             vkDestroyImageView(m_device, m_imageViews[i], nullptr);
         }
+        m_sceneParameterBuffer.Dispose(this);
         for(size_t i = 0; i<m_imageCount; i++)
         {
-	        
 	        vkDestroyFence(m_device, m_frames[i]._renderFence, nullptr);
 	        vkDestroySemaphore(m_device, m_frames[i]._renderSemaphore, nullptr);
 	        vkDestroySemaphore(m_device, m_frames[i]._presentSemaphore, nullptr);
     		vkDestroyCommandPool(m_device, m_frames[i]._commandPool, nullptr);
+            m_frames[i]._cameraBuffer.Dispose(this);
+            m_frames[i]._objectBuffer.Dispose(this);
         }
 
     	vkDestroyImageView(m_device, _depthImageView, nullptr);
@@ -110,7 +119,11 @@ namespace gns::rendering
         }
         m_physicalDevice = phys_ret.value();
         vkb::DeviceBuilder device_builder{ phys_ret.value() };
-        // automatically propagate needed data from instance & physical device
+        VkPhysicalDeviceShaderDrawParametersFeatures shader_draw_parameters_features = {};
+        shader_draw_parameters_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES;
+        shader_draw_parameters_features.pNext = nullptr;
+        shader_draw_parameters_features.shaderDrawParameters = VK_TRUE;
+        vkb::Device vkbDevice = device_builder.add_pNext(&shader_draw_parameters_features).build().value();
         auto dev_ret = device_builder.build();
         if (!dev_ret) {
             LOG_ERROR("Failed to create Vulkan device. Error: " << dev_ret.error().message());
@@ -202,7 +215,7 @@ namespace gns::rendering
         vmaCreateImage(m_allocator, &dimg_info, &dimg_allocinfo, &_depthImage._image, &_depthImage._allocation, nullptr);
 
         //build an image-view for the depth image to use for rendering
-        VkImageViewCreateInfo dview_info = imageview_create_info(m_depthFormat, _depthImage._image, VK_IMAGE_ASPECT_DEPTH_BIT);
+        VkImageViewCreateInfo dview_info = ImageViewCreateInfo(m_depthFormat, _depthImage._image, VK_IMAGE_ASPECT_DEPTH_BIT);
 
         _VK_CHECK(vkCreateImageView(m_device, &dview_info, nullptr, &_depthImageView), "Failed to create ImageView!");
     }
@@ -228,12 +241,11 @@ namespace gns::rendering
     void Device::CreateCommandPool()
     {
         VkCommandPoolCreateInfo commandPoolInfo = CommandPoolCreateInfo(m_graphicsFamilyIndex, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
-        for (int i = 0; i < m_imageCount; i++)
+        for (uint32_t i = 0; i < m_imageCount; i++)
         {
 			_VK_CHECK(vkCreateCommandPool(m_device, &commandPoolInfo, nullptr, &m_frames[i]._commandPool), "Failed to create CommandPool");
 			VkCommandBufferAllocateInfo cmdAllocInfo = CommandBufferAllocateInfo(m_frames[i]._commandPool, 1);
 			_VK_CHECK(vkAllocateCommandBuffers(m_device, &cmdAllocInfo, &m_frames[i]._mainCommandBuffer), "Failed to allocate Command buffer");
-	        
         }
 
     }
@@ -331,7 +343,7 @@ namespace gns::rendering
         m_frameBuffers = std::vector<VkFramebuffer>(swapchain_imagecount);
 
         //create framebuffers for each of the swapchain image views
-        for (int i = 0; i < swapchain_imagecount; i++) {
+        for (uint32_t i = 0; i < swapchain_imagecount; i++) {
 
             VkImageView attachments[2];
             attachments[0] = m_imageViews[i];
@@ -366,6 +378,119 @@ namespace gns::rendering
 	        _VK_CHECK(vkCreateSemaphore(m_device, &semaphoreCreateInfo, nullptr, &m_frames[i]._presentSemaphore), "Failed To create presentSemaphore");
 	        _VK_CHECK(vkCreateSemaphore(m_device, &semaphoreCreateInfo, nullptr, &m_frames[i]._renderSemaphore), "Failed To create renderSemaphore");
         }
+    }
+
+    void Device::InitDescriptors()
+    {
+
+        const std::vector<VkDescriptorPoolSize> sizes =
+        {
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 10 },
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 10 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 10 }
+        };
+
+        VkDescriptorPoolCreateInfo pool_info = {};
+        pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        pool_info.flags = 0;
+        pool_info.maxSets = 10;
+        pool_info.poolSizeCount = static_cast<uint32_t>(sizes.size());
+        pool_info.pPoolSizes = sizes.data();
+
+        _VK_CHECK(
+            vkCreateDescriptorPool(m_device, &pool_info, nullptr, &m_descriptorPool), "Failed to create Descriptor Pool!");
+
+        VkDescriptorSetLayoutBinding objectBind = DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0);
+        VkDescriptorSetLayoutCreateInfo set2info = {};
+        set2info.bindingCount = 1;
+        set2info.flags = 0;
+        set2info.pNext = nullptr;
+        set2info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        set2info.pBindings = &objectBind;
+
+        vkCreateDescriptorSetLayout(m_device, &set2info, nullptr, &m_objectSetLayout);
+
+        VkDescriptorSetLayoutBinding cameraBind = DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0);
+        VkDescriptorSetLayoutBinding sceneBind = DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+    	const std::vector < VkDescriptorSetLayoutBinding> bindings = { cameraBind, sceneBind };
+
+        VkDescriptorSetLayoutCreateInfo setInfo = {};
+        setInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        setInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+        setInfo.flags = 0;
+        setInfo.pBindings = bindings.data();
+        setInfo.pNext = nullptr;
+        _VK_CHECK(vkCreateDescriptorSetLayout(m_device, &setInfo, nullptr, &m_globalSetLayout), "Failed To create descriptor set layout!");
+
+        const size_t sceneParamBufferSize = m_imageCount * PadUniformBufferSize(sizeof(GPUSceneData));
+        m_sceneParameterBuffer = CreateBuffer(m_allocator, sceneParamBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+        constexpr uint32_t structSize = sizeof(GPUCameraData);
+        LOG_INFO("Structure Size: " << structSize);
+        for (uint32_t i = 0; i < m_imageCount; i++)
+        {
+            m_frames[i]._cameraBuffer = CreateBuffer(m_allocator, structSize,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+            m_frames[i]._objectBuffer = CreateBuffer(m_allocator, sizeof(GPUObjectData) * MAX_OBJECTS,
+                VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+            VkDescriptorSetAllocateInfo allocInfo = {};
+            allocInfo.pNext = nullptr;
+            allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+            allocInfo.descriptorPool = m_descriptorPool;
+            allocInfo.descriptorSetCount = 1;
+            allocInfo.pSetLayouts = &m_globalSetLayout;
+            vkAllocateDescriptorSets(m_device, &allocInfo, &m_frames[i]._globalDescriptor);
+
+            //allocate the descriptor set that will point to object buffer
+            VkDescriptorSetAllocateInfo objectSetAlloc = {};
+            objectSetAlloc.pNext = nullptr;
+            objectSetAlloc.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+            objectSetAlloc.descriptorPool = m_descriptorPool;
+            objectSetAlloc.descriptorSetCount = 1;
+            objectSetAlloc.pSetLayouts = &m_objectSetLayout;
+            vkAllocateDescriptorSets(m_device, &objectSetAlloc, &m_frames[i]._objectDescriptor);
+
+            VkDescriptorBufferInfo cameraInfo = {};
+            cameraInfo.buffer = m_frames[i]._cameraBuffer._buffer;
+            cameraInfo.offset = 0;
+            cameraInfo.range = structSize;
+
+            VkDescriptorBufferInfo sceneInfo;
+            sceneInfo.buffer = m_sceneParameterBuffer._buffer;
+            sceneInfo.offset = 0;
+            sceneInfo.range = sizeof(GPUSceneData);
+
+            VkDescriptorBufferInfo objectBufferInfo;
+            objectBufferInfo.buffer = m_frames[i]._objectBuffer._buffer;
+            objectBufferInfo.offset = 0;
+            objectBufferInfo.range = sizeof(GPUObjectData) * MAX_OBJECTS;
+
+            VkWriteDescriptorSet cameraWrite = WriteDescriptorBuffer(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                m_frames[i]._globalDescriptor, &cameraInfo, 0);
+
+            VkWriteDescriptorSet sceneWrite = WriteDescriptorBuffer(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
+                m_frames[i]._globalDescriptor, &sceneInfo, 1);
+
+            VkWriteDescriptorSet objectWrite = WriteDescriptorBuffer(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, m_frames[i]._objectDescriptor,
+                &objectBufferInfo, 0);
+
+        	std::vector<VkWriteDescriptorSet> setWrites = { cameraWrite, sceneWrite, objectWrite };
+            const size_t writesCount = setWrites.size();
+            vkUpdateDescriptorSets(m_device, static_cast<uint32_t>(writesCount), setWrites.data(), 0, nullptr);
+        }
+    }
+
+    size_t Device::PadUniformBufferSize(size_t originalSize)
+    {
+        // Calculate required alignment based on minimum device offset alignment
+        size_t minUboAlignment = m_gpuProperties.limits.minUniformBufferOffsetAlignment;
+        size_t alignedSize = originalSize;
+        if (minUboAlignment > 0) {
+            alignedSize = (alignedSize + minUboAlignment - 1) & ~(minUboAlignment - 1);
+        }
+        return alignedSize;
     }
 
     void Device::EndFrame()

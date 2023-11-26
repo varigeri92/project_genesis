@@ -8,13 +8,16 @@
 #include "ECS/Entity.h"
 
 #include "Rendering/Renderer.h";
+#include "Rendering/Device.h";
+
 
 gns::Application::Application()
 {
 	m_window = new Window();
 	m_close = false;
 	m_renderer = new rendering::Renderer(m_window);
-	/*Testing Randoms*/
+	/*Testing Randoms
+	 
 	#pragma region Random_Test
 	gns::core::guid _guid = gns::core::Guid::GetNewGuid();
 	LOG_INFO(_guid);
@@ -38,6 +41,7 @@ gns::Application::Application()
 	double d = Random::Get(-10000.0, 10000.0);
 	LOG_INFO(d);
 	#pragma endregion
+	 */
 }
 
 gns::Application::~Application()
@@ -69,11 +73,11 @@ void gns::Application::Run()
 	//Create Shaders:
 	std::shared_ptr<Shader> suzan_shader = std::make_shared<Shader>(
 		R"(D:\GenesisEngine\Engine\Assets\Shaders\tri_mesh.vert.spv)",
-		R"(D:\GenesisEngine\Engine\Assets\Shaders\colored_triangle.frag.spv)");
+		R"(D:\GenesisEngine\Engine\Assets\Shaders\default_lit.frag.spv)");
 
 	std::shared_ptr<Shader> triangle_shader = std::make_shared<Shader>(
 		R"(D:\GenesisEngine\Engine\Assets\Shaders\tri_mesh.vert.spv)",
-		R"(D:\GenesisEngine\Engine\Assets\Shaders\colored_triangle.frag.spv)");
+		R"(D:\GenesisEngine\Engine\Assets\Shaders\default_lit.frag.spv)");
 
 	//Create Material objects and pipelines for those materials: 
 	std::shared_ptr<Material> triangle_material = std::make_shared<Material>(triangle_shader);
@@ -104,7 +108,7 @@ void gns::Application::Run()
 			tri.GetTransform().matrix = translation * scale;
 		}
 	}
-	
+
 	while (!m_close)
 	{
 		Time::StartFrameTime();
@@ -128,23 +132,27 @@ void gns::Application::CloseApplication()
 void gns::Application::Render(std::shared_ptr<Scene> scene)
 {
 
-	glm::vec3 camPos = { 0.f,-6.f,-10.f };
-
+	glm::vec3 camPos = { 0.f,-6.f,-15.f };
 	glm::mat4 view = glm::translate(glm::mat4(1.f), camPos);
-	//camera projection
-	glm::mat4 projection = glm::perspective(glm::radians(70.f), 1700.f / 900.f, 0.1f, 200.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(60.f), 1700.f / 900.f, 0.1f, 1000.0f);
 	projection[1][1] *= -1;
+	glm::mat4 matrix = projection * view;
+
+	const GPUCameraData camData = { projection, view, matrix};
 	uint32_t swapchainImageIndex;
 	m_renderer->BeginFrame(swapchainImageIndex);
-
+	m_renderer->UpdateGlobalUbo(camData);
+	m_renderer->UpdateSceneDataUbo();
+	int index = 0;
 	auto entityView = scene->registry.view<Transform, MeshComponent, MaterialComponent>();
 	for (auto [entt, transform, mesh, material] : entityView.each())
 	{
 		m_renderer->UpdatePushConstant(transform.matrix, material.material);
-		m_renderer->Draw(mesh.mesh, material.material);
+		m_renderer->Draw(mesh.mesh, material.material, index);
 	}
 	m_renderer->EndFrame(swapchainImageIndex);
 }
+
 
 void gns::Application::UpdateSystems()
 {

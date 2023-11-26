@@ -39,7 +39,6 @@ void gns::Window::CreateSDLWindow()
 	int w = 0;
 	int h = 0;
 	SDL_Vulkan_GetDrawableSize(sdlWindow, &w, &h);
-
 }
 
 void gns::Window::DestroyWindow()

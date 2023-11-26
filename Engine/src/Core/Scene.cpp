@@ -11,6 +11,7 @@ namespace gns {
 		return scene;
 	}
 
+
 	Entity Scene::CreateEntity(std::string name, Scene* scene)
 	{
 		entt::entity entity = registry.create();

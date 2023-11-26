@@ -13,19 +13,21 @@
 
 namespace gns::rendering
 {
+	struct GPUSceneData;
+	struct GPUCameraData;
 	constexpr unsigned int FRAME_OVERLAP = 2;
 	class Renderer
 	{
 		struct MeshPushConstants {
-			glm::vec4 data;
-			glm::mat4 render_matrix;
+			glm::mat4 model_matrix;
+			glm::mat4 camera_matrix;
 		};
 	public:
 		Renderer(Window* window);
 		~Renderer();
 		Renderer operator=(Renderer& other) = delete;
 		void BeginFrame(uint32_t& swapchainImageIndex);
-		void Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material);
+		void Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, int index);
 		void EndFrame(uint32_t& swapchainImageIndex);
 		void UploadMesh(Mesh* mesh);
 		void CreatePipelineForMaterial(std::shared_ptr<Material> material);
@@ -41,10 +43,15 @@ namespace gns::rendering
 		uint32_t m_framesInFlight;
 
 		VkShaderModule CreateShaderModule(std::vector<uint32_t> buffer);
+		std::shared_ptr<Material> m_material_ptr;
 		//MOVE OUT OF HERE:
 	public:
 		void UpdatePushConstant( 
 			glm::mat4 modelMatrix, 
 			std::shared_ptr<Material> material);
+
+		void UpdateGlobalUbo(GPUCameraData src_bufferData);
+		void UpdateSceneDataUbo();
+		void UpdateObjectData(void* src_data, size_t size);
 	};
 }
