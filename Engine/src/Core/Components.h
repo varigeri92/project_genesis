@@ -59,13 +59,33 @@ namespace gns
 	struct MeshComponent
 	{
 		std::shared_ptr<Mesh> mesh;
-		operator std::shared_ptr<Mesh> () { return mesh; }
 		MeshComponent(std::shared_ptr<Mesh> mesh) : mesh{ mesh } {};
 	};
 
 	struct MaterialComponent {
 		std::shared_ptr<Material> material;
-		operator std::shared_ptr<Material>() { return material; }
 		MaterialComponent(std::shared_ptr<Material> material) : material{ material } {};
+	};
+	struct CameraComponent
+	{
+		CameraComponent() = delete;
+		CameraComponent(float near, float far, float fov, float width, float height, Transform& transform) :
+			_near(near), _far(far), fov(fov), width(width), height(height)
+		{
+			view = glm::translate(glm::mat4(1.f), transform.position);
+			projection = glm::perspective(glm::radians(fov), (width / height), _near, _far);
+			projection[1][1] *= -1;
+			camera_matrix = projection * view;
+		};
+
+		float _near;
+		float _far;
+		float fov;
+		float width;
+		float height;
+
+		glm::mat4 view;
+		glm::mat4 projection;
+		glm::mat4 camera_matrix;
 	};
 }

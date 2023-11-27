@@ -7,9 +7,9 @@
 
 namespace gns
 {
-	gns::CameraSystem::CameraSystem(Transform& transform, Camera& camera) : transform{ transform }, camera{ camera } {}
+	gns::CameraSystem::CameraSystem(Transform& transform, CameraComponent& camera) : transform{ transform }, camera{ camera } {}
 
-	void gns::CameraSystem::UpdateSystem()
+	void gns::CameraSystem::UpdateCamera()
 	{
 		float x_velocity = 0.f;
 		float y_velocity = 0.f;
@@ -17,35 +17,34 @@ namespace gns
 
 		//fwd:
 		if (Input::GetKey(SDLK_w)) {
-			y_velocity = 1.f;
+			z_velocity = 1.f;
 		}
 		//back:
 		if (Input::GetKey(SDLK_s)) {
-			y_velocity = -1.f;
+			z_velocity = -1.f;
 		}
 
 		//left:
 		if (Input::GetKey(SDLK_a)) {
-			x_velocity = -1.f;
+			x_velocity = 1.f;
 		}
 		//right:
 		if (Input::GetKey(SDLK_d)) {
-			x_velocity = 1.f;
+			x_velocity = -1.f;
 		}
 
 		//up:
 		if (Input::GetKey(SDLK_q)) {
-			z_velocity = -1.f;
+			y_velocity = -1.f;
 		}
 		//down:
 		if (Input::GetKey(SDLK_e)) {
-			z_velocity = 1.f;
+			y_velocity = 1.f;
 		}
 
 		transform.position += glm::vec3(x_velocity, y_velocity, z_velocity) * (Time::GetDelta() * m_cameraMoveSpeed);
-		camera.view = glm::lookAt(transform.position,
-			(transform.position + glm::vec3(0.f, 1.f, 0.f)),
-			glm::vec3(0.0f, 0.0f, 1.0f));
+		camera.view = glm::translate(glm::mat4(1.f), transform.position);
+		camera.camera_matrix = camera.projection * camera.view;
 	}
 
 	void gns::CameraSystem::UpdateProjection(int w, int h)

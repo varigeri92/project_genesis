@@ -219,7 +219,6 @@ echo Shader compilation complete.</Command>
     <ClInclude Include="src\Systems\CameraSystem.h" />
     <ClInclude Include="src\ECS\Entity.h" />
     <ClInclude Include="src\AssetDatabase\path.h" />
-    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Core\Components.h" />
     <ClInclude Include="API\EnTT\config\config.h" />
     <ClInclude Include="API\EnTT\config\macro.h" />
@@ -318,7 +317,6 @@ echo Shader compilation complete.</Command>
     <ClCompile Include="src\Rendering\vkb\VkBootstrap.cpp" />
     <ClCompile Include="src\Systems\CameraSystem.cpp" />
     <ClCompile Include="src\ECS\Entity.cpp" />
-    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\AssetDatabase\AssetLoader.cpp" />
     <ClCompile Include="src\Core\Scene.cpp" />

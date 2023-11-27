@@ -108,12 +108,19 @@ void gns::Application::Run()
 			tri.GetTransform().matrix = translation * scale;
 		}
 	}
+	Entity sceneCamera_entity = scene->CreateEntity("SceneCamera", scene.get());
+	Transform& cameraTransform = sceneCamera_entity.GetTransform();
+	cameraTransform.position = { 0.f,-6.f,-15.f };
+	CameraComponent& sceneCamera = sceneCamera_entity.AddComponet<CameraComponent>(0.01f, 1000.f, 60.f, 1700, 900, cameraTransform);
+	CameraSystem cameraSystem = { cameraTransform, sceneCamera };
+
 
 	while (!m_close)
 	{
 		Time::StartFrameTime();
 		HandleEvents();
 		UpdateSystems();
+		cameraSystem.UpdateCamera();
 		Render(scene);
 		Time::EndFrameTime();
 	}
@@ -131,14 +138,24 @@ void gns::Application::CloseApplication()
 
 void gns::Application::Render(std::shared_ptr<Scene> scene)
 {
+	GPUCameraData camData = {};
+	auto cameraView = scene->registry.view<Transform, CameraComponent>();
+	for (auto [entt, transform, camera] : cameraView.each())
+	{
+		camData.view = camera.view;
+		camData.proj = camera.projection;
+		camData.viewproj = camera.camera_matrix; //camera.projection * camera.view;
+	}
 
+	/*
 	glm::vec3 camPos = { 0.f,-6.f,-15.f };
 	glm::mat4 view = glm::translate(glm::mat4(1.f), camPos);
 	glm::mat4 projection = glm::perspective(glm::radians(60.f), 1700.f / 900.f, 0.1f, 1000.0f);
 	projection[1][1] *= -1;
 	glm::mat4 matrix = projection * view;
+	*/
 
-	const GPUCameraData camData = { projection, view, matrix};
+
 	uint32_t swapchainImageIndex;
 	m_renderer->BeginFrame(swapchainImageIndex);
 	m_renderer->UpdateGlobalUbo(camData);
