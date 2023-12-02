@@ -9,6 +9,7 @@
 
 #include "Rendering/Renderer.h";
 #include "Rendering/Device.h";
+#include "Rendering/DataObjects/Texture.h"
 
 
 gns::Application::Application()
@@ -67,17 +68,23 @@ void gns::Application::Run()
 	m_renderer->UploadMesh(trinagleMesh.get());
 
 	//Load Suzan:
-	std::shared_ptr<Mesh> suzan_mesh = AssetLoader::LoadMesh(R"(D:\GenesisEngine\Engine\Assets\Meshes\monkey_smooth.obj)");
+	std::shared_ptr<Mesh> suzan_mesh = AssetLoader::LoadMesh(R"(Meshes\monkey_smooth.obj)");
+	std::shared_ptr<Mesh> mc_mesh = AssetLoader::LoadMesh( R"(Meshes\lost_empire.obj)");
 	m_renderer->UploadMesh(suzan_mesh.get());
+	m_renderer->UploadMesh(mc_mesh.get());
 
 	//Create Shaders:
 	std::shared_ptr<Shader> suzan_shader = std::make_shared<Shader>(
-		R"(D:\GenesisEngine\Engine\Assets\Shaders\tri_mesh.vert.spv)",
-		R"(D:\GenesisEngine\Engine\Assets\Shaders\default_lit.frag.spv)");
+		 R"(Shaders\tri_mesh.vert.spv)",
+		R"(Shaders\default_lit.frag.spv)");
 
 	std::shared_ptr<Shader> triangle_shader = std::make_shared<Shader>(
-		R"(D:\GenesisEngine\Engine\Assets\Shaders\tri_mesh.vert.spv)",
-		R"(D:\GenesisEngine\Engine\Assets\Shaders\default_lit.frag.spv)");
+	R"(Shaders\tri_mesh.vert.spv)",
+		R"(Shaders\default_lit.frag.spv)");
+
+	std::shared_ptr<Shader> mc_shader = std::make_shared<Shader>(
+		R"(Shaders\tri_mesh.vert.spv)",
+		R"(Shaders\textured_lit.frag.spv)");
 
 	//Create Material objects and pipelines for those materials: 
 	std::shared_ptr<Material> triangle_material = std::make_shared<Material>(triangle_shader);
@@ -85,10 +92,23 @@ void gns::Application::Run()
 	std::shared_ptr<Material> suzan_material = std::make_shared<Material>(suzan_shader);
 	m_renderer->CreatePipelineForMaterial(suzan_material);
 
+
+	std::shared_ptr<Material> mc_material = std::make_shared<Material>(mc_shader);
+	mc_material->texture = std::make_shared<Texture>(R"(Textures\lost_empire-RGBA.png)");;
+	mc_material->texture->Create(m_renderer->m_device);
+	m_renderer->CreatePipelineForMaterial(mc_material);
+	mc_material->texture->Apply(m_renderer->m_device);
+
 	//Entity Creation:
 	//Create Scene
 	std::shared_ptr<Scene> scene = std::make_shared<Scene>("Default Scene");
-	//Create Suzan and a dd component With the Dataobject we created above.
+
+	//CreateStuff:
+	Entity mc_entity = scene->CreateEntity("MC_Lost_Empire", scene.get());
+	mc_entity.AddComponet<MeshComponent>(mc_mesh);
+	mc_entity.AddComponet<MaterialComponent>(mc_material);
+	mc_entity.GetTransform().matrix = glm::mat4{ 1 };
+
 	Entity suzan = scene->CreateEntity("Suzan", scene.get());
 	suzan.AddComponet<MeshComponent>(suzan_mesh);
 	suzan.AddComponet<MaterialComponent>(suzan_material);
@@ -114,7 +134,6 @@ void gns::Application::Run()
 	CameraComponent& sceneCamera = sceneCamera_entity.AddComponet<CameraComponent>(0.01f, 1000.f, 60.f, 1700, 900, cameraTransform);
 	CameraSystem cameraSystem = { cameraTransform, sceneCamera };
 
-
 	while (!m_close)
 	{
 		Time::StartFrameTime();
@@ -129,6 +148,9 @@ void gns::Application::Run()
 	m_renderer->DisposeObject(suzan_mesh);
 	m_renderer->DisposeObject(triangle_material);
 	m_renderer->DisposeObject(trinagleMesh);
+	m_renderer->DisposeObject(mc_material->texture);
+	m_renderer->DisposeObject(mc_material);
+	m_renderer->DisposeObject(mc_mesh);
 }
 
 void gns::Application::CloseApplication()
@@ -146,15 +168,6 @@ void gns::Application::Render(std::shared_ptr<Scene> scene)
 		camData.proj = camera.projection;
 		camData.viewproj = camera.camera_matrix; //camera.projection * camera.view;
 	}
-
-	/*
-	glm::vec3 camPos = { 0.f,-6.f,-15.f };
-	glm::mat4 view = glm::translate(glm::mat4(1.f), camPos);
-	glm::mat4 projection = glm::perspective(glm::radians(60.f), 1700.f / 900.f, 0.1f, 1000.0f);
-	projection[1][1] *= -1;
-	glm::mat4 matrix = projection * view;
-	*/
-
 
 	uint32_t swapchainImageIndex;
 	m_renderer->BeginFrame(swapchainImageIndex);

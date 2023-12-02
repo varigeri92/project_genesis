@@ -7,6 +7,7 @@ namespace gns::rendering
 	class Disposeable
 	{
 	public:
+		virtual ~Disposeable() = default;
 		virtual void Dispose(Device* device) = 0;
 	};
 }

@@ -7,6 +7,9 @@
 #include "../Input.h"
 #include "SDL2/SDL_keycode.h"
 #include "../Core/Time.h"
+#include "DataObjects/Texture.h"
+#include "Helpers/VkInitializer.h"
+
 namespace gns::rendering
 {
 	int shader_selector = 0;
@@ -28,31 +31,61 @@ Renderer::~Renderer()
 
 void Renderer::UploadMesh(Mesh* mesh)
 {
-	//allocate vertex buffer
-	VkBufferCreateInfo bufferInfo = {};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	//this is the total size, in bytes, of the buffer we are allocating
-	bufferInfo.size = mesh->_vertices.size() * sizeof(Vertex);
-	//this buffer is going to be used as a Vertex Buffer
-	bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+	const size_t bufferSize = mesh->_vertices.size() * sizeof(Vertex);
+	//allocate staging buffer
+	VkBufferCreateInfo stagingBufferInfo = {};
+	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	stagingBufferInfo.pNext = nullptr;
 
+	stagingBufferInfo.size = bufferSize;
+	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 
-	//let the VMA library know that this data should be writeable by CPU, but also readable by GPU
+	//let the VMA library know that this data should be on CPU RAM
 	VmaAllocationCreateInfo vmaallocInfo = {};
-	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
+	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
+
+	Buffer stagingBuffer;
 
 	//allocate the buffer
-	_VK_CHECK(vmaCreateBuffer(m_device->m_allocator, &bufferInfo, &vmaallocInfo,
-		&mesh->_vertexBuffer._buffer,
-		&mesh->_vertexBuffer._allocation,
-		nullptr), "Buffer creation failed");
+	_VK_CHECK(vmaCreateBuffer(m_device->m_allocator, &stagingBufferInfo, &vmaallocInfo,
+		&stagingBuffer._buffer,
+		&stagingBuffer._allocation,
+		nullptr), "Failed to create Buffer");
 
 	void* data;
-	vmaMapMemory(m_device->m_allocator, mesh->_vertexBuffer._allocation, &data);
+	vmaMapMemory(m_device->m_allocator, stagingBuffer._allocation, &data);
 
 	memcpy(data, mesh->_vertices.data(), mesh->_vertices.size() * sizeof(Vertex));
 
-	vmaUnmapMemory(m_device->m_allocator, mesh->_vertexBuffer._allocation);
+	vmaUnmapMemory(m_device->m_allocator, stagingBuffer._allocation);
+
+
+	VkBufferCreateInfo vertexBufferInfo = {};
+	vertexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	vertexBufferInfo.pNext = nullptr;
+	//this is the total size, in bytes, of the buffer we are allocating
+	vertexBufferInfo.size = bufferSize;
+	//this buffer is going to be used as a Vertex Buffer
+	vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+	//let the VMA library know that this data should be GPU native
+	vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+
+	//allocate the buffer
+	_VK_CHECK(vmaCreateBuffer(m_device->m_allocator, &vertexBufferInfo, &vmaallocInfo,
+		&mesh->_vertexBuffer._buffer,
+		&mesh->_vertexBuffer._allocation,
+		nullptr), "");
+
+	m_device->ImmediateSubmit([&mesh, stagingBuffer, bufferSize](VkCommandBuffer cmd)
+	{
+			VkBufferCopy copy;
+			copy.dstOffset = 0;
+			copy.srcOffset = 0;
+			copy.size = bufferSize;
+			vkCmdCopyBuffer(cmd, stagingBuffer._buffer, mesh->_vertexBuffer._buffer, 1, &copy);
+	});
+	vmaDestroyBuffer(m_device->m_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
 }
 
 void Renderer::CreatePipelineForMaterial(std::shared_ptr<Material> material)
@@ -66,6 +99,14 @@ void Renderer::CreatePipelineForMaterial(std::shared_ptr<Material> material)
 		PipelineShaderStageCreateInfo(VK_SHADER_STAGE_VERTEX_BIT, vertShader));
 	pipelineBuilder._shaderStages.push_back(
 		PipelineShaderStageCreateInfo(VK_SHADER_STAGE_FRAGMENT_BIT, fragShader));
+
+	std::vector<VkDescriptorSetLayout> setLayouts = {m_device->m_globalSetLayout };
+	if (material->texture != nullptr)
+	{
+		CreateTextureResources(material->texture);
+		setLayouts.push_back(m_device->m_singleTextureSetLayout);
+		LOG_INFO("Add texture to material!");
+	}
 
 	pipelineBuilder._vertexInputInfo = VertexInputStateCreateInfo();
 	pipelineBuilder._inputAssembly = InputAssemblyCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
@@ -94,7 +135,6 @@ void Renderer::CreatePipelineForMaterial(std::shared_ptr<Material> material)
 	push_constant.size = sizeof(MeshPushConstants);
 	push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-	std::vector<VkDescriptorSetLayout> setLayouts = {m_device->m_globalSetLayout };
 
 	VkPipelineLayoutCreateInfo layoutInfo = PipelineLayoutCreateInfo();
 	layoutInfo.pPushConstantRanges = &push_constant;
@@ -183,8 +223,11 @@ void Renderer::Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> materi
 		vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer, 
 			VK_PIPELINE_BIND_POINT_GRAPHICS, material->pipelineLayout, 0, 1, 
 			&m_device->GetCurrentFrame()._globalDescriptor, 1, &uniform_offset);
+		if(material->texture != nullptr)
+			vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer, 
+				VK_PIPELINE_BIND_POINT_GRAPHICS, material->pipelineLayout, 1, 1, &material->texture->descriptorSet, 
+				0, nullptr);
 		/*
-		//object data descriptor
 		vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer, 
 			VK_PIPELINE_BIND_POINT_GRAPHICS, material->pipelineLayout, 1, 1, 
 			&m_device->GetCurrentFrame()._objectDescriptor, 0, nullptr);
@@ -307,5 +350,34 @@ void Renderer::UpdateObjectData(void* src_data, size_t size)
 	vmaMapMemory(m_device->m_allocator, m_device->GetCurrentFrame()._objectBuffer._allocation, &objectData);
 	memcpy(objectData, src_data, size);
 	vmaUnmapMemory(m_device->m_allocator, m_device->GetCurrentFrame()._objectBuffer._allocation);
+}
+
+void Renderer::CreateTextureResources(std::shared_ptr<Texture> texture)
+{
+	VkImageViewCreateInfo imageinfo = ImageViewCreateInfo(VK_FORMAT_R8G8B8A8_SRGB, texture->image, VK_IMAGE_ASPECT_COLOR_BIT);
+	vkCreateImageView(m_device->m_device, &imageinfo, nullptr, &texture->imageView);
+
+	const VkSamplerCreateInfo samplerInfo = sampler_create_info(VK_FILTER_NEAREST);
+	vkCreateSampler(m_device->m_device, &samplerInfo, nullptr, &texture->m_sampler);
+
+	//allocate the descriptor set for single-texture to use on the material
+	VkDescriptorSetAllocateInfo allocInfo = {};
+	allocInfo.pNext = nullptr;
+	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	allocInfo.descriptorPool = m_device->m_descriptorPool;
+	allocInfo.descriptorSetCount = 1;
+	allocInfo.pSetLayouts = &m_device->m_singleTextureSetLayout;
+	vkAllocateDescriptorSets(m_device->m_device, &allocInfo, &texture->descriptorSet);
+
+	//write to the descriptor set so that it points to our empire_diffuse texture
+	VkDescriptorImageInfo imageBufferInfo;
+	imageBufferInfo.sampler = texture->m_sampler;
+	imageBufferInfo.imageView = texture->imageView;
+	imageBufferInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+	VkWriteDescriptorSet texture1 = write_descriptor_image(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, texture->descriptorSet,
+		&imageBufferInfo, 0);
+
+	vkUpdateDescriptorSets(m_device->m_device, 1, &texture1, 0, nullptr);
 }
 }

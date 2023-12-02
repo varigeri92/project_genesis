@@ -4,8 +4,8 @@
 #include "vkb/VkBootstrap.h"
 #include <vector>
 #include "Helpers/Buffer.h"
-
 #include "glm/glm.hpp"
+#include <functional>
 
 namespace gns
 {
@@ -26,6 +26,18 @@ namespace gns::rendering
 		glm::mat4 viewproj;
 	};
 
+	struct alignas(64) GPUSceneData {
+		glm::vec4 fogColor; // w is for exponent
+		glm::vec4 fogDistances; //x for min, y for max, zw unused.
+		glm::vec4 ambientColor;
+		glm::vec4 sunlightDirection; //w for sun power
+		glm::vec4 sunlightColor;
+	};
+
+	struct GPUObjectData {
+		glm::mat4 modelMatrix;
+	};
+
 	typedef struct FrameData {
 		VkSemaphore _presentSemaphore;
 		VkSemaphore _renderSemaphore;
@@ -42,16 +54,12 @@ namespace gns::rendering
 
 	} FrameData;
 
-	struct alignas(64) GPUSceneData {
-		glm::vec4 fogColor; // w is for exponent
-		glm::vec4 fogDistances; //x for min, y for max, zw unused.
-		glm::vec4 ambientColor;
-		glm::vec4 sunlightDirection; //w for sun power
-		glm::vec4 sunlightColor;
-	};
+	struct UploadContext {
+		VkFence _uploadFence;
+		VkCommandPool _commandPool;
+		VkCommandBuffer _commandBuffer;
 
-	struct GPUObjectData {
-		glm::mat4 modelMatrix;
+		void Destroy(VkDevice device);
 	};
 
 	class Device
@@ -61,6 +69,7 @@ namespace gns::rendering
 		friend class Renderer;
 		friend class PipelineBuilder;
 		friend class Buffer;
+		friend class Texture;
 	public:
 		Device() = delete;
 		Device(Window* window);
@@ -100,6 +109,7 @@ namespace gns::rendering
 		VulkanImage _depthImage;
 
 		std::vector<FrameData> m_frames;
+		UploadContext m_uploadContext;
 
 		VkRenderPass m_renderPass;
 		std::vector<VkFramebuffer> m_frameBuffers;
@@ -109,6 +119,7 @@ namespace gns::rendering
 
 		VkDescriptorSetLayout m_globalSetLayout;
 		VkDescriptorSetLayout m_objectSetLayout;
+		VkDescriptorSetLayout m_singleTextureSetLayout;
 		VkDescriptorPool m_descriptorPool;
 
 		GPUSceneData m_sceneParameters = {};
@@ -130,6 +141,8 @@ namespace gns::rendering
 		size_t PadUniformBufferSize(size_t originalSize);
 		void EndFrame();
 		FrameData& GetCurrentFrame();
+
+		void ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function);
 	};
 }
 

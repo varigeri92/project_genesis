@@ -4,6 +4,10 @@
 #include "tiny_obj_loader.h"
 #include <glm/glm.hpp>
 #include "../Rendering/DataObjects/Mesh.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#include "../Rendering/DataObjects/Texture.h"
+#include "../Rendering/Helpers/Buffer.h"
 
 using namespace gns::rendering;
 namespace gns
@@ -15,7 +19,7 @@ namespace gns
         std::vector<tinyobj::material_t> materials;
         std::string warn, err;
 
-        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, path.c_str()))
+        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err,   (AssetsPath+path).c_str()))
         {
             LOG_ERROR(warn + err);
         }
@@ -57,6 +61,11 @@ namespace gns
                     //we are setting the vertex color as the vertex normal. This is just for display purposes
                     new_vert.color = new_vert.normal;
 
+                    tinyobj::real_t ux = attrib.texcoords[2 * idx.texcoord_index + 0];
+                    tinyobj::real_t uy = attrib.texcoords[2 * idx.texcoord_index + 1];
+
+                    new_vert.uv.x = ux;
+                    new_vert.uv.y = 1 - uy;
 
                     mesh->_vertices.push_back(new_vert);
                 }
@@ -68,7 +77,7 @@ namespace gns
 
     std::vector<uint32_t> AssetLoader::LoadShader(std::string path)
     {
-        std::ifstream file(path, std::ios::ate | std::ios::binary);
+        std::ifstream file((AssetsPath + path), std::ios::ate | std::ios::binary);
         if (!file.is_open()) {
             LOG_ERROR("Failed To open File: " << path);
             return {};
@@ -80,5 +89,15 @@ namespace gns
         file.close();
         return buffer;
 
+    }
+
+    void AssetLoader::LoadTextureData(std::string path, Texture* texture)
+    {
+        stbi_uc* pixels = stbi_load((AssetsPath + path).c_str(), &texture->width, &texture->height, &texture->chanels, STBI_rgb_alpha);
+
+        if (!pixels) {
+            LOG_ERROR("Can't Open Texture:" << path);
+        }
+        texture->pixels = pixels;
     }
 }

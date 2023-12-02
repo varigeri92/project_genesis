@@ -7,6 +7,11 @@
 
 namespace gns::rendering
 {
+	class Texture;
+}
+
+namespace gns::rendering
+{
 	class Mesh;
 	struct Shader
 	{
@@ -24,6 +29,7 @@ namespace gns::rendering
 		VkPipeline pipeline;
 		VkPipelineLayout pipelineLayout;
 		std::shared_ptr<Shader> shader;
+		std::shared_ptr<Texture> texture{ nullptr };
 
 		void Dispose(Device* device) override;
 	};

@@ -1,6 +1,7 @@
 #pragma once
 #include "../Helpers/Buffer.h"
 #include <vector>
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <vma/vk_mem_alloc.h>
 #include "DisposableVkObject.h"
@@ -23,6 +24,7 @@ namespace gns::rendering
 	    glm::vec3 position;
 	    glm::vec3 normal;
 	    glm::vec3 color;
+		glm::vec2 uv;
 
 		static VertexInputDescription GetVertexDescription();
 	};

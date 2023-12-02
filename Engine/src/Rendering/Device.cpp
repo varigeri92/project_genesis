@@ -35,6 +35,12 @@ namespace gns::rendering
         return VK_FALSE;
     }
 
+    void UploadContext::Destroy(VkDevice device)
+    {
+        vkDestroyFence(device, _uploadFence, nullptr);
+        vkDestroyCommandPool(device, _commandPool, nullptr);
+    }
+
 	Device::Device(Window* window)
 	{
         LOG_INFO("Initialize Vulkan!");
@@ -66,6 +72,8 @@ namespace gns::rendering
 	Device::~Device()
 	{
         LOG_INFO("Clenup Device");
+        m_uploadContext.Destroy(m_device);
+
         vkDestroyDescriptorPool(m_device, m_descriptorPool, nullptr);
         vkDestroyDescriptorSetLayout(m_device, m_globalSetLayout, nullptr);
         vkDestroyDescriptorSetLayout(m_device, m_objectSetLayout, nullptr);
@@ -204,7 +212,7 @@ namespace gns::rendering
         m_depthFormat = VK_FORMAT_D32_SFLOAT;
 
         //the depth image will be an image with the format we selected and Depth Attachment usage flag
-        VkImageCreateInfo dimg_info = image_create_info(m_depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, depthImageExtent);
+        VkImageCreateInfo dimg_info = ImageCreateInfo(m_depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, depthImageExtent);
 
         //for the depth image, we want to allocate it from GPU local memory
         VmaAllocationCreateInfo dimg_allocinfo = {};
@@ -247,6 +255,16 @@ namespace gns::rendering
 			VkCommandBufferAllocateInfo cmdAllocInfo = CommandBufferAllocateInfo(m_frames[i]._commandPool, 1);
 			_VK_CHECK(vkAllocateCommandBuffers(m_device, &cmdAllocInfo, &m_frames[i]._mainCommandBuffer), "Failed to allocate Command buffer");
         }
+
+
+    	//create pool for upload context
+        VkCommandPoolCreateInfo uploadCommandPoolInfo = CommandPoolCreateInfo(m_transferFamilyIndex);
+        _VK_CHECK(vkCreateCommandPool(m_device, &uploadCommandPoolInfo, nullptr, &m_uploadContext._commandPool), 
+            "Failed to create upload CommandPool");
+        VkCommandBufferAllocateInfo cmdAllocInfo = CommandBufferAllocateInfo(m_uploadContext._commandPool, 1);
+        VkCommandBuffer cmd;
+        _VK_CHECK(vkAllocateCommandBuffers(m_device, &cmdAllocInfo, &m_uploadContext._commandBuffer), 
+            "Failed to allocate Command buffer");
 
     }
 
@@ -378,6 +396,13 @@ namespace gns::rendering
 	        _VK_CHECK(vkCreateSemaphore(m_device, &semaphoreCreateInfo, nullptr, &m_frames[i]._presentSemaphore), "Failed To create presentSemaphore");
 	        _VK_CHECK(vkCreateSemaphore(m_device, &semaphoreCreateInfo, nullptr, &m_frames[i]._renderSemaphore), "Failed To create renderSemaphore");
         }
+        VkFenceCreateInfo uploadFenceCreateInfo = {};
+        uploadFenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+        uploadFenceCreateInfo.pNext = nullptr;
+        //we want to create the fence with the Create Signaled flag, so we can wait on it before using it on a GPU command (for the first frame)
+        uploadFenceCreateInfo.flags = 0;
+
+        _VK_CHECK(vkCreateFence(m_device, &uploadFenceCreateInfo, nullptr, &m_uploadContext._uploadFence), "Failed to initialize Upload Fence");
     }
 
     void Device::InitDescriptors()
@@ -387,7 +412,8 @@ namespace gns::rendering
         {
 			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 10 },
 			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 10 },
-			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 10 }
+			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 10 },
+            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 10 }
         };
 
         VkDescriptorPoolCreateInfo pool_info = {};
@@ -421,6 +447,16 @@ namespace gns::rendering
         setInfo.pBindings = bindings.data();
         setInfo.pNext = nullptr;
         _VK_CHECK(vkCreateDescriptorSetLayout(m_device, &setInfo, nullptr, &m_globalSetLayout), "Failed To create descriptor set layout!");
+
+        //another set, one that holds a single texture
+        VkDescriptorSetLayoutBinding textureBind = DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 0);
+        VkDescriptorSetLayoutCreateInfo set3info = {};
+        set3info.bindingCount = 1;
+        set3info.flags = 0;
+        set3info.pNext = nullptr;
+        set3info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        set3info.pBindings = &textureBind;
+        vkCreateDescriptorSetLayout(m_device, &set3info, nullptr, &m_singleTextureSetLayout);
 
         const size_t sceneParamBufferSize = m_imageCount * PadUniformBufferSize(sizeof(GPUSceneData));
         m_sceneParameterBuffer = CreateBuffer(m_allocator, sceneParamBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
@@ -502,5 +538,22 @@ namespace gns::rendering
     FrameData& Device::GetCurrentFrame()
     {
         return m_frames[m_imageIndex];
+    }
+
+    void Device::ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function)
+    {
+        VkCommandBuffer cmd = m_uploadContext._commandBuffer;
+
+        //begin the command buffer recording. We will use this command buffer exactly once before resetting, so we tell vulkan that
+        VkCommandBufferBeginInfo cmdBeginInfo = CommandBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+        _VK_CHECK(vkBeginCommandBuffer(cmd, &cmdBeginInfo),"FailedTo Begin CommandBuffer");
+        function(cmd);
+        _VK_CHECK(vkEndCommandBuffer(cmd), "Failed To end CommandBuffer");
+        VkSubmitInfo submit = SubmitInfo(&cmd);
+        _VK_CHECK(vkQueueSubmit(m_transferQueue, 1, &submit, m_uploadContext._uploadFence), "Failed To bubmit Command Buffer");
+        vkWaitForFences(m_device, 1, &m_uploadContext._uploadFence, VK_TRUE, static_cast<uint64_t>(-1));
+        vkResetFences(m_device, 1, &m_uploadContext._uploadFence);
+        vkResetCommandPool(m_device, m_uploadContext._commandPool, 0);
     }
 }

@@ -11,6 +11,11 @@
 #include "DataObjects/Material.h"
 #include "DataObjects/DisposableVkObject.h"
 
+namespace gns
+{
+	class Application;
+}
+
 namespace gns::rendering
 {
 	struct GPUSceneData;
@@ -18,6 +23,7 @@ namespace gns::rendering
 	constexpr unsigned int FRAME_OVERLAP = 2;
 	class Renderer
 	{
+		friend class gns::Application;
 		struct MeshPushConstants {
 			glm::mat4 model_matrix;
 			glm::mat4 camera_matrix;
@@ -53,5 +59,6 @@ namespace gns::rendering
 		void UpdateGlobalUbo(GPUCameraData src_bufferData);
 		void UpdateSceneDataUbo();
 		void UpdateObjectData(void* src_data, size_t size);
+		void CreateTextureResources(std::shared_ptr<Texture> texture);
 	};
 }
