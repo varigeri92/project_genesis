@@ -84,12 +84,16 @@ void gns::Window::WindowEvent(const SDL_Event* event)
 		case SDL_WINDOWEVENT_RESIZED:
 			break;
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
+			LOG_INFO("Window size change!");
 			break;
 		case SDL_WINDOWEVENT_MINIMIZED:
+			LOG_INFO("Window minimized!");
 			break;
 		case SDL_WINDOWEVENT_MAXIMIZED:
+			LOG_INFO("Window maximized!");
 			break;
 		case SDL_WINDOWEVENT_RESTORED:
+			LOG_INFO("Window restored!");
 			break;
 		case SDL_WINDOWEVENT_ENTER:
 			break;

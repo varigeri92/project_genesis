@@ -21,22 +21,33 @@ namespace gns::rendering
 		VkPipelineViewportStateCreateInfo viewportState = {};
 		viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 		viewportState.pNext = nullptr;
-
 		viewportState.viewportCount = 1;
 		viewportState.pViewports = &_viewport;
 		viewportState.scissorCount = 1;
 		viewportState.pScissors = &_scissor;
-
+		//viewportState.flags = VK_DYNAMIC_STATE_VIEWPORT;
 		//setup dummy color blending. We aren't using transparent objects yet
 		//the blending is just "no blend", but we do write to the color attachment
 		VkPipelineColorBlendStateCreateInfo colorBlending = {};
 		colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 		colorBlending.pNext = nullptr;
-
 		colorBlending.logicOpEnable = VK_FALSE;
 		colorBlending.logicOp = VK_LOGIC_OP_COPY;
 		colorBlending.attachmentCount = 1;
 		colorBlending.pAttachments = &_colorBlendAttachment;
+
+		std::vector<VkDynamicState> dynamicStates = {
+			VK_DYNAMIC_STATE_VIEWPORT,
+			VK_DYNAMIC_STATE_SCISSOR
+		};
+
+		VkPipelineDynamicStateCreateInfo dynStateInfo = {};
+		dynStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+		dynStateInfo.flags = 0;
+		dynStateInfo.dynamicStateCount = dynamicStates.size();
+		dynStateInfo.pDynamicStates = dynamicStates.data();
+		dynStateInfo.pNext = nullptr;
+		
 
 		//build the actual pipeline
 	//we now use all of the info structs we have been writing into into this one to create the pipeline
@@ -57,6 +68,7 @@ namespace gns::rendering
 		pipelineInfo.subpass = 0;
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 		pipelineInfo.pDepthStencilState = &_depthStencil;
+		pipelineInfo.pDynamicState = &dynStateInfo;
 
 
 

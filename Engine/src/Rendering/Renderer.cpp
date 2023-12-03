@@ -159,16 +159,26 @@ void Renderer::DisposeObject(std::shared_ptr<Disposeable> object)
 	_disposeQueue.push_back(object);
 }
 
-void Renderer::BeginFrame(uint32_t& swapchainImageIndex)
+bool Renderer::BeginFrame(uint32_t& swapchainImageIndex)
 {
+	//request image from the swapchain, one second timeout
+	VkResult result =vkAcquireNextImageKHR(m_device->m_device, m_device->m_swapchain, 1000000000, m_device->GetCurrentFrame()._presentSemaphore,nullptr, &swapchainImageIndex);
+	if(result == VK_ERROR_OUT_OF_DATE_KHR)
+	{
+		LOG_VK_WARNING("NEED TO RECREATE SWAPCHAIN!");
+		m_device->RebuildSwapchain();
+		m_framebufferResized = true;
+		return false;
+	}
+	else
+	{
+		_VK_CHECK(result, "Failed to acquire the next swapchain image!");
+	}
+
 	m_frameNumber++;
 	//wait until the GPU has finished rendering the last frame. Timeout of 1 second
 	_VK_CHECK(vkWaitForFences(m_device->m_device, 1, &m_device->GetCurrentFrame()._renderFence, true, 1000000000), "--");
 	_VK_CHECK(vkResetFences(m_device->m_device, 1, &m_device->GetCurrentFrame()._renderFence), "--");
-
-	//request image from the swapchain, one second timeout
-	_VK_CHECK(
-		vkAcquireNextImageKHR(m_device->m_device, m_device->m_swapchain, 1000000000, m_device->GetCurrentFrame()._presentSemaphore, nullptr, &swapchainImageIndex), "XXX");
 
 	//now that we are sure that the commands finished executing, we can safely reset the command buffer to begin recording again.
 	_VK_CHECK(vkResetCommandBuffer(m_device->GetCurrentFrame()._mainCommandBuffer, 0), "Failed to reset command buffer!");
@@ -183,35 +193,46 @@ void Renderer::BeginFrame(uint32_t& swapchainImageIndex)
 	cmdBeginInfo.pInheritanceInfo = nullptr;
 	cmdBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
+	VkViewport viewport = { 0, 0, (float)m_device->m_vkb_swapchain.extent.width, (float)m_device->m_vkb_swapchain.extent.height, 0, 1 };
+	VkRect2D scissor = {};
+	scissor.offset = { 0,0 };
+	scissor.extent = m_device->m_vkb_swapchain.extent;
+
 	_VK_CHECK(vkBeginCommandBuffer(m_device->GetCurrentFrame()._mainCommandBuffer, &cmdBeginInfo), "Cannot begin cmdBuffer");
+	vkCmdSetViewport(m_device->GetCurrentFrame()._mainCommandBuffer, 0, 1, &viewport);
+	vkCmdSetScissor(m_device->GetCurrentFrame()._mainCommandBuffer, 0, 1, &scissor);
+	return true;
+}
 
-
+void Renderer::BeginRenderPass(uint32_t& swapchainImageIndex, bool gui)
+{
 	//make a clear-color from frame number. This will flash with a 120*pi frame period.
 	VkClearValue clearValue;
-	m_flash += Time::GetDelta() * (10 * m_rotationSpeed);
-	float flash = abs(sin(m_flash / 120.f));
-	clearValue.color = { { 0.0f, 0.0f, flash, 1.0f } };
+	clearValue.color = { { 0.0f, 0.0f, 0.0f, 1.0f } };
 	VkClearValue depthClear;
 	depthClear.depthStencil.depth = 1.f;
 	//start the main renderpass.
 	//We will use the clear color from above, and the framebuffer of the index the swapchain gave us
+
 	VkRenderPassBeginInfo rpInfo = {};
 	rpInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	rpInfo.pNext = nullptr;
 
-	rpInfo.renderPass = m_device->m_renderPass;
+	rpInfo.renderPass = gui? m_device->m_guiPass : m_device->m_renderPass;
 	rpInfo.renderArea.offset.x = 0;
 	rpInfo.renderArea.offset.y = 0;
 	rpInfo.renderArea.extent = m_device->m_vkb_swapchain.extent;
 	rpInfo.framebuffer = m_device->m_frameBuffers[swapchainImageIndex];
-
-	//connect clear values
 	rpInfo.clearValueCount = 2;
 	VkClearValue clearValues[] = { clearValue, depthClear };
-
 	rpInfo.pClearValues = &clearValues[0];
-
 	vkCmdBeginRenderPass(m_device->GetCurrentFrame()._mainCommandBuffer, &rpInfo, VK_SUBPASS_CONTENTS_INLINE);
+}
+
+void Renderer::EndRenderPass(uint32_t& swapchainImageIndex)
+{
+	//finalize the render pass
+	vkCmdEndRenderPass(m_device->GetCurrentFrame()._mainCommandBuffer);
 }
 
 void Renderer::Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, int index)
@@ -244,8 +265,6 @@ void Renderer::Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> materi
 
 void Renderer::EndFrame(uint32_t& swapchainImageIndex)
 {
-	//finalize the render pass
-	vkCmdEndRenderPass(m_device->GetCurrentFrame()._mainCommandBuffer);
 	//finalize the command buffer (we can no longer add commands, but it can now be executed)
 	_VK_CHECK(vkEndCommandBuffer(m_device->GetCurrentFrame()._mainCommandBuffer), "failed to end m_currentCommandBuffer buffer!");
 	//prepare the submission to the queue.
@@ -288,7 +307,17 @@ void Renderer::EndFrame(uint32_t& swapchainImageIndex)
 
 	presentInfo.pImageIndices = &swapchainImageIndex;
 
-	_VK_CHECK(vkQueuePresentKHR(m_device->m_graphicsQueue, &presentInfo), "Failed to present");
+	VkResult result = vkQueuePresentKHR(m_device->m_graphicsQueue, &presentInfo);
+	if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_framebufferResized)
+	{
+		LOG_WARNING("NEED TO RECREATE SWAPCHAIN!");
+		m_framebufferResized = false;
+		m_device->RebuildSwapchain();
+	}
+	else
+	{
+		_VK_CHECK(result, "Failed to present image! on");
+	}
 
 }
 

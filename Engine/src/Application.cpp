@@ -146,8 +146,9 @@ void gns::Application::Run()
 		HandleEvents();
 		UpdateSystems();
 		cameraSystem.UpdateCamera();
-		gui->BeginGUI();
 		UpdateLate();
+		gui->BeginGUI();
+		gui->DrawGUI();
 		Render(scene);
 		Time::EndFrameTime();
 	}
@@ -179,18 +180,23 @@ void gns::Application::Render(std::shared_ptr<Scene> scene)
 	}
 
 	uint32_t swapchainImageIndex;
-	m_renderer->BeginFrame(swapchainImageIndex);
-	m_renderer->UpdateGlobalUbo(camData);
-	m_renderer->UpdateSceneDataUbo();
-	int index = 0;
-	auto entityView = scene->registry.view<Transform, MeshComponent, MaterialComponent>();
-	for (auto [entt, transform, mesh, material] : entityView.each())
+	if(m_renderer->BeginFrame(swapchainImageIndex))
 	{
-		m_renderer->UpdatePushConstant(transform.matrix, material.material);
-		m_renderer->Draw(mesh.mesh, material.material, index);
+		m_renderer->BeginRenderPass(swapchainImageIndex, false);
+		m_renderer->UpdateGlobalUbo(camData);
+		m_renderer->UpdateSceneDataUbo();
+		auto entityView = scene->registry.view<Transform, MeshComponent, MaterialComponent>();
+		for (auto [entt, transform, mesh, material] : entityView.each())
+		{
+			m_renderer->UpdatePushConstant(transform.matrix, material.material);
+			m_renderer->Draw(mesh.mesh, material.material, swapchainImageIndex);
+		}
+		m_renderer->EndRenderPass(swapchainImageIndex);
+		m_renderer->BeginRenderPass(swapchainImageIndex, true);
+		gui->EndGUI();
+		m_renderer->EndRenderPass(swapchainImageIndex);
+		m_renderer->EndFrame(swapchainImageIndex);
 	}
-	gui->EndGUI();
-	m_renderer->EndFrame(swapchainImageIndex);
 }
 
 
@@ -201,7 +207,7 @@ void gns::Application::UpdateSystems()
 
 void gns::Application::UpdateLate()
 {
-	gui->DrawGUI();
+		
 }
 
 void gns::Application::HandleEvents()

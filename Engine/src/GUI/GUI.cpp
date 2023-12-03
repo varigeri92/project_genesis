@@ -41,9 +41,7 @@ void gns::GUI::InitializeGUI()
 	_VK_CHECK(vkCreateDescriptorPool(m_device->m_device, &pool_info, nullptr, &m_device->m_imGuiPool), "Failed to create DescriptorPools for GUI");
 
 
-	// 2: initialize imgui library
-
-	//this initializes the core structures of imgui
+	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
 	//this initializes imgui for SDL
@@ -66,6 +64,14 @@ void gns::GUI::InitializeGUI()
 	m_device->ImmediateSubmit([&](VkCommandBuffer cmd) {
 		ImGui_ImplVulkan_CreateFontsTexture();
 		});
+	ImGuiIO& io = ImGui::GetIO(); //(void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+	io.ConfigFlags |= ImGuiConfigFlags_IsSRGB;         // Enable Docking
+	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+
+	ImGui::StyleColorsDark();
 }
 
 void gns::GUI::BeginGUI()

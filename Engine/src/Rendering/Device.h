@@ -79,6 +79,7 @@ namespace gns::rendering
 		Device operator=(const Device& other) = delete;
 
 	private:
+		Window* m_window;
 		VmaAllocator m_allocator;
 
 		uint32_t m_imageCount;
@@ -114,6 +115,7 @@ namespace gns::rendering
 		UploadContext m_uploadContext;
 
 		VkRenderPass m_renderPass;
+		VkRenderPass m_guiPass;
 		std::vector<VkFramebuffer> m_frameBuffers;
 
 		//the format for the depth image
@@ -129,14 +131,15 @@ namespace gns::rendering
 		Buffer m_sceneParameterBuffer;
 
 
-		bool InitVulkan(Window* window);
-		void CreateSurface(Window* window);
-		void CreateSwapchain(Window* window);
+		bool InitVulkan();
+		void CreateSurface();
+		void CreateSwapchain();
 		void RebuildSwapchain();
 
 		void CreateCommandPool();
 
 		void InitDefaultRenderPass();
+		void InitGUIRenderPass();
 
 		void InitFrameBuffers();
 		void InitSyncStructures();

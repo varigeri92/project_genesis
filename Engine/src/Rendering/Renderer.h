@@ -32,7 +32,9 @@ namespace gns::rendering
 		Renderer(Window* window);
 		~Renderer();
 		Renderer operator=(Renderer& other) = delete;
-		void BeginFrame(uint32_t& swapchainImageIndex);
+		bool BeginFrame(uint32_t& swapchainImageIndex);
+		void BeginRenderPass(uint32_t& swapchainImageIndex, bool gui);
+		void EndRenderPass(uint32_t& swapchainImageIndex);
 		void Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, int index);
 		void EndFrame(uint32_t& swapchainImageIndex);
 		void UploadMesh(Mesh* mesh);
@@ -40,6 +42,13 @@ namespace gns::rendering
 		
 		void DisposeObject(std::shared_ptr<Disposeable> object);
 	private:
+
+		VkClearValue m_clearValue;
+		VkClearValue m_depthClear;
+		VkClearValue m_clearValues[2];
+		VkRenderPassBeginInfo m_mainRPInfo;
+
+		bool m_framebufferResized = false;
 		std::vector<std::shared_ptr<Disposeable>> _disposeQueue;
 		uint32_t m_frameNumber{ 0 };
 		float m_rotation{ 0 };

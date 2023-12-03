@@ -41,10 +41,10 @@ namespace gns::rendering
         vkDestroyCommandPool(device, _commandPool, nullptr);
     }
 
-	Device::Device(Window* window)
+	Device::Device(Window* window): m_window(window)
 	{
         LOG_INFO("Initialize Vulkan!");
-        if (!InitVulkan(window))
+        if (!InitVulkan())
         {
             LOG_ERROR("Vulkan initialization failed!");
             return;
@@ -58,11 +58,12 @@ namespace gns::rendering
         m_gpuProperties = m_vkb_device.physical_device.properties;
         LOG_INFO("The GPU has a minimum buffer alignment of " << m_gpuProperties.limits.minUniformBufferOffsetAlignment);
 
-        CreateSwapchain(window);
+        CreateSwapchain();
         m_frames.resize(m_imageCount);
 
         CreateCommandPool();
         InitDefaultRenderPass();
+        InitGUIRenderPass();
         InitFrameBuffers();
         InitSyncStructures();
         InitDescriptors();
@@ -79,6 +80,7 @@ namespace gns::rendering
         vkDestroyDescriptorSetLayout(m_device, m_objectSetLayout, nullptr);
         vkDestroyDescriptorSetLayout(m_device, m_singleTextureSetLayout, nullptr);
         vkDestroyRenderPass(m_device, m_renderPass, nullptr);
+        vkDestroyRenderPass(m_device, m_guiPass, nullptr);
         for (int i = 0; i < m_frameBuffers.size(); i++) {
             vkDestroyFramebuffer(m_device, m_frameBuffers[i], nullptr);
             vkDestroyImageView(m_device, m_imageViews[i], nullptr);
@@ -101,7 +103,7 @@ namespace gns::rendering
         vkb::destroy_device(m_vkb_device);
 	}
 
-	bool Device::InitVulkan(Window* window) {
+	bool Device::InitVulkan() {
         vkb::InstanceBuilder builder;
         auto inst_ret = builder.request_validation_layers(true).set_debug_callback(debugCallback)
     		.set_debug_messenger_severity(VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
@@ -116,7 +118,7 @@ namespace gns::rendering
         }
         m_vkb_instance = inst_ret.value();
         m_instance = m_vkb_instance.instance;
-        CreateSurface(window);
+        CreateSurface();
         vkb::PhysicalDeviceSelector selector{ m_vkb_instance };
         auto phys_ret = selector.set_surface(m_surface)
             .set_minimum_version(1, 1) // require a vulkan 1.1 capable device
@@ -181,17 +183,17 @@ namespace gns::rendering
         return true;
     }
 
-    void Device::CreateSurface(Window* window)
+    void Device::CreateSurface()
     {
         VkWin32SurfaceCreateInfoKHR createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-        createInfo.hwnd = window->hwndHandle;
-        createInfo.hinstance = window->hinstance;
+        createInfo.hwnd = m_window->hwndHandle;
+        createInfo.hinstance = m_window->hinstance;
 
         _VK_CHECK(vkCreateWin32SurfaceKHR(m_instance, &createInfo, nullptr, &m_surface), "Failed to create Surface");
     }
 
-    void Device::CreateSwapchain(Window* window)
+    void Device::CreateSwapchain()
     {
         vkb::SwapchainBuilder swapchain_builder{ m_vkb_device };
         auto swap_ret = swapchain_builder.build();
@@ -205,27 +207,18 @@ namespace gns::rendering
         m_imageViews = m_vkb_swapchain.get_image_views().value();
 
         int w= 0, h = 0;
-        window->GetExtent(w,h);
-        //depth image size will match the window
+        m_window->GetExtent(w,h);
         VkExtent3D depthImageExtent = {static_cast<uint32_t>(w),static_cast<uint32_t>(h),1};
-
-        //hardcoding the depth format to 32 bit float
         m_depthFormat = VK_FORMAT_D32_SFLOAT;
-
-        //the depth image will be an image with the format we selected and Depth Attachment usage flag
         VkImageCreateInfo dimg_info = ImageCreateInfo(m_depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, depthImageExtent);
 
-        //for the depth image, we want to allocate it from GPU local memory
         VmaAllocationCreateInfo dimg_allocinfo = {};
         dimg_allocinfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
         dimg_allocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-        //allocate and create the image
         vmaCreateImage(m_allocator, &dimg_info, &dimg_allocinfo, &_depthImage._image, &_depthImage._allocation, nullptr);
 
-        //build an image-view for the depth image to use for rendering
         VkImageViewCreateInfo dview_info = ImageViewCreateInfo(m_depthFormat, _depthImage._image, VK_IMAGE_ASPECT_DEPTH_BIT);
-
         _VK_CHECK(vkCreateImageView(m_device, &dview_info, nullptr, &_depthImageView), "Failed to create ImageView!");
     }
 
@@ -235,6 +228,7 @@ namespace gns::rendering
         auto swap_ret = swapchain_builder.set_old_swapchain(m_vkb_swapchain)
             .build();
         if(!swap_ret) {
+            LOG_ERROR("Failed to createSwapchain!");
             // If it failed to create a swapchain, the old swapchain handle is invalid.
             m_vkb_swapchain.swapchain = VK_NULL_HANDLE;
         }
@@ -245,6 +239,24 @@ namespace gns::rendering
         m_swapchain = m_vkb_swapchain.swapchain;
         m_swapchainFormat = m_vkb_swapchain.image_format;
         m_imageViews = m_vkb_swapchain.get_image_views().value();
+
+        int w = 0, h = 0;
+        m_window->GetExtent(w, h);
+        VkExtent3D depthImageExtent = { static_cast<uint32_t>(w),static_cast<uint32_t>(h),1 };
+        VkImageCreateInfo dimg_info = ImageCreateInfo(m_depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, depthImageExtent);
+        vmaDestroyImage(m_allocator, _depthImage._image, nullptr);
+        VmaAllocationCreateInfo dimg_allocinfo = {};
+        dimg_allocinfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+        dimg_allocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        vmaCreateImage(m_allocator, &dimg_info, &dimg_allocinfo, &_depthImage._image, &_depthImage._allocation, nullptr);
+        VkImageViewCreateInfo dview_info = ImageViewCreateInfo(m_depthFormat, _depthImage._image, VK_IMAGE_ASPECT_DEPTH_BIT);
+        vkDestroyImageView(m_device, _depthImageView, nullptr);
+        _VK_CHECK(vkCreateImageView(m_device, &dview_info, nullptr, &_depthImageView), "Failed to create ImageView!");
+
+        for (int i = 0; i < m_frameBuffers.size(); i++) {
+            vkDestroyFramebuffer(m_device, m_frameBuffers[i], nullptr);
+        }
+        InitFrameBuffers();
     }
 
     void Device::CreateCommandPool()
@@ -342,6 +354,82 @@ namespace gns::rendering
         renderPassInfo.pDependencies = &dependencies[0];
 
         _VK_CHECK(vkCreateRenderPass(m_device, &renderPassInfo, nullptr, &m_renderPass), "Failed to create RenderPass");
+    }
+
+    void Device::InitGUIRenderPass()
+    {
+        VkAttachmentDescription colorAttachment = {};
+
+        colorAttachment.format = m_swapchainFormat;
+        colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+        VkAttachmentReference colorAttachmentRef = {};
+        colorAttachmentRef.attachment = 0;
+        colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+        VkAttachmentDescription depthAttachment = {};
+        // Depth attachment
+        depthAttachment.flags = 0;
+        depthAttachment.format = m_depthFormat;
+        depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        VkAttachmentReference depthAttachmentRef = {};
+        depthAttachmentRef.attachment = 1;
+        depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        VkSubpassDescription subpass = {};
+        subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+        subpass.colorAttachmentCount = 1;
+        subpass.pColorAttachments = &colorAttachmentRef;
+        subpass.pDepthStencilAttachment = &depthAttachmentRef;
+
+        VkAttachmentDescription attachments[2] = { colorAttachment, depthAttachment };
+
+        VkRenderPassCreateInfo renderPassInfo = {};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+        renderPassInfo.attachmentCount = 2;
+        renderPassInfo.pAttachments = &attachments[0];
+        renderPassInfo.subpassCount = 1;
+        renderPassInfo.pSubpasses = &subpass;
+
+
+        VkSubpassDependency dependency = {};
+        dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+        dependency.dstSubpass = 0;
+        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        dependency.srcAccessMask = 0;
+        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+        VkSubpassDependency depthDependency = {};
+        depthDependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+        depthDependency.dstSubpass = 0;
+        depthDependency.srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+        depthDependency.srcAccessMask = 0;
+        depthDependency.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+        depthDependency.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+
+        VkSubpassDependency dependencies[2] = { dependency, depthDependency };
+
+        //other code...
+        renderPassInfo.dependencyCount = 2;
+        renderPassInfo.pDependencies = &dependencies[0];
+
+        _VK_CHECK(vkCreateRenderPass(m_device, &renderPassInfo, nullptr, &m_guiPass), "Failed to create RenderPass");
+
     }
 
     void Device::InitFrameBuffers()
