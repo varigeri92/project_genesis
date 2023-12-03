@@ -66,6 +66,7 @@ namespace gns::rendering
 	{
 	    vmaDestroyImage(device->m_allocator, image, allocation);
 		vkDestroyImageView(device->m_device, imageView, nullptr);
+		vkDestroySampler(device->m_device, m_sampler, nullptr);
 	}
 
 	void Texture::Apply(Device* device)

@@ -77,6 +77,7 @@ namespace gns::rendering
         vkDestroyDescriptorPool(m_device, m_descriptorPool, nullptr);
         vkDestroyDescriptorSetLayout(m_device, m_globalSetLayout, nullptr);
         vkDestroyDescriptorSetLayout(m_device, m_objectSetLayout, nullptr);
+        vkDestroyDescriptorSetLayout(m_device, m_singleTextureSetLayout, nullptr);
         vkDestroyRenderPass(m_device, m_renderPass, nullptr);
         for (int i = 0; i < m_frameBuffers.size(); i++) {
             vkDestroyFramebuffer(m_device, m_frameBuffers[i], nullptr);
@@ -258,7 +259,7 @@ namespace gns::rendering
 
 
     	//create pool for upload context
-        VkCommandPoolCreateInfo uploadCommandPoolInfo = CommandPoolCreateInfo(m_transferFamilyIndex);
+        VkCommandPoolCreateInfo uploadCommandPoolInfo = CommandPoolCreateInfo(m_graphicsFamilyIndex);
         _VK_CHECK(vkCreateCommandPool(m_device, &uploadCommandPoolInfo, nullptr, &m_uploadContext._commandPool), 
             "Failed to create upload CommandPool");
         VkCommandBufferAllocateInfo cmdAllocInfo = CommandBufferAllocateInfo(m_uploadContext._commandPool, 1);
@@ -540,7 +541,7 @@ namespace gns::rendering
         return m_frames[m_imageIndex];
     }
 
-    void Device::ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function)
+    void Device::ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function, bool transfer/* = true*/)
     {
         VkCommandBuffer cmd = m_uploadContext._commandBuffer;
 
@@ -551,7 +552,9 @@ namespace gns::rendering
         function(cmd);
         _VK_CHECK(vkEndCommandBuffer(cmd), "Failed To end CommandBuffer");
         VkSubmitInfo submit = SubmitInfo(&cmd);
-        _VK_CHECK(vkQueueSubmit(m_transferQueue, 1, &submit, m_uploadContext._uploadFence), "Failed To bubmit Command Buffer");
+
+        _VK_CHECK(vkQueueSubmit(m_graphicsQueue, 1, &submit, m_uploadContext._uploadFence), "Failed To bubmit Command Buffer");
+
         vkWaitForFences(m_device, 1, &m_uploadContext._uploadFence, VK_TRUE, static_cast<uint64_t>(-1));
         vkResetFences(m_device, 1, &m_uploadContext._uploadFence);
         vkResetCommandPool(m_device, m_uploadContext._commandPool, 0);

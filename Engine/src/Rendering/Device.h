@@ -142,7 +142,7 @@ namespace gns::rendering
 		void EndFrame();
 		FrameData& GetCurrentFrame();
 
-		void ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function);
+		void ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function, bool transfer = true);
 	};
 }
 

@@ -15,7 +15,7 @@ namespace gns {
 			scene	{ scene } 
 		{};
 		
-		Entity() = default;
+		Entity() = delete;
 
 		template<typename T, typename... Args>
 		T& AddComponet(Args&& ... args)

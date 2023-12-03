@@ -67,6 +67,16 @@ void gns::Application::Run()
 	trinagleMesh->_vertices[2].color = { 0.f, 1.f, 0.0f };
 	m_renderer->UploadMesh(trinagleMesh.get());
 
+	std::shared_ptr<Shader> mc_shader = std::make_shared<Shader>(
+		R"(Shaders\tri_mesh.vert.spv)",
+		R"(Shaders\textured_lit.frag.spv)");
+
+	std::shared_ptr<Material> mc_material = std::make_shared<Material>(mc_shader, "mc_material");
+	mc_material->texture = std::make_shared<Texture>(R"(Textures\lost_empire-RGBA.png)");
+	mc_material->texture->Create(m_renderer->m_device);
+	m_renderer->CreatePipelineForMaterial(mc_material);
+	mc_material->texture->Apply(m_renderer->m_device);
+
 	//Load Suzan:
 	std::shared_ptr<Mesh> suzan_mesh = AssetLoader::LoadMesh(R"(Meshes\monkey_smooth.obj)");
 	std::shared_ptr<Mesh> mc_mesh = AssetLoader::LoadMesh( R"(Meshes\lost_empire.obj)");
@@ -82,22 +92,14 @@ void gns::Application::Run()
 	R"(Shaders\tri_mesh.vert.spv)",
 		R"(Shaders\default_lit.frag.spv)");
 
-	std::shared_ptr<Shader> mc_shader = std::make_shared<Shader>(
-		R"(Shaders\tri_mesh.vert.spv)",
-		R"(Shaders\textured_lit.frag.spv)");
 
 	//Create Material objects and pipelines for those materials: 
-	std::shared_ptr<Material> triangle_material = std::make_shared<Material>(triangle_shader);
+	std::shared_ptr<Material> triangle_material = std::make_shared<Material>(triangle_shader, "triangle_material");
 	m_renderer->CreatePipelineForMaterial(triangle_material);
-	std::shared_ptr<Material> suzan_material = std::make_shared<Material>(suzan_shader);
+	std::shared_ptr<Material> suzan_material = std::make_shared<Material>(suzan_shader, "Suzan_Material");
 	m_renderer->CreatePipelineForMaterial(suzan_material);
 
 
-	std::shared_ptr<Material> mc_material = std::make_shared<Material>(mc_shader);
-	mc_material->texture = std::make_shared<Texture>(R"(Textures\lost_empire-RGBA.png)");;
-	mc_material->texture->Create(m_renderer->m_device);
-	m_renderer->CreatePipelineForMaterial(mc_material);
-	mc_material->texture->Apply(m_renderer->m_device);
 
 	//Entity Creation:
 	//Create Scene

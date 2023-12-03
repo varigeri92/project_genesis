@@ -24,8 +24,8 @@ namespace gns::rendering
 		std::string fragmentShaderPath;
 	};
 	struct Material : public Disposeable {
-		Material(std::shared_ptr<Shader> shader) :shader(shader){};
-
+		Material(std::shared_ptr<Shader> shader, std::string name) :shader(shader), name(name) {};
+		std::string name;
 		VkPipeline pipeline;
 		VkPipelineLayout pipelineLayout;
 		std::shared_ptr<Shader> shader;

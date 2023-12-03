@@ -54,9 +54,7 @@ void Renderer::UploadMesh(Mesh* mesh)
 
 	void* data;
 	vmaMapMemory(m_device->m_allocator, stagingBuffer._allocation, &data);
-
 	memcpy(data, mesh->_vertices.data(), mesh->_vertices.size() * sizeof(Vertex));
-
 	vmaUnmapMemory(m_device->m_allocator, stagingBuffer._allocation);
 
 
@@ -151,6 +149,7 @@ void Renderer::CreatePipelineForMaterial(std::shared_ptr<Material> material)
 
 	vkDestroyShaderModule(m_device->m_device, vertShader, nullptr);
 	vkDestroyShaderModule(m_device->m_device, fragShader, nullptr);
+	LOG_INFO("Pipeline created for:" << material->name);
 }
 
 void Renderer::DisposeObject(std::shared_ptr<Disposeable> object)
