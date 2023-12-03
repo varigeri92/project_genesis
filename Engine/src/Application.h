@@ -9,6 +9,7 @@ namespace gns::rendering
 }
 namespace gns
 {
+	class GUI;
 	class Window;
 
 	class Application
@@ -18,6 +19,7 @@ namespace gns
 		~Application();
 	private:
 		//
+		GUI* gui;
 		Window* m_window;
 		bool m_close;
 		CameraSystem* camerasystem = nullptr;

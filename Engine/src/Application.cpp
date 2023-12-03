@@ -6,6 +6,9 @@
 #include "Log.h"
 #include "AssetDatabase/AssetLoader.h"
 #include "ECS/Entity.h"
+#include "GUI/GUI.h"
+#include "GUI/ImGui/imgui_impl_sdl2.h"
+#include "GUI/ImGui/imgui_impl_vulkan.h"
 
 #include "Rendering/Renderer.h";
 #include "Rendering/Device.h";
@@ -136,16 +139,20 @@ void gns::Application::Run()
 	CameraComponent& sceneCamera = sceneCamera_entity.AddComponet<CameraComponent>(0.01f, 1000.f, 60.f, 1700, 900, cameraTransform);
 	CameraSystem cameraSystem = { cameraTransform, sceneCamera };
 
+	gui = new GUI{ m_renderer->m_device, m_window };
 	while (!m_close)
 	{
 		Time::StartFrameTime();
 		HandleEvents();
 		UpdateSystems();
 		cameraSystem.UpdateCamera();
+		gui->BeginGUI();
+		UpdateLate();
 		Render(scene);
 		Time::EndFrameTime();
 	}
 
+	gui->DisposeGUI();
 	m_renderer->DisposeObject(suzan_material);
 	m_renderer->DisposeObject(suzan_mesh);
 	m_renderer->DisposeObject(triangle_material);
@@ -182,6 +189,7 @@ void gns::Application::Render(std::shared_ptr<Scene> scene)
 		m_renderer->UpdatePushConstant(transform.matrix, material.material);
 		m_renderer->Draw(mesh.mesh, material.material, index);
 	}
+	gui->EndGUI();
 	m_renderer->EndFrame(swapchainImageIndex);
 }
 
@@ -193,6 +201,7 @@ void gns::Application::UpdateSystems()
 
 void gns::Application::UpdateLate()
 {
+	gui->DrawGUI();
 }
 
 void gns::Application::HandleEvents()

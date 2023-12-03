@@ -13,6 +13,8 @@ namespace gns
 {
 	class Window
 	{
+		friend class GUI;
+		friend class Application;
 	public:
 		HWND hwndHandle;
 		HINSTANCE hinstance;

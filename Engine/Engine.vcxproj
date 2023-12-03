@@ -202,7 +202,16 @@ echo Shader compilation complete.</Command>
     <ClInclude Include="API\core.h" />
     <ClInclude Include="API\gnsAPI.h" />
     <ClInclude Include="API\Log.h" />
+    <ClInclude Include="src\GUI\GUI.h" />
     <ClInclude Include="src\AssetDatabase\stb_image.h" />
+    <ClInclude Include="src\GUI\ImGui\imconfig.h" />
+    <ClInclude Include="src\GUI\ImGui\imgui.h" />
+    <ClInclude Include="src\GUI\ImGui\imgui_impl_sdl2.h" />
+    <ClInclude Include="src\GUI\ImGui\imgui_impl_vulkan.h" />
+    <ClInclude Include="src\GUI\ImGui\imgui_internal.h" />
+    <ClInclude Include="src\GUI\ImGui\imstb_rectpack.h" />
+    <ClInclude Include="src\GUI\ImGui\imstb_textedit.h" />
+    <ClInclude Include="src\GUI\ImGui\imstb_truetype.h" />
     <ClInclude Include="src\Rendering\DataObjects\DisposableVkObject.h" />
     <ClInclude Include="src\Rendering\DataObjects\Material.h" />
     <ClInclude Include="src\Rendering\DataObjects\Mesh.h" />
@@ -307,6 +316,14 @@ echo Shader compilation complete.</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="API\vklog.h" />
+    <ClCompile Include="src\GUI\GUI.cpp" />
+    <ClCompile Include="src\GUI\ImGui\imgui.cpp" />
+    <ClCompile Include="src\GUI\ImGui\imgui_demo.cpp" />
+    <ClCompile Include="src\GUI\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="src\GUI\ImGui\imgui_impl_sdl2.cpp" />
+    <ClCompile Include="src\GUI\ImGui\imgui_impl_vulkan.cpp" />
+    <ClCompile Include="src\GUI\ImGui\imgui_tables.cpp" />
+    <ClCompile Include="src\GUI\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="src\Rendering\DataObjects\Material.cpp" />
     <ClCompile Include="src\Rendering\DataObjects\Mesh.cpp" />
     <ClCompile Include="src\Rendering\Helpers\PipelineHelper.cpp" />

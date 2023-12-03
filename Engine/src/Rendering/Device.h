@@ -9,6 +9,7 @@
 
 namespace gns
 {
+	class GUI;
 	class Window;
 }
 
@@ -70,6 +71,7 @@ namespace gns::rendering
 		friend class PipelineBuilder;
 		friend class Buffer;
 		friend class Texture;
+		friend class gns::GUI;
 	public:
 		Device() = delete;
 		Device(Window* window);
@@ -121,6 +123,7 @@ namespace gns::rendering
 		VkDescriptorSetLayout m_objectSetLayout;
 		VkDescriptorSetLayout m_singleTextureSetLayout;
 		VkDescriptorPool m_descriptorPool;
+		VkDescriptorPool m_imGuiPool;
 
 		GPUSceneData m_sceneParameters = {};
 		Buffer m_sceneParameterBuffer;

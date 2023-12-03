@@ -9,6 +9,8 @@
 #include "../Core/Time.h"
 #include "DataObjects/Texture.h"
 #include "Helpers/VkInitializer.h"
+#include "../GUI/ImGui/imgui_impl_sdl2.h"
+#include "../GUI/ImGui/imgui_impl_vulkan.h"
 
 namespace gns::rendering
 {

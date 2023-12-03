@@ -3,6 +3,7 @@
 #include <string>
 #include "Log.h"
 #include "Window/Window.h"
+#include "GUI/ImGui/imgui_impl_sdl2.h"
 
 
 namespace gns
@@ -52,8 +53,8 @@ namespace gns
 		*/
 		while (SDL_PollEvent(&event) != 0)
 		{
+			ImGui_ImplSDL2_ProcessEvent(&event);
 			window->WindowEvent(&event);
-
 			switch (event.type)
 			{
 			case SDL_QUIT:
@@ -84,11 +85,11 @@ namespace gns
 			default:
 				break;
 			}
+
 		}
 		mouseVelocity = p_mousePos - mousePos;
 		mouseVelocity.x = (float)mouseVelocity.x / 100.f;
 		mouseVelocity.y = (float)mouseVelocity.y / 100.f;
-
 		return false;
 	}
 	bool Input::GetMouseButtonDown(int mouseButton)
