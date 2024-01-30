@@ -6,10 +6,10 @@
 #include "AssetDatabase/tiny_obj_loader.h"
 
 using namespace gns;
-GEN_API int CreateApplication()
+GEN_API int CreateApplication(const char* WorkingDirectory)
 {
 	LOG_INFO("Hello Genesis engine");
-	Application* application = new Application();
+	Application* application = new Application(WorkingDirectory);
 	application->Run();
 	delete(application);
 	return 0;

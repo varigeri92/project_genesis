@@ -66,6 +66,13 @@ namespace gns
 		std::shared_ptr<Material> material;
 		MaterialComponent(std::shared_ptr<Material> material) : material{ material } {};
 	};
+
+	struct RendererComponent
+	{
+		std::shared_ptr<Mesh> mesh;
+		std::shared_ptr<Material> material;
+		RendererComponent(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) : mesh(mesh), material(material) {};
+	};
 	struct CameraComponent
 	{
 		CameraComponent() = delete;

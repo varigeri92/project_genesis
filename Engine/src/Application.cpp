@@ -7,8 +7,8 @@
 #include "AssetDatabase/AssetLoader.h"
 #include "ECS/Entity.h"
 #include "GUI/GUI.h"
-#include "GUI/ImGui/imgui_impl_sdl2.h"
-#include "GUI/ImGui/imgui_impl_vulkan.h"
+#include "ImGui/imgui_impl_sdl2.h"
+#include "ImGui/imgui_impl_vulkan.h"
 
 #include "Rendering/Renderer.h";
 #include "Rendering/Device.h";
@@ -17,8 +17,9 @@
 
 GPUSceneData sceneData = {};
 
-gns::Application::Application()
+gns::Application::Application(std::string assetsPath)
 {
+	AssetLoader::SetPaths(assetsPath);
 	m_window = new Window();
 	m_close = false;
 	m_renderer = new rendering::Renderer(m_window);
@@ -48,6 +49,10 @@ gns::Application::Application()
 	LOG_INFO(d);
 	#pragma endregion
 	 */
+
+	sceneData.ambientColor = { 0.299f,0.145f,0.145f,0.150f };
+	sceneData.sunlightColor = {1.f, 1.f, 1.f, 1.f};
+	sceneData.sunlightDirection = { 1.f, 1.f, 0.f , 0.f};
 }
 
 gns::Application::~Application()
@@ -58,15 +63,16 @@ gns::Application::~Application()
 
 void gns::Application::Run()
 {
-
 	//Load Suzan:
 	std::shared_ptr<Mesh> suzan_mesh = AssetLoader::LoadMesh(R"(Meshes\OtherModels\Rei\Rei.obj)");
-	std::shared_ptr<Shader> suzan_shader = std::make_shared<Shader>(R"(Shaders\blinphong.vert.spv)",
-		R"(Shaders\blinphong.frag.spv)");
 	m_renderer->UploadMesh(suzan_mesh.get());
 
-	std::shared_ptr<Material> suzan_material = std::make_shared<Material>(suzan_shader, "Suzan_Material");
-	m_renderer->CreatePipelineForMaterial(suzan_material);
+	std::shared_ptr<Mesh> groundPlaneMesh = AssetLoader::LoadMesh(R"(Meshes\plane.obj)");
+	m_renderer->UploadMesh(groundPlaneMesh.get());
+
+	std::shared_ptr<Shader> defaultShader = std::make_shared<Shader>("blinphong.vert.spv","blinphong.frag.spv");
+	std::shared_ptr<Material> defaultMaterial = std::make_shared<Material>(defaultShader, "Rei_Material");
+	m_renderer->CreatePipelineForMaterial(defaultMaterial);
 
 	/* 
 	//load MC:
@@ -91,20 +97,21 @@ void gns::Application::Run()
 	mc_entity.GetTransform().matrix = glm::mat4{ 1 };
 	*/
 
-	Entity suzan = scene->CreateEntity("Suzan", scene.get());
-	suzan.AddComponet<MeshComponent>(suzan_mesh);
-	suzan.AddComponet<MaterialComponent>(suzan_material);
+	Entity suzan = scene->CreateEntity("Ayanami_Rei", scene.get());
+	suzan.AddComponet<RendererComponent>(suzan_mesh, defaultMaterial);
 	suzan.GetComponent<Transform>().matrix = glm::mat4{ 1 };
+
+	Entity floor = scene->CreateEntity("GroundFloor", scene.get());
+	floor.AddComponet<RendererComponent>(groundPlaneMesh, defaultMaterial);
+	floor.GetComponent<Transform>().matrix = glm::mat4{ 1 };
 
 	Entity sceneCamera_entity = scene->CreateEntity("SceneCamera", scene.get());
 	Transform& cameraTransform = sceneCamera_entity.GetTransform();
 	cameraTransform.position = { 0.f,-1.f,-3.f };
 	CameraComponent& sceneCamera = sceneCamera_entity.AddComponet<CameraComponent>(0.01f, 1000.f, 60.f, 1700, 900, cameraTransform);
 	CameraSystem cameraSystem = { cameraTransform, sceneCamera };
-
 	gui = new GUI{ m_renderer->m_device, m_window };
 
-	float lightdir[3] = {1,-1,0};
 	while (!m_close)
 	{
 		Time::StartFrameTime();
@@ -118,18 +125,12 @@ void gns::Application::Run()
 		ImGui::Begin("Scene Data Editor");
 
 		ImGui::ColorEdit3("Ambient Color", (float*)&sceneData.ambientColor);
-		ImGui::DragFloat("Ambient Intensity", &sceneData.ambientColor.w, 0);
+		ImGui::DragFloat("Ambient Intensity", &sceneData.ambientColor.w, 0.01f, 0);
 
 		ImGui::ColorEdit3("Light Color", (float*)&sceneData.sunlightColor);
-		ImGui::DragFloat("Light Intensity", &sceneData.sunlightColor.w, 0);
+		ImGui::DragFloat("Light Intensity", &sceneData.sunlightColor.w, 0.001f, 0);
 
-		ImGui::DragFloat3("light Direction", (float*)&sceneData.sunlightDirection, 0.01f, 0.0f, 1.0f);
-		/*
-		 
-		sceneData.sunlightDirection.x = lightdir[0];
-		sceneData.sunlightDirection.y = lightdir[1];
-		sceneData.sunlightDirection.z = lightdir[2];
-		*/
+		ImGui::DragFloat3("light Direction", (float*)&sceneData.sunlightDirection, 0.001f, -1.0f, 1.0f);
 
 		ImGui::End();
 		Render(scene);
@@ -137,13 +138,9 @@ void gns::Application::Run()
 	}
 
 	gui->DisposeGUI();
-	m_renderer->DisposeObject(suzan_material);
+	m_renderer->DisposeObject(defaultMaterial);
 	m_renderer->DisposeObject(suzan_mesh);
-	/*
-	m_renderer->DisposeObject(mc_material->texture);
-	m_renderer->DisposeObject(mc_material);
-	m_renderer->DisposeObject(mc_mesh);
-	 */
+	m_renderer->DisposeObject(groundPlaneMesh);
 }
 
 void gns::Application::CloseApplication()
@@ -168,11 +165,11 @@ void gns::Application::Render(std::shared_ptr<Scene> scene)
 		m_renderer->BeginRenderPass(swapchainImageIndex, false);
 		m_renderer->UpdateGlobalUbo(camData);
 		m_renderer->UpdateSceneDataUbo(sceneData);
-		auto entityView = scene->registry.view<Transform, MeshComponent, MaterialComponent, EntityComponent>();
-		for (auto [entt, transform, mesh, material, entity] : entityView.each())
+		auto entityView = scene->registry.view<Transform, RendererComponent, EntityComponent>();
+		for (auto [entt, transform, rendererComponent, entity] : entityView.each())
 		{
-			m_renderer->UpdatePushConstant(transform.matrix, material.material);
-			m_renderer->Draw(mesh.mesh, material.material, swapchainImageIndex);
+			m_renderer->UpdatePushConstant(transform.matrix, rendererComponent.material);
+			m_renderer->Draw(rendererComponent.mesh, rendererComponent.material, swapchainImageIndex);
 		}
 		m_renderer->EndRenderPass(swapchainImageIndex);
 		m_renderer->BeginRenderPass(swapchainImageIndex, true);

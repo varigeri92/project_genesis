@@ -14,6 +14,11 @@ using namespace gns::rendering;
 //#define LOAD_OLD_WAY
 namespace gns
 {
+	void AssetLoader::SetPaths(std::string assetsPath)
+	{
+        AssetsPath = assetsPath;
+	}
+
     std::shared_ptr<Mesh> AssetLoader::LoadMesh(std::string path)
     {
 
@@ -131,7 +136,7 @@ namespace gns
 
     std::vector<uint32_t> AssetLoader::LoadShader(std::string path)
     {
-        std::ifstream file((AssetsPath + path), std::ios::ate | std::ios::binary);
+        std::ifstream file((ShadersPath + path), std::ios::ate | std::ios::binary);
         if (!file.is_open()) {
             LOG_ERROR("Failed To open File: " << path);
             return {};

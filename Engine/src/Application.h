@@ -15,7 +15,7 @@ namespace gns
 	class Application
 	{
 	public:
-		Application();
+		Application(std::string assetsPath);
 		~Application();
 	private:
 		//
