@@ -49,6 +49,7 @@ namespace gns::rendering
 		VkRenderPassBeginInfo m_mainRPInfo;
 
 		bool m_framebufferResized = false;
+		bool m_pipelineBound = false;
 		std::vector<std::shared_ptr<Disposeable>> _disposeQueue;
 		uint32_t m_frameNumber{ 0 };
 		float m_rotation{ 0 };
@@ -58,6 +59,8 @@ namespace gns::rendering
 		uint32_t m_framesInFlight;
 
 		VkShaderModule CreateShaderModule(std::vector<uint32_t> buffer);
+		void CreateVertexBuffers(Mesh* mesh);
+		void CreateIndexBuffers(Mesh* mesh);
 		std::shared_ptr<Material> m_material_ptr;
 		//MOVE OUT OF HERE:
 	public:
@@ -66,7 +69,7 @@ namespace gns::rendering
 			std::shared_ptr<Material> material);
 
 		void UpdateGlobalUbo(GPUCameraData src_bufferData);
-		void UpdateSceneDataUbo();
+		void UpdateSceneDataUbo(const GPUSceneData& data);
 		void UpdateObjectData(void* src_data, size_t size);
 		void CreateTextureResources(std::shared_ptr<Texture> texture);
 	};

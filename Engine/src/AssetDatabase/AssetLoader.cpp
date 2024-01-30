@@ -10,10 +10,14 @@
 #include "../Rendering/Helpers/Buffer.h"
 
 using namespace gns::rendering;
+
+//#define LOAD_OLD_WAY
 namespace gns
 {
     std::shared_ptr<Mesh> AssetLoader::LoadMesh(std::string path)
     {
+
+#ifdef LOAD_OLD_WAY
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> materials;
@@ -70,6 +74,56 @@ namespace gns
                     mesh->_vertices.push_back(new_vert);
                 }
                 index_offset += fv;
+            }
+        }
+        return mesh;
+#else
+        return LoadMeshIndexed(path);
+#endif
+
+    }
+
+    std::shared_ptr<gns::rendering::Mesh> AssetLoader::LoadMeshIndexed(std::string path)
+    {
+        tinyobj::attrib_t attrib;
+        std::vector<tinyobj::shape_t> shapes;
+        std::vector<tinyobj::material_t> materials;
+        std::string warn, err;
+
+        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, (AssetsPath + path).c_str()))
+        {
+            LOG_ERROR(warn + err);
+        }
+
+        auto mesh = std::make_shared<Mesh>();
+        for (const auto& shape : shapes) {
+            uint32_t ind = 0;
+            for (const auto& index : shape.mesh.indices) {
+                Vertex vertex{};
+                vertex.position = {
+                    attrib.vertices[3 * index.vertex_index + 0],
+                    attrib.vertices[3 * index.vertex_index + 1],
+                    attrib.vertices[3 * index.vertex_index + 2]
+                };
+
+                vertex.normal = {
+                    attrib.normals[3 * index.normal_index + 0],
+                    attrib.normals[3 * index.normal_index + 1],
+                    attrib.normals[3 * index.normal_index + 2]
+                };
+
+                vertex.color = {
+                    attrib.normals[3 * index.normal_index + 0],
+                    attrib.normals[3 * index.normal_index + 1],
+                    attrib.normals[3 * index.normal_index + 2]
+                };
+
+                vertex.uv = {
+                    attrib.texcoords[2 * index.texcoord_index + 0],
+                    1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+                };
+                mesh->_vertices.push_back(vertex);
+                mesh->_indices.push_back(mesh->_indices.size());
             }
         }
         return mesh;

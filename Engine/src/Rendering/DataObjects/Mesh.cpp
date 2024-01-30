@@ -49,5 +49,6 @@ gns::rendering::VertexInputDescription gns::rendering::Vertex::GetVertexDescript
 void gns::rendering::Mesh::Dispose(Device* device)
 {
 	vmaDestroyBuffer(device->m_allocator, _vertexBuffer._buffer, _vertexBuffer._allocation);
+	vmaDestroyBuffer(device->m_allocator, _indexBuffer._buffer, _indexBuffer._allocation);
 }
 

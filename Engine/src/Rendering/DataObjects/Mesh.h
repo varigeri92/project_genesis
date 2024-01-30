@@ -31,8 +31,10 @@ namespace gns::rendering
 
 	struct Mesh : public Disposeable {
 		
-	    std::vector<Vertex> _vertices;
-	    Buffer _vertexBuffer;
+		std::vector<Vertex> _vertices;
+		std::vector<uint32_t> _indices;
+		Buffer _vertexBuffer;
+		Buffer _indexBuffer;
 
 		void Dispose(Device* device) override;
 	};

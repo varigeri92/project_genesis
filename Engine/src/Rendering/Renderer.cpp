@@ -33,59 +33,8 @@ Renderer::~Renderer()
 
 void Renderer::UploadMesh(Mesh* mesh)
 {
-	const size_t bufferSize = mesh->_vertices.size() * sizeof(Vertex);
-	//allocate staging buffer
-	VkBufferCreateInfo stagingBufferInfo = {};
-	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	stagingBufferInfo.pNext = nullptr;
-
-	stagingBufferInfo.size = bufferSize;
-	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-
-	//let the VMA library know that this data should be on CPU RAM
-	VmaAllocationCreateInfo vmaallocInfo = {};
-	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
-
-	Buffer stagingBuffer;
-
-	//allocate the buffer
-	_VK_CHECK(vmaCreateBuffer(m_device->m_allocator, &stagingBufferInfo, &vmaallocInfo,
-		&stagingBuffer._buffer,
-		&stagingBuffer._allocation,
-		nullptr), "Failed to create Buffer");
-
-	void* data;
-	vmaMapMemory(m_device->m_allocator, stagingBuffer._allocation, &data);
-	memcpy(data, mesh->_vertices.data(), mesh->_vertices.size() * sizeof(Vertex));
-	vmaUnmapMemory(m_device->m_allocator, stagingBuffer._allocation);
-
-
-	VkBufferCreateInfo vertexBufferInfo = {};
-	vertexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	vertexBufferInfo.pNext = nullptr;
-	//this is the total size, in bytes, of the buffer we are allocating
-	vertexBufferInfo.size = bufferSize;
-	//this buffer is going to be used as a Vertex Buffer
-	vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-
-	//let the VMA library know that this data should be GPU native
-	vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-
-	//allocate the buffer
-	_VK_CHECK(vmaCreateBuffer(m_device->m_allocator, &vertexBufferInfo, &vmaallocInfo,
-		&mesh->_vertexBuffer._buffer,
-		&mesh->_vertexBuffer._allocation,
-		nullptr), "");
-
-	m_device->ImmediateSubmit([&mesh, stagingBuffer, bufferSize](VkCommandBuffer cmd)
-	{
-			VkBufferCopy copy;
-			copy.dstOffset = 0;
-			copy.srcOffset = 0;
-			copy.size = bufferSize;
-			vkCmdCopyBuffer(cmd, stagingBuffer._buffer, mesh->_vertexBuffer._buffer, 1, &copy);
-	});
-	vmaDestroyBuffer(m_device->m_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
+	CreateVertexBuffers(mesh);
+	CreateIndexBuffers(mesh);
 }
 
 void Renderer::CreatePipelineForMaterial(std::shared_ptr<Material> material)
@@ -237,7 +186,7 @@ void Renderer::EndRenderPass(uint32_t& swapchainImageIndex)
 
 void Renderer::Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, int index)
 {
-	if(m_material_ptr != material)
+	if(m_material_ptr != material || m_pipelineBound == false)
 	{
 		m_material_ptr = material;
 		vkCmdBindPipeline(m_device->GetCurrentFrame()._mainCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, material->pipeline);
@@ -254,13 +203,19 @@ void Renderer::Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> materi
 			VK_PIPELINE_BIND_POINT_GRAPHICS, material->pipelineLayout, 1, 1, 
 			&m_device->GetCurrentFrame()._objectDescriptor, 0, nullptr);
 		*/
+		m_pipelineBound = true;
 	}
 
 	VkDeviceSize offset = 0;
 	vkCmdBindVertexBuffers(m_device->GetCurrentFrame()._mainCommandBuffer, 
 		0, 1, &mesh->_vertexBuffer._buffer, &offset);
+	vkCmdBindIndexBuffer(m_device->GetCurrentFrame()._mainCommandBuffer,
+		mesh->_indexBuffer._buffer, offset, VK_INDEX_TYPE_UINT32);
+	vkCmdDrawIndexed(m_device->GetCurrentFrame()._mainCommandBuffer, static_cast<uint32_t>(mesh->_indices.size()), 1, 0, 0, 0);
+	/*
 	vkCmdDraw(m_device->GetCurrentFrame()._mainCommandBuffer, 
 		mesh->_vertices.size(), 1, 0, 0);
+	*/
 }
 
 void Renderer::EndFrame(uint32_t& swapchainImageIndex)
@@ -318,7 +273,7 @@ void Renderer::EndFrame(uint32_t& swapchainImageIndex)
 	{
 		_VK_CHECK(result, "Failed to present image! on");
 	}
-
+	m_pipelineBound = false;
 }
 
 VkShaderModule Renderer::CreateShaderModule(std::vector<uint32_t> buffer)
@@ -335,6 +290,123 @@ VkShaderModule Renderer::CreateShaderModule(std::vector<uint32_t> buffer)
 		return VK_NULL_HANDLE;
 	}
 	return shaderModule;
+}
+
+void Renderer::CreateVertexBuffers(Mesh* mesh)
+{
+	const size_t bufferSize = mesh->_vertices.size() * sizeof(Vertex);
+	//allocate staging buffer
+	VkBufferCreateInfo stagingBufferInfo = {};
+	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	stagingBufferInfo.pNext = nullptr;
+
+	stagingBufferInfo.size = bufferSize;
+	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+
+	//let the VMA library know that this data should be on CPU RAM
+	VmaAllocationCreateInfo vmaallocInfo = {};
+	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
+
+	Buffer stagingBuffer;
+
+	//allocate the buffer
+	_VK_CHECK(vmaCreateBuffer(m_device->m_allocator, &stagingBufferInfo, &vmaallocInfo,
+		&stagingBuffer._buffer,
+		&stagingBuffer._allocation,
+		nullptr), "Failed to create Buffer");
+
+	void* data;
+	vmaMapMemory(m_device->m_allocator, stagingBuffer._allocation, &data);
+	memcpy(data, mesh->_vertices.data(), mesh->_vertices.size() * sizeof(Vertex));
+	vmaUnmapMemory(m_device->m_allocator, stagingBuffer._allocation);
+
+
+	VkBufferCreateInfo vertexBufferInfo = {};
+	vertexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	vertexBufferInfo.pNext = nullptr;
+	//this is the total size, in bytes, of the buffer we are allocating
+	vertexBufferInfo.size = bufferSize;
+	//this buffer is going to be used as a Vertex Buffer
+	vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+	//let the VMA library know that this data should be GPU native
+	vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+
+	//allocate the buffer
+	_VK_CHECK(vmaCreateBuffer(m_device->m_allocator, &vertexBufferInfo, &vmaallocInfo,
+		&mesh->_vertexBuffer._buffer,
+		&mesh->_vertexBuffer._allocation,
+		nullptr), "");
+
+	m_device->ImmediateSubmit([&mesh, stagingBuffer, bufferSize](VkCommandBuffer cmd)
+		{
+			VkBufferCopy copy;
+			copy.dstOffset = 0;
+			copy.srcOffset = 0;
+			copy.size = bufferSize;
+			vkCmdCopyBuffer(cmd, stagingBuffer._buffer, mesh->_vertexBuffer._buffer, 1, &copy);
+		});
+	vmaDestroyBuffer(m_device->m_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
+}
+
+void Renderer::CreateIndexBuffers(Mesh* mesh)
+{
+	size_t size = sizeof(mesh->_indices[0]);
+	const size_t bufferSize = mesh->_indices.size() * size;
+	//allocate staging buffer
+	VkBufferCreateInfo stagingBufferInfo = {};
+	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	stagingBufferInfo.pNext = nullptr;
+
+	stagingBufferInfo.size = bufferSize;
+	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+
+	//let the VMA library know that this data should be on CPU RAM
+	VmaAllocationCreateInfo vmaallocInfo = {};
+	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
+
+	Buffer stagingBuffer;
+
+	LOG_INFO(mesh->_indices.size());
+
+	//allocate the buffer
+	_VK_CHECK(vmaCreateBuffer(m_device->m_allocator, &stagingBufferInfo, &vmaallocInfo,
+		&stagingBuffer._buffer,
+		&stagingBuffer._allocation,
+		nullptr), "Failed to create Buffer");
+
+	void* data;
+	vmaMapMemory(m_device->m_allocator, stagingBuffer._allocation, &data);
+	memcpy(data, mesh->_indices.data(), mesh->_indices.size() * size);
+	vmaUnmapMemory(m_device->m_allocator, stagingBuffer._allocation);
+
+
+	VkBufferCreateInfo indexBufferInfo = {};
+	indexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	indexBufferInfo.pNext = nullptr;
+	//this is the total size, in bytes, of the buffer we are allocating
+	indexBufferInfo.size = bufferSize;
+	//this buffer is going to be used as a Vertex Buffer
+	indexBufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+	//let the VMA library know that this data should be GPU native
+	vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+
+	//allocate the buffer
+	_VK_CHECK(vmaCreateBuffer(m_device->m_allocator, &indexBufferInfo, &vmaallocInfo,
+		&mesh->_indexBuffer._buffer,
+		&mesh->_indexBuffer._allocation,
+		nullptr), "");
+
+	m_device->ImmediateSubmit([&mesh, stagingBuffer, bufferSize](VkCommandBuffer cmd)
+		{
+			VkBufferCopy copy;
+			copy.dstOffset = 0;
+			copy.srcOffset = 0;
+			copy.size = bufferSize;
+			vkCmdCopyBuffer(cmd, stagingBuffer._buffer, mesh->_indexBuffer._buffer, 1, &copy);
+		});
+	vmaDestroyBuffer(m_device->m_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
 }
 
 
@@ -362,10 +434,10 @@ void Renderer::UpdateGlobalUbo(GPUCameraData src_bufferData)
 	vmaUnmapMemory(m_device->m_allocator, m_device->GetCurrentFrame()._cameraBuffer._allocation);
 }
 
-void Renderer::UpdateSceneDataUbo()
+void Renderer::UpdateSceneDataUbo(const GPUSceneData &data)
 {
 	float framed = (m_frameNumber / 120.f);
-	m_device->m_sceneParameters.ambientColor = { sin(framed),0,cos(framed),1 };
+	m_device->m_sceneParameters = data;
 	int frameIndex = m_frameNumber % m_device->m_imageCount;
 	char* sceneData;
 	vmaMapMemory(m_device->m_allocator, m_device->m_sceneParameterBuffer._allocation, (void**)&sceneData);
