@@ -7,6 +7,7 @@
 #include "AssetDatabase/AssetLoader.h"
 #include "ECS/Entity.h"
 #include "GUI/GUI.h"
+#include "GUI/TestWindow.h"
 #include "ImGui/imgui_impl_sdl2.h"
 #include "ImGui/imgui_impl_vulkan.h"
 
@@ -111,6 +112,8 @@ void gns::Application::Run()
 	CameraComponent& sceneCamera = sceneCamera_entity.AddComponet<CameraComponent>(0.01f, 1000.f, 60.f, 1700, 900, cameraTransform);
 	CameraSystem cameraSystem = { cameraTransform, sceneCamera };
 	gui = new GUI{ m_renderer->m_device, m_window };
+
+	TestWindow* testWindow = new TestWindow("test window", gui);
 
 	while (!m_close)
 	{

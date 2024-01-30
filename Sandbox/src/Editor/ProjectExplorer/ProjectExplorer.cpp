@@ -1,7 +1,8 @@
 #include "ProjectExplorer.h"
 
-void ProjectExplorer::Draw()
+#include "ImGui/imgui.h"
+
+void ProjectExplorer::OnGUI()
 {
-	ImGui::Begin("Project");
-	ImGui::End();
+	
 }

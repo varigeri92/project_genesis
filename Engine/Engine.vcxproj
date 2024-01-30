@@ -201,6 +201,7 @@ echo Shader compilation complete.</Command>
   <ItemGroup>
     <ClInclude Include="API\core.h" />
     <ClInclude Include="API\gnsAPI.h" />
+    <ClInclude Include="API\GUI\GuiWindow.h" />
     <ClInclude Include="API\Log.h" />
     <ClInclude Include="src\GUI\SceneOptionsWindow.h" />
     <ClInclude Include="src\GUI\GUI.h" />
@@ -315,9 +316,11 @@ echo Shader compilation complete.</Command>
     <ClInclude Include="src\Rendering\Helpers\VkInitializer.h" />
     <ClInclude Include="src\ECS\SystemBase.h" />
     <ClInclude Include="src\Rendering\DataObjects\Texture.h" />
+    <ClInclude Include="src\GUI\TestWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="API\vklog.h" />
+    <ClCompile Include="src\GUI\GuiWindow.cpp" />
     <ClCompile Include="src\GUI\SceneOptionsWindow.cpp" />
     <ClCompile Include="src\GUI\GUI.cpp" />
     <ClCompile Include="API\ImGui\imgui.cpp" />
@@ -346,6 +349,7 @@ echo Shader compilation complete.</Command>
     <ClCompile Include="src\Rendering\Helpers\VkInitializer.cpp" />
     <ClCompile Include="src\ECS\SystemBase.cpp" />
     <ClCompile Include="src\Rendering\DataObjects\Texture.cpp" />
+    <ClCompile Include="src\GUI\TestWindow.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -7,6 +7,11 @@
 #include "ImGui/imgui_impl_vulkan.h"
 #include "../Window/Window.h"
 
+void gns::GUI::RegisterWindow(gns::gui::GuiWindow* gui_window)
+{
+	guiWindows.push_back(gui_window);
+}
+
 gns::GUI::GUI(rendering::Device* device, Window* window) :m_device(device), m_window(window)
 {
 	InitializeGUI();
@@ -92,6 +97,10 @@ void gns::GUI::EndGUI()
 void gns::GUI::DrawGUI()
 {
 	ImGui::ShowDemoWindow();
+	for(auto window : guiWindows)
+	{
+		window->DrawWindow();
+	}
 }
 
 void gns::GUI::DisposeGUI()
