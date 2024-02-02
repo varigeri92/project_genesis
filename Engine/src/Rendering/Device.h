@@ -127,7 +127,7 @@ namespace gns::rendering
 		VkDescriptorPool m_descriptorPool;
 		VkDescriptorPool m_imGuiPool;
 
-		GPUSceneData m_sceneParameters = {};
+		//GPUSceneData m_sceneParameters = {};
 		Buffer m_sceneParameterBuffer;
 
 

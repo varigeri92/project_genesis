@@ -3,7 +3,7 @@
 #include <string>
 #include "Log.h"
 #include "Window/Window.h"
-#include "GUI/ImGui/imgui_impl_sdl2.h"
+#include "ImGui/imgui_impl_sdl2.h"
 
 
 namespace gns

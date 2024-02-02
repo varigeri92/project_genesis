@@ -1,9 +1,13 @@
 #pragma once
 #include <memory>
 #include <string>
+#include <vector>
 #include <glm/gtx/transform.hpp>
 #include "vulkan/vulkan.h"
 #include "DisposableVkObject.h"
+#include "../../AssetDatabase/Guid.h"
+#include "../../Core/GnsObject.h"
+#include "../Helpers/Buffer.h"
 
 namespace gns::rendering
 {
@@ -13,25 +17,32 @@ namespace gns::rendering
 namespace gns::rendering
 {
 	class Mesh;
-	struct Shader
+	struct Shader : public GnsObject
 	{
-		Shader(std::string vertexShaderPath, std::string fragmentShaderPath) :
+		Shader(std::string vertexShaderPath, std::string fragmentShaderPath) : GnsObject(),
 			vertexShaderPath(vertexShaderPath),
-			fragmentShaderPath(fragmentShaderPath) {};
-
-
+			fragmentShaderPath(fragmentShaderPath)
+		{};
 		std::string vertexShaderPath;
 		std::string fragmentShaderPath;
-	};
-	struct Material : public Disposeable {
-		Material(std::shared_ptr<Shader> shader, std::string name) :shader(shader), name(name) {};
-		std::string name;
+
 		VkPipeline pipeline;
 		VkPipelineLayout pipelineLayout;
-		std::shared_ptr<Shader> shader;
-		std::shared_ptr<Texture> texture{ nullptr };
+
+		Buffer materialUniformBuffer;
+		VkDescriptorSet descriptorSet;
+	};
+
+	struct Material : public IDisposeable, public GnsObject {
+
+		Material(std::shared_ptr<Shader> shader, std::string name) :m_shader(shader), name(name) {};
+
+		std::string name;
+		std::shared_ptr<Shader> m_shader;
+		std::shared_ptr<Texture> m_texture{ nullptr };
 
 		void Dispose(Device* device) override;
+		void SetTexture(const std::shared_ptr<Texture>& texture);
 	};
 }
 

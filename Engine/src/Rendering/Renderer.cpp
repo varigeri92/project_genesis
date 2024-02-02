@@ -2,6 +2,7 @@
 #include <glm/gtx/transform.hpp>
 #include "Log.h"
 #include "rendererInclude.h"
+#include "RenderSystem.h"
 #include "vklog.h"
 #include "../AssetDatabase/AssetLoader.h"
 #include "../Input.h"
@@ -19,6 +20,7 @@ namespace gns::rendering
 Renderer::Renderer(Window* window) 
 {
 	m_device = new Device(window);
+	RenderSystem::S_Device = m_device;
 }
 
 Renderer::~Renderer()
@@ -37,26 +39,24 @@ void Renderer::UploadMesh(Mesh* mesh)
 	CreateIndexBuffers(mesh);
 }
 
-void Renderer::CreatePipelineForMaterial(std::shared_ptr<Material> material)
+void Renderer::CreatePipelineForMaterial(std::shared_ptr<Shader> shader)
 {
-	VkShaderModule vertShader = CreateShaderModule(AssetLoader::LoadShader(material->shader->vertexShaderPath));
-	VkShaderModule fragShader = CreateShaderModule(AssetLoader::LoadShader(material->shader->fragmentShaderPath));
+	VkShaderModule vertShader = CreateShaderModule(AssetLoader::LoadShader(shader->vertexShaderPath));
+	VkShaderModule fragShader = CreateShaderModule(AssetLoader::LoadShader(shader->fragmentShaderPath));
 
-	//build the stage-create-info for both vertex and fragment stages. This lets the pipeline know the shader modules per stage
+	//build the stage-create-info for both vertex and fragment stages. This lets the pipeline know the m_shader modules per stage
 	PipelineBuilder pipelineBuilder(m_device);
 	pipelineBuilder._shaderStages.push_back(
 		PipelineShaderStageCreateInfo(VK_SHADER_STAGE_VERTEX_BIT, vertShader));
 	pipelineBuilder._shaderStages.push_back(
 		PipelineShaderStageCreateInfo(VK_SHADER_STAGE_FRAGMENT_BIT, fragShader));
 
-	std::vector<VkDescriptorSetLayout> setLayouts = {m_device->m_globalSetLayout };
-	if (material->texture != nullptr)
-	{
-		CreateTextureResources(material->texture);
-		setLayouts.push_back(m_device->m_singleTextureSetLayout);
-		LOG_INFO("Add texture to material!");
-	}
+	std::vector<VkDescriptorSetLayout> setLayouts = {
+		m_device->m_globalSetLayout,
+		m_device->m_singleTextureSetLayout
+	};
 
+	//setLayouts.push_back(m_device->m_singleTextureSetLayout);
 	pipelineBuilder._vertexInputInfo = VertexInputStateCreateInfo();
 	pipelineBuilder._inputAssembly = InputAssemblyCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 	pipelineBuilder._viewport.x = 0.0f;
@@ -91,19 +91,18 @@ void Renderer::CreatePipelineForMaterial(std::shared_ptr<Material> material)
 	layoutInfo.setLayoutCount = static_cast<uint32_t>(setLayouts.size());
 	layoutInfo.pSetLayouts = setLayouts.data();
 
-	_VK_CHECK(vkCreatePipelineLayout(m_device->m_device, &layoutInfo, nullptr, &material->pipelineLayout),
+	_VK_CHECK(vkCreatePipelineLayout(m_device->m_device, &layoutInfo, nullptr, &shader->pipelineLayout),
 		"Failed To create pipeline Layout");
 
-	pipelineBuilder._pipelineLayout = material->pipelineLayout;
+	pipelineBuilder._pipelineLayout = shader->pipelineLayout;
 
-	material->pipeline = pipelineBuilder.Build(m_device->m_device, m_device->m_renderPass);
+	shader->pipeline = pipelineBuilder.Build(m_device->m_device, m_device->m_renderPass);
 
 	vkDestroyShaderModule(m_device->m_device, vertShader, nullptr);
 	vkDestroyShaderModule(m_device->m_device, fragShader, nullptr);
-	LOG_INFO("Pipeline created for:" << material->name);
 }
 
-void Renderer::DisposeObject(std::shared_ptr<Disposeable> object)
+void Renderer::DisposeObject(std::shared_ptr<IDisposeable> object)
 {
 	_disposeQueue.push_back(object);
 }
@@ -189,14 +188,14 @@ void Renderer::Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> materi
 	if(m_material_ptr != material || m_pipelineBound == false)
 	{
 		m_material_ptr = material;
-		vkCmdBindPipeline(m_device->GetCurrentFrame()._mainCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, material->pipeline);
+		vkCmdBindPipeline(m_device->GetCurrentFrame()._mainCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_shader->pipeline);
 		uint32_t uniform_offset = m_device->PadUniformBufferSize(sizeof(GPUSceneData)) * m_device->m_imageIndex;
 		vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer, 
-			VK_PIPELINE_BIND_POINT_GRAPHICS, material->pipelineLayout, 0, 1, 
+			VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_shader->pipelineLayout, 0, 1, 
 			&m_device->GetCurrentFrame()._globalDescriptor, 1, &uniform_offset);
-		if(material->texture != nullptr)
+		if(material->m_texture != nullptr)
 			vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer, 
-				VK_PIPELINE_BIND_POINT_GRAPHICS, material->pipelineLayout, 1, 1, &material->texture->descriptorSet, 
+				VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_shader->pipelineLayout, 1, 1, &material->m_texture->descriptorSet,
 				0, nullptr);
 		/*
 		vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer, 
@@ -367,8 +366,6 @@ void Renderer::CreateIndexBuffers(Mesh* mesh)
 
 	Buffer stagingBuffer;
 
-	LOG_INFO(mesh->_indices.size());
-
 	//allocate the buffer
 	_VK_CHECK(vmaCreateBuffer(m_device->m_allocator, &stagingBufferInfo, &vmaallocInfo,
 		&stagingBuffer._buffer,
@@ -422,7 +419,7 @@ void Renderer::UpdatePushConstant( glm::mat4 modelMatrix, std::shared_ptr<Materi
 
 	push_constants.model_matrix = modelMatrix;
 	push_constants.camera_matrix = matrix;
-	vkCmdPushConstants(m_device->GetCurrentFrame()._mainCommandBuffer, material->pipelineLayout,
+	vkCmdPushConstants(m_device->GetCurrentFrame()._mainCommandBuffer, material->m_shader->pipelineLayout,
 		VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MeshPushConstants), &push_constants);
 }
 
@@ -436,14 +433,22 @@ void Renderer::UpdateGlobalUbo(GPUCameraData src_bufferData)
 
 void Renderer::UpdateSceneDataUbo(const GPUSceneData &data)
 {
-	float framed = (m_frameNumber / 120.f);
-	m_device->m_sceneParameters = data;
 	int frameIndex = m_frameNumber % m_device->m_imageCount;
 	char* sceneData;
 	vmaMapMemory(m_device->m_allocator, m_device->m_sceneParameterBuffer._allocation, (void**)&sceneData);
-	sceneData += m_device->PadUniformBufferSize(sizeof(GPUSceneData)) * frameIndex;
-	memcpy(sceneData, &m_device->m_sceneParameters, sizeof(GPUSceneData));
+	sceneData += m_device->PadUniformBufferSize(sizeof(data)) * frameIndex;
+	memcpy(sceneData, &data, sizeof(data));
 	vmaUnmapMemory(m_device->m_allocator, m_device ->m_sceneParameterBuffer._allocation);
+}
+
+void Renderer::UpdateSceneDataUbo(const void* data, size_t size)
+{
+	int frameIndex = m_frameNumber % m_device->m_imageCount;
+	char* sceneData;
+	vmaMapMemory(m_device->m_allocator, m_device->m_sceneParameterBuffer._allocation, (void**)&sceneData);
+	sceneData += m_device->PadUniformBufferSize(size) * frameIndex;
+	memcpy(sceneData, data, size);
+	vmaUnmapMemory(m_device->m_allocator, m_device->m_sceneParameterBuffer._allocation);
 }
 
 void Renderer::UpdateObjectData(void* src_data, size_t size)
@@ -454,6 +459,14 @@ void Renderer::UpdateObjectData(void* src_data, size_t size)
 	vmaUnmapMemory(m_device->m_allocator, m_device->GetCurrentFrame()._objectBuffer._allocation);
 }
 
+void Renderer::UpdateMaterialUniformBuffer(void* src_data, size_t size, Material* material)
+{
+	void* objectData;
+	vmaMapMemory(m_device->m_allocator, material->m_shader->materialUniformBuffer._allocation, &objectData);
+	memcpy(objectData, src_data, size);
+	vmaUnmapMemory(m_device->m_allocator, material->m_shader->materialUniformBuffer._allocation);
+}
+
 void Renderer::CreateTextureResources(std::shared_ptr<Texture> texture)
 {
 	VkImageViewCreateInfo imageinfo = ImageViewCreateInfo(VK_FORMAT_R8G8B8A8_SRGB, texture->image, VK_IMAGE_ASPECT_COLOR_BIT);
@@ -462,7 +475,7 @@ void Renderer::CreateTextureResources(std::shared_ptr<Texture> texture)
 	const VkSamplerCreateInfo samplerInfo = sampler_create_info(VK_FILTER_NEAREST);
 	vkCreateSampler(m_device->m_device, &samplerInfo, nullptr, &texture->m_sampler);
 
-	//allocate the descriptor set for single-texture to use on the material
+	//allocate the descriptor set for single-m_texture to use on the material
 	VkDescriptorSetAllocateInfo allocInfo = {};
 	allocInfo.pNext = nullptr;
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -471,7 +484,7 @@ void Renderer::CreateTextureResources(std::shared_ptr<Texture> texture)
 	allocInfo.pSetLayouts = &m_device->m_singleTextureSetLayout;
 	vkAllocateDescriptorSets(m_device->m_device, &allocInfo, &texture->descriptorSet);
 
-	//write to the descriptor set so that it points to our empire_diffuse texture
+	//write to the descriptor set so that it points to our empire_diffuse m_texture
 	VkDescriptorImageInfo imageBufferInfo;
 	imageBufferInfo.sampler = texture->m_sampler;
 	imageBufferInfo.imageView = texture->imageView;

@@ -29,7 +29,7 @@ namespace gns::rendering
 		static VertexInputDescription GetVertexDescription();
 	};
 
-	struct Mesh : public Disposeable {
+	struct Mesh : public IDisposeable {
 		
 		std::vector<Vertex> _vertices;
 		std::vector<uint32_t> _indices;

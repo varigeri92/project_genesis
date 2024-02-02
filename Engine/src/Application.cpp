@@ -4,26 +4,27 @@
 #include "AssetDatabase/Guid.h"
 #include "Core/Scene.h"
 #include "Log.h"
+#include "Rendering/RenderSystem.h"
 #include "AssetDatabase/AssetLoader.h"
 #include "ECS/Entity.h"
 #include "GUI/GUI.h"
+#include "GUI/EntityInspector.h"
 #include "GUI/TestWindow.h"
 #include "ImGui/imgui_impl_sdl2.h"
 #include "ImGui/imgui_impl_vulkan.h"
 
-#include "Rendering/Renderer.h";
-#include "Rendering/Device.h";
+#include "Rendering/Renderer.h"
+#include "Rendering/Device.h"
 #include "Rendering/DataObjects/Texture.h"
 
 
 GPUSceneData sceneData = {};
-
 gns::Application::Application(std::string assetsPath)
 {
 	AssetLoader::SetPaths(assetsPath);
 	m_window = new Window();
 	m_close = false;
-	m_renderer = new rendering::Renderer(m_window);
+	RenderSystem::S_Renderer = new rendering::Renderer(m_window);
 	/*Testing Randoms
 	 
 	#pragma region Random_Test
@@ -58,22 +59,26 @@ gns::Application::Application(std::string assetsPath)
 
 gns::Application::~Application()
 {
-	delete(m_renderer);
+	delete(RenderSystem::S_Renderer);
 	delete(m_window);
 }
 
-void gns::Application::Run()
+void gns::Application::Run(std::function<void()> OnUpdate)
 {
 	//Load Suzan:
 	std::shared_ptr<Mesh> suzan_mesh = AssetLoader::LoadMesh(R"(Meshes\OtherModels\Rei\Rei.obj)");
-	m_renderer->UploadMesh(suzan_mesh.get());
+	RenderSystem::S_Renderer->UploadMesh(suzan_mesh.get());
 
 	std::shared_ptr<Mesh> groundPlaneMesh = AssetLoader::LoadMesh(R"(Meshes\plane.obj)");
-	m_renderer->UploadMesh(groundPlaneMesh.get());
+	RenderSystem::S_Renderer->UploadMesh(groundPlaneMesh.get());
 
 	std::shared_ptr<Shader> defaultShader = std::make_shared<Shader>("blinphong.vert.spv","blinphong.frag.spv");
+	LOG_INFO(defaultShader->GetGuid());
+	RenderSystem::S_Renderer->CreatePipelineForMaterial(defaultShader);
 	std::shared_ptr<Material> defaultMaterial = std::make_shared<Material>(defaultShader, "Rei_Material");
-	m_renderer->CreatePipelineForMaterial(defaultMaterial);
+	LOG_INFO(defaultMaterial->GetGuid());
+	defaultMaterial->m_texture = std::make_shared<Texture>(R"(Textures\lost_empire-RGBA.png)");
+	defaultMaterial->m_texture->Apply();
 
 	/* 
 	//load MC:
@@ -81,10 +86,8 @@ void gns::Application::Run()
 	m_renderer->UploadMesh(mc_mesh.get());
 	std::shared_ptr<Shader> mc_shader = std::make_shared<Shader>(R"(Shaders\tri_mesh.vert.spv)",R"(Shaders\textured_lit.frag.spv)");
 	std::shared_ptr<Material> mc_material = std::make_shared<Material>(mc_shader, "mc_material");
-	mc_material->texture = std::make_shared<Texture>(R"(Textures\lost_empire-RGBA.png)");
-	mc_material->texture->Create(m_renderer->m_device);
+	mc_material->m_texture->Create(m_renderer->m_device);
 	m_renderer->CreatePipelineForMaterial(mc_material);
-	mc_material->texture->Apply(m_renderer->m_device);
 	*/
 
 
@@ -111,14 +114,15 @@ void gns::Application::Run()
 	cameraTransform.position = { 0.f,-1.f,-3.f };
 	CameraComponent& sceneCamera = sceneCamera_entity.AddComponet<CameraComponent>(0.01f, 1000.f, 60.f, 1700, 900, cameraTransform);
 	CameraSystem cameraSystem = { cameraTransform, sceneCamera };
-	gui = new GUI{ m_renderer->m_device, m_window };
+	gui = new GUI{ RenderSystem::S_Renderer->m_device, m_window };
 
-	TestWindow* testWindow = new TestWindow("test window", gui);
-
+	editor::EntityInspector* inspector = new editor::EntityInspector(gui);
+	editor::SceneHierachy* sceneHierachy = new editor::SceneHierachy(gui, scene.get(), inspector);
 	while (!m_close)
 	{
 		Time::StartFrameTime();
 		HandleEvents();
+		OnUpdate();
 		UpdateSystems();
 		cameraSystem.UpdateCamera();
 		UpdateLate();
@@ -141,9 +145,9 @@ void gns::Application::Run()
 	}
 
 	gui->DisposeGUI();
-	m_renderer->DisposeObject(defaultMaterial);
-	m_renderer->DisposeObject(suzan_mesh);
-	m_renderer->DisposeObject(groundPlaneMesh);
+	RenderSystem::S_Renderer->DisposeObject(defaultMaterial);
+	RenderSystem::S_Renderer->DisposeObject(suzan_mesh);
+	RenderSystem::S_Renderer->DisposeObject(groundPlaneMesh);
 }
 
 void gns::Application::CloseApplication()
@@ -163,22 +167,22 @@ void gns::Application::Render(std::shared_ptr<Scene> scene)
 	}
 
 	uint32_t swapchainImageIndex;
-	if(m_renderer->BeginFrame(swapchainImageIndex))
+	if(RenderSystem::S_Renderer->BeginFrame(swapchainImageIndex))
 	{
-		m_renderer->BeginRenderPass(swapchainImageIndex, false);
-		m_renderer->UpdateGlobalUbo(camData);
-		m_renderer->UpdateSceneDataUbo(sceneData);
+		RenderSystem::S_Renderer->BeginRenderPass(swapchainImageIndex, false);
+		RenderSystem::S_Renderer->UpdateGlobalUbo(camData);
+		RenderSystem::S_Renderer->UpdateSceneDataUbo((void*)&sceneData, sizeof(sceneData));
 		auto entityView = scene->registry.view<Transform, RendererComponent, EntityComponent>();
 		for (auto [entt, transform, rendererComponent, entity] : entityView.each())
 		{
-			m_renderer->UpdatePushConstant(transform.matrix, rendererComponent.material);
-			m_renderer->Draw(rendererComponent.mesh, rendererComponent.material, swapchainImageIndex);
+			RenderSystem::S_Renderer->UpdatePushConstant(transform.matrix, rendererComponent.material);
+			RenderSystem::S_Renderer->Draw(rendererComponent.mesh, rendererComponent.material, swapchainImageIndex);
 		}
-		m_renderer->EndRenderPass(swapchainImageIndex);
-		m_renderer->BeginRenderPass(swapchainImageIndex, true);
+		RenderSystem::S_Renderer->EndRenderPass(swapchainImageIndex);
+		RenderSystem::S_Renderer->BeginRenderPass(swapchainImageIndex, true);
 		gui->EndGUI();
-		m_renderer->EndRenderPass(swapchainImageIndex);
-		m_renderer->EndFrame(swapchainImageIndex);
+		RenderSystem::S_Renderer->EndRenderPass(swapchainImageIndex);
+		RenderSystem::S_Renderer->EndFrame(swapchainImageIndex);
 	}
 }
 

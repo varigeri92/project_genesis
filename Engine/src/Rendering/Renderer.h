@@ -38,9 +38,9 @@ namespace gns::rendering
 		void Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, int index);
 		void EndFrame(uint32_t& swapchainImageIndex);
 		void UploadMesh(Mesh* mesh);
-		void CreatePipelineForMaterial(std::shared_ptr<Material> material);
+		void CreatePipelineForMaterial(std::shared_ptr<Shader> shader);
 		
-		void DisposeObject(std::shared_ptr<Disposeable> object);
+		void DisposeObject(std::shared_ptr<IDisposeable> object);
 	private:
 
 		VkClearValue m_clearValue;
@@ -50,7 +50,7 @@ namespace gns::rendering
 
 		bool m_framebufferResized = false;
 		bool m_pipelineBound = false;
-		std::vector<std::shared_ptr<Disposeable>> _disposeQueue;
+		std::vector<std::shared_ptr<IDisposeable>> _disposeQueue;
 		uint32_t m_frameNumber{ 0 };
 		float m_rotation{ 0 };
 		float m_flash{ 0 };
@@ -70,7 +70,9 @@ namespace gns::rendering
 
 		void UpdateGlobalUbo(GPUCameraData src_bufferData);
 		void UpdateSceneDataUbo(const GPUSceneData& data);
+		void UpdateSceneDataUbo(const void* data, size_t size);
 		void UpdateObjectData(void* src_data, size_t size);
+		void UpdateMaterialUniformBuffer(void* src_data, size_t size, Material* material);
 		void CreateTextureResources(std::shared_ptr<Texture> texture);
 	};
 }

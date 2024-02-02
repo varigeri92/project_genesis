@@ -27,5 +27,6 @@ void main()
 	gl_Position = transformMatrix * vec4(vPosition, 1.0f);
 	outColor = vColor;
 	texCoord = vTexCoord;
-	normal = vNormal;
+	//normal = vNormal;
+	normal = mat3(transpose(inverse(PushConstants.model_matrix))) * vNormal; 
 }

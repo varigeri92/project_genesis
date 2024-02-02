@@ -4,10 +4,10 @@ namespace gns::rendering
 {
 	class Device;
 
-	class Disposeable
+	class IDisposeable
 	{
 	public:
-		virtual ~Disposeable() = default;
+		virtual ~IDisposeable() = default;
 		virtual void Dispose(Device* device) = 0;
 	};
 }

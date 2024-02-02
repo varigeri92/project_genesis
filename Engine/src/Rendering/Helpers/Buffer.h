@@ -7,7 +7,7 @@ namespace gns::rendering
 {
 	class Renderer;
 	struct Mesh;
-	class Buffer : Disposeable
+	class Buffer : IDisposeable
 	{
 	public:
 		VkBuffer _buffer;

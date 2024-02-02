@@ -1,8 +1,7 @@
 #include "ProjectExplorer.h"
-
-#include "ImGui/imgui.h"
+#include <GUI/GnsGui.h>
 
 void ProjectExplorer::OnGUI()
 {
-	
+	Text("Hello");
 }

@@ -4,7 +4,7 @@
 
 namespace gns::rendering
 {
-class Texture : public  Disposeable
+class Texture : public  IDisposeable
 {
 	friend class Renderer;
 public:
@@ -14,9 +14,9 @@ public:
 	int width;
 	int height;
 	int chanels;
-	void Create(Device* device);
+	void Create();
 	void Dispose(Device* device) override;
-	void Apply(Device* device);
+	void Apply();
 private:
 	VkDescriptorSet descriptorSet;
 	VkImage image;
