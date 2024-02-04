@@ -68,6 +68,10 @@ void gns::editor::SceneHierachy::OnGUI()
 				LOG_INFO("Clicked on: " << entity.name);
 				m_entityInspector->SetInspectedEntity(entt, m_scene);
 			}
+			if(node_open)
+			{
+				
+			}
 		}
 	}
 }

@@ -7,6 +7,8 @@
 #include "ImGui/imgui_impl_vulkan.h"
 #include "../Window/Window.h"
 
+
+std::vector<gns::gui::GuiWindow*> gns::GUI::guiWindows = {};
 void gns::GUI::RegisterWindow(gns::gui::GuiWindow* gui_window)
 {
 	guiWindows.push_back(gui_window);
@@ -66,9 +68,6 @@ void gns::GUI::InitializeGUI()
 	ImGui_ImplVulkan_Init(&init_info, m_device->m_renderPass);
 
 	//execute a gpu command to upload imgui font textures
-	m_device->ImmediateSubmit([&](VkCommandBuffer cmd) {
-		ImGui_ImplVulkan_CreateFontsTexture();
-		});
 	ImGuiIO& io = ImGui::GetIO(); //(void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -77,6 +76,17 @@ void gns::GUI::InitializeGUI()
 	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 
 	ImGui::StyleColorsDark();
+	/*
+	*/
+	 
+	ImFont* normal = io.Fonts->AddFontFromFileTTF(R"(D:\GenesisEngine\Engine\Resources\Fonnt\static\Montserrat-Regular.ttf)", 
+		14, nullptr, io.Fonts->GetGlyphRangesDefault());
+	ImFont* bold  = io.Fonts->AddFontFromFileTTF(R"(D:\GenesisEngine\Engine\Resources\Fonnt\static\Montserrat-SemiBold.ttf)", 
+		14, nullptr, io.Fonts->GetGlyphRangesDefault());
+	io.Fonts->Build();
+	m_device->ImmediateSubmit([&](VkCommandBuffer cmd) {
+		ImGui_ImplVulkan_CreateFontsTexture();
+		});
 }
 
 void gns::GUI::BeginGUI()

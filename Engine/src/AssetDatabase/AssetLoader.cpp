@@ -155,7 +155,7 @@ namespace gns
         stbi_uc* pixels = stbi_load((AssetsPath + path).c_str(), &texture->width, &texture->height, &texture->chanels, STBI_rgb_alpha);
 
         if (!pixels) {
-            LOG_ERROR("Can't Open Texture:" << path);
+            LOG_ERROR("Can't Open Texture:" << (AssetsPath + path).c_str());
         }
         texture->pixels = pixels;
     }

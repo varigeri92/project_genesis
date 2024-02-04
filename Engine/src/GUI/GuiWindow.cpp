@@ -3,14 +3,15 @@
 
 #include "GUI.h"
 
-gns::gui::GuiWindow::GuiWindow(std::string name, GUI* gui) : Name(name)
+
+gns::gui::GuiWindow::GuiWindow(std::string name) : Name(name)
 {
-	gui->RegisterWindow(this);
+	GUI::RegisterWindow(this);
 }
 
 void gns::gui::GuiWindow::DrawWindow()
 {
-	ImGui::Begin(Name.c_str());
+	ImGui::Begin(Name.c_str(), &m_isOpen, m_flags);
 	OnGUI();
 	ImGui::End();
 }

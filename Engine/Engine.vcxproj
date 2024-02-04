@@ -137,15 +137,15 @@ C:\VulkanSDK\1.3.261.1\Bin\glslc.exe "$(SolutionDir)Engine\Assets\Shaders\defaul
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)BUILD_DLL</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.261.1\Include;C:\VulkanSDK\1.3.261.0\Include;$(ProjectDir)API;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GenesisEngine\Engine\vendor\include;C:\VulkanSDK\1.3.261.1\Include;C:\VulkanSDK\1.3.261.0\Include;$(ProjectDir)API;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>core.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.3.261.1\Lib;C:\VulkanSDK\1.3.261.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\GenesisEngine\Engine\vendor\lib;C:\VulkanSDK\1.3.261.1\Lib;C:\VulkanSDK\1.3.261.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;vulkan-1.lib;yaml-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>
@@ -171,7 +171,7 @@ echo Shader compilation complete.</Command>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)BUILD_DLL;ASSETS_PATH = "$(ProjectDir)Assets"</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.261.1\Include;C:\VulkanSDK\1.3.261.0\Include;$(ProjectDir)API;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GenesisEngine\Engine\vendor\include;C:\VulkanSDK\1.3.261.1\Include;C:\VulkanSDK\1.3.261.0\Include;$(ProjectDir)API;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>core.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -180,8 +180,8 @@ echo Shader compilation complete.</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.3.261.1\Lib;C:\VulkanSDK\1.3.261.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\GenesisEngine\Engine\vendor\lib;C:\VulkanSDK\1.3.261.1\Lib;C:\VulkanSDK\1.3.261.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;vulkan-1.lib;yaml-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>
@@ -204,6 +204,7 @@ echo Shader compilation complete.</Command>
     <ClInclude Include="API\GUI\GnsGui.h" />
     <ClInclude Include="API\GUI\GuiWindow.h" />
     <ClInclude Include="API\Log.h" />
+    <ClInclude Include="src\AssetDatabase\ContentBrowser.h" />
     <ClInclude Include="src\AssetDatabase\AssetDatabase.h" />
     <ClInclude Include="src\Rendering\RenderSystem.h" />
     <ClInclude Include="src\GUI\EntityInspector.h" />
@@ -324,6 +325,7 @@ echo Shader compilation complete.</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="API\vklog.h" />
+    <ClCompile Include="src\AssetDatabase\ContentBrowser.cpp" />
     <ClCompile Include="src\AssetDatabase\AssetDatabase.cpp" />
     <ClCompile Include="src\Core\GnsObject.h" />
     <ClCompile Include="src\Rendering\RenderSystem.cpp" />

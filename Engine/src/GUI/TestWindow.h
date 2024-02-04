@@ -8,7 +8,7 @@ namespace gns
 	class TestWindow : public GuiWindow
 	{
 	public:
-		TestWindow(std::string name, GUI* gui) : GuiWindow(name, gui) {};
+		TestWindow(std::string name) : GuiWindow(name) {};
 
 	protected:
 		void OnGUI() override;

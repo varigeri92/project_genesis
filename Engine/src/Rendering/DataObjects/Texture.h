@@ -2,11 +2,18 @@
 #include "../../AssetDatabase/AssetLoader.h"
 #include "../Helpers/Buffer.h"
 
+namespace gns
+{
+	class Application;
+}
+
 namespace gns::rendering
 {
 class Texture : public  IDisposeable
 {
 	friend class Renderer;
+	friend class gns::Application;
+	
 public:
 	Texture() = default;
 	Texture(std::string path);

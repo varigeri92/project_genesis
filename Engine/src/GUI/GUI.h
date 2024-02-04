@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "GUI/GuiWindow.h"
+#include "ImGui/imgui.h"
 
 namespace gns::rendering
 {
@@ -17,8 +18,9 @@ namespace gns
 		rendering::Device* m_device;
 		Window* m_window;
 		void InitializeGUI();
-		std::vector<gns::gui::GuiWindow*> guiWindows;
-		void RegisterWindow(gns::gui::GuiWindow* gui_window);
+		static std::vector<gns::gui::GuiWindow*> guiWindows;
+		static void RegisterWindow(gns::gui::GuiWindow* gui_window);
+
 	public:
 		GUI(rendering::Device* device, Window* window);
 

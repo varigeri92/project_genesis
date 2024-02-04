@@ -6,6 +6,7 @@
 #include "Log.h"
 #include "Rendering/RenderSystem.h"
 #include "AssetDatabase/AssetLoader.h"
+#include "AssetDatabase/ContentBrowser.h"
 #include "ECS/Entity.h"
 #include "GUI/GUI.h"
 #include "GUI/EntityInspector.h"
@@ -79,6 +80,8 @@ void gns::Application::Run(std::function<void()> OnUpdate)
 	LOG_INFO(defaultMaterial->GetGuid());
 	defaultMaterial->m_texture = std::make_shared<Texture>(R"(Textures\lost_empire-RGBA.png)");
 	defaultMaterial->m_texture->Apply();
+	std::shared_ptr<Texture> icon = std::make_shared<Texture>(R"(Resources\Icons\icon_file.png)");
+	icon->Apply();
 
 	/* 
 	//load MC:
@@ -116,8 +119,9 @@ void gns::Application::Run(std::function<void()> OnUpdate)
 	CameraSystem cameraSystem = { cameraTransform, sceneCamera };
 	gui = new GUI{ RenderSystem::S_Renderer->m_device, m_window };
 
-	editor::EntityInspector* inspector = new editor::EntityInspector(gui);
-	editor::SceneHierachy* sceneHierachy = new editor::SceneHierachy(gui, scene.get(), inspector);
+	editor::EntityInspector* inspector = new editor::EntityInspector();
+	editor::SceneHierachy* sceneHierachy = new editor::SceneHierachy(scene.get(), inspector);
+	gns::gui::ContentBrowser* contentBrowser = new gns::gui::ContentBrowser();
 	while (!m_close)
 	{
 		Time::StartFrameTime();
@@ -140,6 +144,29 @@ void gns::Application::Run(std::function<void()> OnUpdate)
 		ImGui::DragFloat3("light Direction", (float*)&sceneData.sunlightDirection, 0.001f, -1.0f, 1.0f);
 
 		ImGui::End();
+
+		ImVec2 size = ImVec2(40.0f, 40.0f);                         // Size of the image we want to make visible
+		ImVec2 uv0 = ImVec2(0.0f, 0.0f);                            // UV coordinates for lower-left
+		ImVec2 uv1 = ImVec2(1.f,1.f);
+		ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+		ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+		ImGui::Begin("Vulkan Texture Test");
+		ImGui::Text("pointer = %p", icon->descriptorSet);
+		ImGui::Text("size = %d x %d", icon->width, icon->height);
+		/*
+		ImGui::Image(
+			(ImTextureID)defaultMaterial->m_texture->descriptorSet, 
+			ImVec2(defaultMaterial->m_texture->width, 
+				defaultMaterial->m_texture->height)
+		);
+		*/
+		if (ImGui::ImageButton("btn", (ImTextureID)icon->descriptorSet, size, uv0, uv1, bg_col, tint_col))
+		{
+			LOG_INFO("Button Pressed!");
+		}
+		ImGui::End();
+
 		Render(scene);
 		Time::EndFrameTime();
 	}

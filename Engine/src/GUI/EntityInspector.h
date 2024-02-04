@@ -22,8 +22,8 @@ namespace gns::editor
 		entt::entity m_entity;
 		bool is_entitySelected = false;
 	public:
-		EntityInspector(GUI* gui)
-			: GuiWindow("Scene Inspector", gui)
+		EntityInspector()
+			: GuiWindow("Scene Inspector")
 		{
 		}
 
@@ -38,8 +38,11 @@ namespace gns::editor
 		EntityInspector* m_entityInspector;
 		bool m_headerOpen = true;
 	public:
-		SceneHierachy(GUI* gui, Scene* scene, EntityInspector* inspector)
-			: GuiWindow("Scene Hierarchy", gui), m_scene(scene), m_entityInspector(inspector) {}
+		SceneHierachy(Scene* scene, EntityInspector* inspector)
+			: GuiWindow("Scene Hierarchy"), m_scene(scene), m_entityInspector(inspector)
+		{
+			m_headerOpen = true;
+		}
 		void OnGUI() override;
 
 	};

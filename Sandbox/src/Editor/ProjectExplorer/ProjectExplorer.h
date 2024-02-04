@@ -5,7 +5,7 @@ using namespace gns::gui;
 class ProjectExplorer : GuiWindow
 {
 public:
-	ProjectExplorer(std::string name, gns::GUI* gui) : GuiWindow(name, gui) {};
+	ProjectExplorer(std::string name) : GuiWindow(name) {};
 
 protected:
 	GEN_API void OnGUI() override;
