@@ -17,7 +17,7 @@ namespace gns
 {
 	struct EntityComponent
 	{
-		EntityComponent(std::string name) : name{ name } {};
+		EntityComponent(std::string name) : name{ name } {}
 		std::string name;
 		bool isEnabled = true;
 		bool isStatic = false;
@@ -37,7 +37,7 @@ namespace gns
 			matrix = glm::translate(matrix, glm::vec3(0.f));
 			matrix = glm::scale(matrix, glm::vec3(1.f));
 			matrix = glm::rotate(matrix, 0.f, glm::vec3(0.f, 1.f, 0.f));
-		};
+		}
 
 		Transform(
 			glm::vec3 position, glm::vec3 rotation, glm::vec3 scale) 
@@ -47,7 +47,7 @@ namespace gns
 			matrix = glm::translate(matrix, glm::vec3(0.f));
 			matrix = glm::scale(matrix, glm::vec3(1.f));
 			matrix = glm::rotate(matrix, 0.f, glm::vec3(0.f, 1.f, 0.f));
-		};
+		}
 
 		void UpdateMatrix() {
 			matrix = glm::mat4(1.f);
@@ -62,19 +62,19 @@ namespace gns
 	struct MeshComponent
 	{
 		std::shared_ptr<Mesh> mesh;
-		MeshComponent(std::shared_ptr<Mesh> mesh) : mesh{ mesh } {};
+		MeshComponent(std::shared_ptr<Mesh> mesh) : mesh{ mesh } {}
 	};
 
 	struct MaterialComponent {
 		std::shared_ptr<Material> material;
-		MaterialComponent(std::shared_ptr<Material> material) : material{ material } {};
+		MaterialComponent(std::shared_ptr<Material> material) : material{ material } {}
 	};
 
 	struct RendererComponent
 	{
 		std::shared_ptr<Mesh> mesh;
 		std::shared_ptr<Material> material;
-		RendererComponent(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) : mesh(mesh), material(material) {};
+		RendererComponent(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) : mesh(mesh), material(material) {}
 	};
 
 	struct CameraComponent
@@ -90,7 +90,7 @@ namespace gns
 			projection = glm::perspective(glm::radians(fov), (width / height), _near, _far);
 			projection[1][1] *= -1;
 			camera_matrix = projection * view;
-		};
+		}
 
 		float _near;
 		float _far;

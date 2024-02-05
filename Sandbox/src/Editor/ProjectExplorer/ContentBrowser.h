@@ -3,7 +3,6 @@
 #include <map>
 #include <memory>
 #include <GUI/GuiWindow.h>
-#include <GUI/GnsGui.h>
 
 namespace gns::rendering
 {

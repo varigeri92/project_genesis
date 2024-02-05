@@ -164,11 +164,19 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\CameraSystem.cpp" />
+    <ClCompile Include="src\Editor\gui\EditorGUI.cpp" />
+    <ClCompile Include="src\Editor\gui\EntityInspector.cpp" />
+    <ClCompile Include="src\Editor\ProjectExplorer\ContentBrowser.cpp" />
     <ClCompile Include="src\Editor\ProjectExplorer\ProjectExplorer.cpp" />
     <ClCompile Include="src\Sandbox.cpp" />
     <ClCompile Include="src\TestClass.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\CameraSystem.h" />
+    <ClInclude Include="src\Editor\gui\EditorGUI.h" />
+    <ClInclude Include="src\Editor\gui\EntityInspector.h" />
+    <ClInclude Include="src\Editor\ProjectExplorer\ContentBrowser.h" />
     <ClInclude Include="src\Editor\ProjectExplorer\ProjectExplorer.h" />
     <ClInclude Include="src\paths.h" />
     <ClInclude Include="src\TestClass.h" />

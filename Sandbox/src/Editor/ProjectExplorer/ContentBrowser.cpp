@@ -1,7 +1,6 @@
 #include "ContentBrowser.h"
 #include <filesystem>
 #include <iostream>
-#include <yaml-cpp/node/detail/node.h>
 
 #include "Log.h"
 #include "ImGui/imgui.h"
@@ -166,31 +165,19 @@ void gns::gui::ContentBrowser::OnGUI()
 
     {
         ImGui::BeginGroup();
-    	ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
-        ImGui::SameLine();
-        ImGui::Text(selected.c_str());
-    	ImGui::SameLine();
-        if (ImGui::Button("  <<  ")) {}
+    	ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()));
+
+        if (ImGui::Button("  <<  "))
+        {
+            fs::path currentpath = selected;
+        	selected = currentpath.parent_path().string();
+            if (selected.length() < assetsPath.length())
+                selected = assetsPath;
+
+        }
         ImGui::SameLine();
         ImGui::SliderFloat("Icon Size", &f, 0, 1);
         ImGui::SeparatorText(selected.c_str());
-        /*
-        ImVec2 button_sz(40 + (40*f), 40 + (40 * f));
-        ImGuiStyle& style = ImGui::GetStyle();
-        int buttons_count = 20;
-        float window_visible_x2 = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
-        for (int n = 0; n < buttons_count; n++)
-        {
-            ImGui::PushID(n);
-            ImGui::Button("Box", button_sz);
-            float last_button_x2 = ImGui::GetItemRectMax().x;
-            float next_button_x2 = last_button_x2 + style.ItemSpacing.x + button_sz.x; // Expected position if next button was on same line
-            if (n + 1 < buttons_count && next_button_x2 < window_visible_x2)
-                ImGui::SameLine();
-            ImGui::PopID();
-        }
-        */
-
         DrawDirectoryContent(selected);
 
 

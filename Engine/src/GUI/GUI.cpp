@@ -14,6 +14,15 @@ void gns::GUI::RegisterWindow(gns::gui::GuiWindow* gui_window)
 	guiWindows.push_back(gui_window);
 }
 
+gns::gui::GuiWindow* gns::GUI::GetWindow_Internal(std::string name)
+{
+	for (auto window : guiWindows)
+	{
+		if (window->Name == name)
+			return window;
+	}
+}
+
 gns::GUI::GUI(rendering::Device* device, Window* window) :m_device(device), m_window(window)
 {
 	InitializeGUI();

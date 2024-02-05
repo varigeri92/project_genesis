@@ -5,7 +5,7 @@
 #include <glm/vec3.hpp>
 #include <vma/vk_mem_alloc.h>
 #include "DisposableVkObject.h"
-
+#include <gnsAPI.h>
 
 
 namespace gns::rendering
@@ -36,7 +36,7 @@ namespace gns::rendering
 		Buffer _vertexBuffer;
 		Buffer _indexBuffer;
 
-		void Dispose(Device* device) override;
+		void GEN_API Dispose(Device* device) override;
 	};
 }
 

@@ -1,16 +1,23 @@
 #pragma once
-#include "../Core/Components.h"
+#include "genesis.h"
 
 namespace gns {
-	class CameraSystem
+	class CameraSystem : public gns::core::SystemBase
 	{
 		float m_cameraMoveSpeed = 3.f;
 		Transform& transform;
 		CameraComponent& camera;
 		public:
 		CameraSystem(Transform& transform, CameraComponent& camera);
+		~CameraSystem() = default;
+
 		void UpdateCamera();
 		void UpdateProjection(int w, int h);
+
+	protected:
+		void OnCreate() override;
+		void OnUpdate() override;
+		void OnDestroy() override;
 	};
 }
 

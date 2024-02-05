@@ -6,7 +6,7 @@ namespace gns::rendering
 	class RenderSystem
 	{
 	public:
-		static gns::rendering::Renderer* S_Renderer;
-		static gns::rendering::Device* S_Device;
+		static GEN_API gns::rendering::Renderer* S_Renderer;
+		static GEN_API gns::rendering::Device* S_Device;
 	};
 }

@@ -23,7 +23,7 @@ namespace gns::gui
 		GEN_API virtual void OnGUI() = 0;
 	public:
 	virtual ~GuiWindow() = default;
-	GuiWindow(std::string name);
+	GEN_API GuiWindow(std::string name);
 		std::string Name;
 	};
 }

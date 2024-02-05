@@ -1,16 +1,22 @@
 #pragma once
 #include "../Application.h"
-class SystemBase
+
+namespace gns::core
 {
-public:
-	SystemBase();
-	~SystemBase() = default;
+	class SystemsApi;
+	class SystemBase
+	{
+		friend class SystemsApi;
+	public:
+		GEN_API SystemBase(std::string name);
+		virtual ~SystemBase() = default;
 
-
-protected:
-	virtual void OnStart() = 0;
-	virtual void OnUpdate() = 0;
-	virtual void OnLateUpdate() = 0;
-	virtual void OnDestroy() = 0;
-};
-
+		std::string name;
+		guid guid;
+		size_t index;
+	protected:
+		GEN_API virtual void OnCreate() = 0;
+		GEN_API virtual void OnUpdate() = 0;
+		GEN_API virtual void OnDestroy() = 0;
+	};
+}

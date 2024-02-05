@@ -29,18 +29,20 @@ namespace gns::rendering
 			glm::mat4 camera_matrix;
 		};
 	public:
-		Renderer(Window* window);
+		Renderer(Window* window, size_t buffersize);
 		~Renderer();
 		Renderer operator=(Renderer& other) = delete;
-		bool BeginFrame(uint32_t& swapchainImageIndex);
-		void BeginRenderPass(uint32_t& swapchainImageIndex, bool gui);
-		void EndRenderPass(uint32_t& swapchainImageIndex);
-		void Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, int index);
-		void EndFrame(uint32_t& swapchainImageIndex);
-		void UploadMesh(Mesh* mesh);
-		void CreatePipelineForMaterial(std::shared_ptr<Shader> shader);
+		GEN_API bool BeginFrame(uint32_t& swapchainImageIndex);
+		GEN_API void BeginRenderPass(uint32_t& swapchainImageIndex, bool gui);
+		GEN_API void EndRenderPass(uint32_t& swapchainImageIndex);
+		GEN_API void Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, 
+			int index, size_t uniformSize);
+
+		GEN_API void EndFrame(uint32_t& swapchainImageIndex);
+		GEN_API void UploadMesh(Mesh* mesh);
+		GEN_API void CreatePipelineForMaterial(std::shared_ptr<Shader> shader);
 		
-		void DisposeObject(std::shared_ptr<IDisposeable> object);
+		GEN_API void DisposeObject(std::shared_ptr<IDisposeable> object);
 	private:
 
 		VkClearValue m_clearValue;
@@ -64,15 +66,15 @@ namespace gns::rendering
 		std::shared_ptr<Material> m_material_ptr;
 		//MOVE OUT OF HERE:
 	public:
-		void UpdatePushConstant( 
+		GEN_API void UpdatePushConstant(
 			glm::mat4 modelMatrix, 
 			std::shared_ptr<Material> material);
 
-		void UpdateGlobalUbo(GPUCameraData src_bufferData);
-		void UpdateSceneDataUbo(const GPUSceneData& data);
-		void UpdateSceneDataUbo(const void* data, size_t size);
-		void UpdateObjectData(void* src_data, size_t size);
-		void UpdateMaterialUniformBuffer(void* src_data, size_t size, Material* material);
-		void CreateTextureResources(std::shared_ptr<Texture> texture);
+		GEN_API void UpdateGlobalUbo(GPUCameraData src_bufferData);
+		GEN_API void UpdateSceneDataUbo(const GPUSceneData& data);
+		GEN_API void UpdateSceneDataUbo(const void* data, size_t size);
+		GEN_API void UpdateObjectData(void* src_data, size_t size);
+		GEN_API void UpdateMaterialUniformBuffer(void* src_data, size_t size, Material* material);
+		GEN_API void CreateTextureResources(std::shared_ptr<Texture> texture);
 	};
 }

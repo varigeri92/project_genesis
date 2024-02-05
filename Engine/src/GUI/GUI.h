@@ -1,8 +1,6 @@
 #pragma once
 #include <vector>
-
 #include "GUI/GuiWindow.h"
-#include "ImGui/imgui.h"
 
 namespace gns::rendering
 {
@@ -20,9 +18,10 @@ namespace gns
 		void InitializeGUI();
 		static std::vector<gns::gui::GuiWindow*> guiWindows;
 		static void RegisterWindow(gns::gui::GuiWindow* gui_window);
-
 	public:
 		GUI(rendering::Device* device, Window* window);
+		static GEN_API gns::gui::GuiWindow* GetWindow_Internal(std::string name);
+
 
 		void BeginGUI();
 		void EndGUI();

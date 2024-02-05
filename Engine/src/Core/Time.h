@@ -1,5 +1,6 @@
 #pragma once
 #include <chrono>
+#include "gnsAPI.h"
 
 namespace gns
 {
@@ -8,7 +9,7 @@ namespace gns
 	{
 		friend class  gns::Application;
 	public:
-		static float GetDelta() { return m_deltaTime; }
+		static GEN_API float GetDelta() { return m_deltaTime; }
 	private:
 		inline static float m_deltaTime = 0;
 		inline static std::chrono::time_point<std::chrono::steady_clock> m_startTime;

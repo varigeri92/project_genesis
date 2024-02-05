@@ -1,6 +1,8 @@
 #pragma once
 #include <SDL2/SDL_keycode.h>
 #include <map>
+
+#include "gnsAPI.h"
 #include "glm/glm.hpp"
 
 
@@ -27,13 +29,13 @@ namespace gns
 	public:
 		inline static FrameInput frameInput{};
 
-		static bool GetKey(int keyCode);
-		static bool GetKeyUp(int keyCode);
-		static bool GetKeyDown(int keyCode);
-		static bool ProcessInput(SDL_Event& event);
-		static bool GetMouseButtonDown(int mouseButton);
-		static bool GetMouseButton(int mouseButton);
-		static bool GetMouseButtonUp(int mouseButton);
+		static GEN_API bool GetKey(int keyCode);
+		static GEN_API bool GetKeyUp(int keyCode);
+		static GEN_API bool GetKeyDown(int keyCode);
+		static GEN_API bool ProcessInput(SDL_Event& event);
+		static GEN_API bool GetMouseButtonDown(int mouseButton);
+		static GEN_API bool GetMouseButton(int mouseButton);
+		static GEN_API bool GetMouseButtonUp(int mouseButton);
 
 		inline static glm::vec2 mousePos;
 		inline static glm::vec2 p_mousePos;

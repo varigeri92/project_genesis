@@ -27,6 +27,7 @@ namespace gns::rendering
 		glm::mat4 viewproj;
 	};
 
+	/* 
 	struct alignas(64) GPUSceneData {
 		glm::vec4 fogColor; // w is for exponent
 		glm::vec4 fogDistances; //x for min, y for max, zw unused.
@@ -34,6 +35,7 @@ namespace gns::rendering
 		glm::vec4 sunlightDirection; //w for sun power
 		glm::vec4 sunlightColor;
 	};
+	*/
 
 	struct GPUObjectData {
 		glm::mat4 modelMatrix;
@@ -143,7 +145,7 @@ namespace gns::rendering
 
 		void InitFrameBuffers();
 		void InitSyncStructures();
-		void InitDescriptors();
+		void InitDescriptors(size_t size);
 		size_t PadUniformBufferSize(size_t originalSize);
 		void EndFrame();
 		FrameData& GetCurrentFrame();

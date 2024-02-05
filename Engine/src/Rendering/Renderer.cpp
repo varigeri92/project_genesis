@@ -17,9 +17,10 @@ namespace gns::rendering
 {
 	int shader_selector = 0;
 	int shaderCount = 2;
-Renderer::Renderer(Window* window) 
+Renderer::Renderer(Window* window, size_t buffersize)
 {
 	m_device = new Device(window);
+	m_device->InitDescriptors(buffersize);
 	RenderSystem::S_Device = m_device;
 }
 
@@ -183,20 +184,25 @@ void Renderer::EndRenderPass(uint32_t& swapchainImageIndex)
 	vkCmdEndRenderPass(m_device->GetCurrentFrame()._mainCommandBuffer);
 }
 
-void Renderer::Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, int index)
+void Renderer::Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, int index, size_t uniformSize)
 {
 	if(m_material_ptr != material || m_pipelineBound == false)
 	{
 		m_material_ptr = material;
 		vkCmdBindPipeline(m_device->GetCurrentFrame()._mainCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_shader->pipeline);
-		uint32_t uniform_offset = m_device->PadUniformBufferSize(sizeof(GPUSceneData)) * m_device->m_imageIndex;
+
+		uint32_t uniform_offset = m_device->PadUniformBufferSize(uniformSize) * m_device->m_imageIndex;
+
 		vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer, 
 			VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_shader->pipelineLayout, 0, 1, 
 			&m_device->GetCurrentFrame()._globalDescriptor, 1, &uniform_offset);
+
+
 		if(material->m_texture != nullptr)
 			vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer, 
 				VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_shader->pipelineLayout, 1, 1, &material->m_texture->descriptorSet,
 				0, nullptr);
+
 		/*
 		vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer, 
 			VK_PIPELINE_BIND_POINT_GRAPHICS, material->pipelineLayout, 1, 1, 
@@ -431,6 +437,8 @@ void Renderer::UpdateGlobalUbo(GPUCameraData src_bufferData)
 	vmaUnmapMemory(m_device->m_allocator, m_device->GetCurrentFrame()._cameraBuffer._allocation);
 }
 
+	/*
+	 
 void Renderer::UpdateSceneDataUbo(const GPUSceneData &data)
 {
 	int frameIndex = m_frameNumber % m_device->m_imageCount;
@@ -440,6 +448,7 @@ void Renderer::UpdateSceneDataUbo(const GPUSceneData &data)
 	memcpy(sceneData, &data, sizeof(data));
 	vmaUnmapMemory(m_device->m_allocator, m_device ->m_sceneParameterBuffer._allocation);
 }
+	 */
 
 void Renderer::UpdateSceneDataUbo(const void* data, size_t size)
 {

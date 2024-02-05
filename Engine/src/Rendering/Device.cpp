@@ -66,8 +66,6 @@ namespace gns::rendering
         InitGUIRenderPass();
         InitFrameBuffers();
         InitSyncStructures();
-        InitDescriptors();
-        
 	}
 
 	Device::~Device()
@@ -494,9 +492,8 @@ namespace gns::rendering
         _VK_CHECK(vkCreateFence(m_device, &uploadFenceCreateInfo, nullptr, &m_uploadContext._uploadFence), "Failed to initialize Upload Fence");
     }
 
-    void Device::InitDescriptors()
+    void Device::InitDescriptors(size_t size)
     {
-
         const std::vector<VkDescriptorPoolSize> sizes =
         {
 			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 10 },
@@ -547,7 +544,7 @@ namespace gns::rendering
         set3info.pBindings = &textureBind;
         vkCreateDescriptorSetLayout(m_device, &set3info, nullptr, &m_singleTextureSetLayout);
 
-        const size_t sceneParamBufferSize = m_imageCount * PadUniformBufferSize(sizeof(GPUSceneData));
+        const size_t sceneParamBufferSize = m_imageCount * PadUniformBufferSize(size);
         m_sceneParameterBuffer = CreateBuffer(m_allocator, sceneParamBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
         constexpr uint32_t structSize = sizeof(GPUCameraData);
@@ -585,7 +582,7 @@ namespace gns::rendering
             VkDescriptorBufferInfo sceneInfo;
             sceneInfo.buffer = m_sceneParameterBuffer._buffer;
             sceneInfo.offset = 0;
-            sceneInfo.range = sizeof(GPUSceneData);
+            sceneInfo.range = size;
 
             VkDescriptorBufferInfo objectBufferInfo;
             objectBufferInfo.buffer = m_frames[i]._objectBuffer._buffer;

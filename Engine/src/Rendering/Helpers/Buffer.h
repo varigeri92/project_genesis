@@ -12,7 +12,7 @@ namespace gns::rendering
 	public:
 		VkBuffer _buffer;
 		VmaAllocation _allocation;
-		void Dispose(Device* device) override;
+		GEN_API void Dispose(Device* device) override;
 	};
 
 	struct VulkanImage {

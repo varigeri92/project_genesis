@@ -1,5 +1,5 @@
 #pragma once
-
+#include "gnsAPI.h"
 namespace gns::rendering
 {
 	class Device;
@@ -8,6 +8,6 @@ namespace gns::rendering
 	{
 	public:
 		virtual ~IDisposeable() = default;
-		virtual void Dispose(Device* device) = 0;
+		virtual GEN_API void Dispose(Device* device) = 0;
 	};
 }

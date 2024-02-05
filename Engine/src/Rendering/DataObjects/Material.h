@@ -1,4 +1,5 @@
 #pragma once
+#include <gnsAPI.h>
 #include <memory>
 #include <string>
 #include <vector>
@@ -41,8 +42,8 @@ namespace gns::rendering
 		std::shared_ptr<Shader> m_shader;
 		std::shared_ptr<Texture> m_texture{ nullptr };
 
-		void Dispose(Device* device) override;
-		void SetTexture(const std::shared_ptr<Texture>& texture);
+		void GEN_API Dispose(Device* device) override;
+		void GEN_API SetTexture(const std::shared_ptr<Texture>& texture);
 	};
 }
 

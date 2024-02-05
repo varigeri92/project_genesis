@@ -1,13 +1,13 @@
 #include "CameraSystem.h"
-#include "../Input.h"
+#include "genesis.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "SDL2/SDL_keycode.h"
-#include "../Core/Time.h"
 
 namespace gns
 {
-	gns::CameraSystem::CameraSystem(Transform& transform, CameraComponent& camera) : transform{ transform }, camera{ camera } {}
+	gns::CameraSystem::CameraSystem(Transform& transform, CameraComponent& camera) :
+	SystemBase("CameraSystem"), transform{ transform }, camera{ camera } {}
 
 	void gns::CameraSystem::UpdateCamera()
 	{
@@ -53,5 +53,20 @@ namespace gns
 		camera.height = h;
 		camera.projection = glm::perspective(glm::radians(camera.fov), (camera.width / camera.height), camera._near, camera._far);
 		camera.projection[1][1] *= -1;
+	}
+
+	void CameraSystem::OnCreate()
+	{
+		LOG_INFO("System: " << name << "has ben created!");
+	}
+
+	void CameraSystem::OnUpdate()
+	{
+		UpdateCamera();
+	}
+
+	void CameraSystem::OnDestroy()
+	{
+		LOG_INFO("System: " << name << "has ben Destroyed!");
 	}
 }

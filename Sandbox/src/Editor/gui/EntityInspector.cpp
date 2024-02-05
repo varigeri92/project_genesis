@@ -1,8 +1,9 @@
 #include "EntityInspector.h"
 
+#include <genesis.h>
+
+#include "EditorGUI.h"
 #include "Log.h"
-#include "../Core/Scene.h"
-#include "../ECS/Entity.h"
 #include "ImGui/imgui.h"
 
 static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_SpanAvailWidth;
@@ -26,7 +27,6 @@ void gns::editor::EntityInspector::OnGUI()
 	if(rendererComponent != nullptr)
 	{
 		ImGui::Text("Renderer");
-
 	}
 
 	CameraComponent* cameraComponent = m_scene->registry.try_get<CameraComponent>(m_entity);
@@ -54,7 +54,19 @@ void gns::editor::EntityInspector::SetInspectedEntity(entt::entity entity, Scene
 	is_entitySelected = true;
 }
 
-void gns::editor::SceneHierachy::OnGUI()
+
+gns::editor::SceneHierarchy::SceneHierarchy() :
+	GuiWindow("Scene Hierarchy")
+{
+	m_entityInspector = dynamic_cast<EntityInspector*>(EditorGUI::GetWindow("Inspector"));
+	if(m_entityInspector == nullptr)
+	{
+		LOG_ERROR("'Inspector' Window Does not exists!!");
+	}
+	m_scene = SceneManager::GetActiveScene();
+}
+
+void gns::editor::SceneHierarchy::OnGUI()
 {
 	if (ImGui::CollapsingHeader(m_scene->name.c_str(), &m_headerOpen, ImGuiTreeNodeFlags_None))
 	{
