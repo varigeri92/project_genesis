@@ -11,6 +11,8 @@
 static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_SpanAvailWidth;
 ImGuiTreeNodeFlags node_flags = base_flags;
 
+std::vector<const char*> componentList = {};
+
 void gns::editor::EntityInspector::OnGUI()
 {
 	if (!is_entitySelected) return;
@@ -45,10 +47,24 @@ void gns::editor::EntityInspector::OnGUI()
 		ImGui::Separator();
 		ImGui::Text("clear color component");
 	}
+
+	for (ComponentMetadata component: Entity::ComponentRegistry[m_entity])
+	{
+		ImGui::Separator();
+		ImGui::Separator();
+		ImGui::Text(component.name);
+		if(strcmp(component.name, "struct gns::RendererComponent") == 0)
+		{
+			gns::RendererComponent* comp = (RendererComponent*)component.data;
+			ImGui::Text(comp->material->name.c_str());
+		}
+	}
+	
 }
 
 void gns::editor::EntityInspector::SetInspectedEntity(entt::entity entity, Scene* scene)
 {
+	componentList.clear();
 	m_scene = scene;
 	m_entity = entity;
 	auto reg = m_scene->registry.storage();
@@ -58,10 +74,8 @@ void gns::editor::EntityInspector::SetInspectedEntity(entt::entity entity, Scene
 
 		if (auto& storage = curr.second; storage.contains(entity))
 		{
-			std::cout << "Entity has component id = " << id << " the typename is: " <<storage.type().name() << std::endl;
-
-			auto type = entt::resolve(id);
-			
+			std::cout << "Entity has component id = " << storage.type().hash() << " the typename is: "
+			<< storage.type().name() << std::endl;
 		}
 	}
 	is_entitySelected = true;

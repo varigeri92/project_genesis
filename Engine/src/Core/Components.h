@@ -19,16 +19,14 @@ enum Type
 	char_type,
 	bool_type,
 };
-struct Member
+
+struct Property
 {
-	const char* _name = 0;
-	void* _data = 0;
-	Type _type = Type::none_type;
-	size_t _size = 0;
-
-	void assign(void* number);
-	void* read();
-
+	const char* name = 0;
+	void* data = 0;
+	const char* type = 0;
+	size_t size = 0;
+	size_t offset = 0;
 };
 
 #define SERIALIZE(type, name, value) type name = value
@@ -41,7 +39,7 @@ namespace gns
 	struct ComponentBase
 	{
 		core::guid guid;
-		std::vector<Member> members;
+		std::vector<Property> members;
 	};
 
 	COMPONENT(EntityComponent)
