@@ -36,6 +36,7 @@ namespace gns
 		static GEN_API bool GetMouseButtonDown(int mouseButton);
 		static GEN_API bool GetMouseButton(int mouseButton);
 		static GEN_API bool GetMouseButtonUp(int mouseButton);
+		static GEN_API glm::vec2 GetMouseVelocity();
 
 		inline static glm::vec2 mousePos;
 		inline static glm::vec2 p_mousePos;

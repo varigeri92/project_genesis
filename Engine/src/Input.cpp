@@ -81,15 +81,18 @@ namespace gns
 			case SDL_MOUSEMOTION:
 				mousePos.x = event.motion.x;
 				mousePos.y = event.motion.y;
+				mouseVelocity.x = event.motion.xrel;
+				mouseVelocity.y = event.motion.yrel;
 				break;
 			default:
 				break;
 			}
 
 		}
-		mouseVelocity = p_mousePos - mousePos;
-		mouseVelocity.x = (float)mouseVelocity.x / 100.f;
-		mouseVelocity.y = (float)mouseVelocity.y / 100.f;
+		//mouseVelocity = p_mousePos - mousePos;
+		//mouseVelocity.x = (float)mouseVelocity.x / 100.f; // 
+		//mouseVelocity.y = (float)mouseVelocity.y / 100.f;
+		//mouseVelocity = glm::normalize(mouseVelocity);
 		return false;
 	}
 	bool Input::GetMouseButtonDown(int mouseButton)
@@ -99,6 +102,11 @@ namespace gns
 	bool Input::GetMouseButtonUp(int mouseButton)
 	{
 		return frameInput.mouseUp[mouseButton];
+	}
+
+	glm::vec2 Input::GetMouseVelocity()
+	{
+		return mouseVelocity;
 	}
 
 	bool Input::GetMouseButton(int mouseButton)

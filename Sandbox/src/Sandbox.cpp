@@ -7,6 +7,8 @@
 #include "Editor/ProjectExplorer/ContentBrowser.h"
 #include "ImGui/imgui.h"
 
+#include "Components/ClearColorComponent.h"
+
 
 using namespace gns;
 using namespace gns::gui;
@@ -49,6 +51,7 @@ int main()
 
 		Entity sceneCamera_entity = SceneManager::GetActiveScene()->CreateEntity("SceneCamera",
 			SceneManager::GetActiveScene());
+		sceneCamera_entity.AddComponet<ClearColor>();
 
 		Transform& cameraTransform = sceneCamera_entity.GetTransform();
 		cameraTransform.position = { 0.f,-1.f,-3.f };

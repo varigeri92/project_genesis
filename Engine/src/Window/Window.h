@@ -9,6 +9,8 @@
 #include <SDL2/SDL_vulkan.h>
 #include <vector>
 
+#include "gnsAPI.h"
+
 namespace gns
 {
 	class Window
@@ -35,6 +37,8 @@ namespace gns
 		void GetExtentions(uint32_t& count, const char** names);
 		void GetExtent(int& width, int& height);
 		void WindowEvent(const SDL_Event* event);
+
+		static GEN_API void SetMouseRelative(bool isRelative);
 
 	private:
 		void CreateSDLWindow();

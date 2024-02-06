@@ -24,3 +24,5 @@
 #include "../src/Core/Time.h"
 #include "../src/Input.h"
 
+#include "../src/Window/Window.h"
+

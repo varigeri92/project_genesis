@@ -1,10 +1,7 @@
 #pragma once
-#include <memory>
-#include <string>
-#include <vector>
-
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "../AssetDatabase/Guid.h"
 
 constexpr float PI = 3.14159265359f;
 namespace gns::rendering
@@ -13,17 +10,50 @@ namespace gns::rendering
 	struct Material;
 }
 using namespace gns::rendering;
+
+enum Type
+{
+	none_type = 0,
+	int_type,
+	float_type,
+	char_type,
+	bool_type,
+};
+struct Member
+{
+	const char* _name = 0;
+	void* _data = 0;
+	Type _type = Type::none_type;
+	size_t _size = 0;
+
+	void assign(void* number);
+	void* read();
+
+};
+
+#define SERIALIZE(type, name, value) type name = value
+
+#define COMPONENT(name) struct name : public gns::ComponentBase
+
+
 namespace gns
 {
-	struct EntityComponent
+	struct ComponentBase
+	{
+		core::guid guid;
+		std::vector<Member> members;
+	};
+
+	COMPONENT(EntityComponent)
 	{
 		EntityComponent(std::string name) : name{ name } {}
 		std::string name;
-		bool isEnabled = true;
-		bool isStatic = false;
+		SERIALIZE(bool, isEnabled, true);
+		SERIALIZE(bool, isStatic, true);
+
 	};
 
-	struct Transform
+	COMPONENT(Transform)
 	{
 		glm::vec3 position;
 		glm::vec3 rotation;
@@ -59,25 +89,25 @@ namespace gns
 		}
 	};
 
-	struct MeshComponent
+	COMPONENT(MeshComponent)
 	{
 		std::shared_ptr<Mesh> mesh;
 		MeshComponent(std::shared_ptr<Mesh> mesh) : mesh{ mesh } {}
 	};
 
-	struct MaterialComponent {
+	COMPONENT(MaterialComponent) {
 		std::shared_ptr<Material> material;
 		MaterialComponent(std::shared_ptr<Material> material) : material{ material } {}
 	};
 
-	struct RendererComponent
+	COMPONENT(RendererComponent)
 	{
 		std::shared_ptr<Mesh> mesh;
 		std::shared_ptr<Material> material;
 		RendererComponent(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) : mesh(mesh), material(material) {}
 	};
 
-	struct CameraComponent
+	COMPONENT(CameraComponent)
 	{
 		CameraComponent() = delete;
 		CameraComponent(float near, float far, float fov, float width, float height, Transform& transform) :

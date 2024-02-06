@@ -117,3 +117,8 @@ void gns::Window::WindowEvent(const SDL_Event* event)
 		}
 	}
 }
+
+void gns::Window::SetMouseRelative(bool isRelative)
+{
+	SDL_SetRelativeMouseMode(isRelative ? SDL_TRUE : SDL_FALSE);
+}

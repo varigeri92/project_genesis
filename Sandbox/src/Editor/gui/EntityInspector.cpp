@@ -5,6 +5,8 @@
 #include "EditorGUI.h"
 #include "Log.h"
 #include "ImGui/imgui.h"
+#include "../../Components/ClearColorComponent.h"
+#include "EnTT/entt.hpp"
 
 static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_SpanAvailWidth;
 ImGuiTreeNodeFlags node_flags = base_flags;
@@ -17,6 +19,8 @@ void gns::editor::EntityInspector::OnGUI()
 	ImGui::Text(entityComponent.name.c_str());
 	ImGui::Separator();
 	ImGui::Text("Transform:");
+
+
 	Transform& transform = m_scene->registry.get<Transform>(m_entity);
 	ImGui::DragFloat3("Position", (float*)&transform.position, 0.01f);
 	ImGui::DragFloat3("Rotation", (float*)&transform.rotation, 0.01f);
@@ -34,6 +38,13 @@ void gns::editor::EntityInspector::OnGUI()
 	{
 		ImGui::Text("Camera");
 	}
+
+	ClearColor* clearColor = m_scene->registry.try_get<ClearColor>(m_entity);
+	if (clearColor != nullptr)
+	{
+		ImGui::Separator();
+		ImGui::Text("clear color component");
+	}
 }
 
 void gns::editor::EntityInspector::SetInspectedEntity(entt::entity entity, Scene* scene)
@@ -47,7 +58,9 @@ void gns::editor::EntityInspector::SetInspectedEntity(entt::entity entity, Scene
 
 		if (auto& storage = curr.second; storage.contains(entity))
 		{
-			std::cout << "Entity has component id = " << id << std::endl;
+			std::cout << "Entity has component id = " << id << " the typename is: " <<storage.type().name() << std::endl;
+
+			auto type = entt::resolve(id);
 			
 		}
 	}

@@ -4,47 +4,79 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "SDL2/SDL_keycode.h"
 
+bool flipY = true;
 namespace gns
 {
 	gns::CameraSystem::CameraSystem(Transform& transform, CameraComponent& camera) :
 	SystemBase("CameraSystem"), transform{ transform }, camera{ camera } {}
 
+
+	void gns::CameraSystem::UpdateViewMatrix()
+	{
+	};
+
+
 	void gns::CameraSystem::UpdateCamera()
 	{
-		float x_velocity = 0.f;
-		float y_velocity = 0.f;
-		float z_velocity = 0.f;
 
-		//fwd:
-		if (Input::GetKey(SDLK_w)) {
-			z_velocity = 1.f;
+		float speed = (Time::GetDelta() * m_cameraMoveSpeed);
+		if(Input::GetMouseButton(3))
+		{
+			Window::SetMouseRelative(true);
+
+			float mouse_sensitivity = (Time::GetDelta() * 10);
+			transform.rotation.x += Input::GetMouseVelocity().y * mouse_sensitivity;
+			transform.rotation.y += -Input::GetMouseVelocity().x * mouse_sensitivity;
+
+			glm::vec3 camFront;
+			camFront.x = -cos(glm::radians(transform.rotation.x)) * sin(glm::radians(transform.rotation.y));
+			camFront.y = sin(glm::radians(transform.rotation.x));
+			camFront.z = cos(glm::radians(transform.rotation.x)) * cos(glm::radians(transform.rotation.y));
+			camFront = glm::normalize(camFront);
+
+			glm::vec3 camRight = glm::normalize(glm::cross(camFront, glm::vec3(0.0f, 1.0f, 0.0f)));
+			glm::vec3 camUp = glm::normalize(glm::cross(camRight, camFront));
+
+
+			//fwd:
+			if (Input::GetKey(SDLK_w)) {
+				transform.position += camFront * speed;
+			}
+			//back:
+			if (Input::GetKey(SDLK_s)) {
+				transform.position -= camFront * speed;
+			}
+
+			//left:
+			if (Input::GetKey(SDLK_a)) {
+				transform.position -= camRight * speed;
+			}
+			//right:
+			if (Input::GetKey(SDLK_d)) {
+				transform.position += camRight * speed;
+			}
+
+			//up:
+			if (Input::GetKey(SDLK_q)) {
+				transform.position -= camUp * speed;
+			}
+			//down:
+			if (Input::GetKey(SDLK_e)) {
+				transform.position += camUp * speed;
+			}
+
 		}
-		//back:
-		if (Input::GetKey(SDLK_s)) {
-			z_velocity = -1.f;
+		else
+		{
+			Window::SetMouseRelative(false);
 		}
 
-		//left:
-		if (Input::GetKey(SDLK_a)) {
-			x_velocity = 1.f;
-		}
-		//right:
-		if (Input::GetKey(SDLK_d)) {
-			x_velocity = -1.f;
-		}
-
-		//up:
-		if (Input::GetKey(SDLK_q)) {
-			y_velocity = -1.f;
-		}
-		//down:
-		if (Input::GetKey(SDLK_e)) {
-			y_velocity = 1.f;
-		}
-
-		transform.position += glm::vec3(x_velocity, y_velocity, z_velocity) * (Time::GetDelta() * m_cameraMoveSpeed);
 		camera.view = glm::translate(glm::mat4(1.f), transform.position);
-		camera.camera_matrix = camera.projection * camera.view;
+		glm::mat4 rotM = glm::mat4(1.0f);
+		rotM = glm::rotate(rotM, glm::radians(transform.rotation.x * (flipY ? -1.0f : 1.0f)), glm::vec3(1.0f, 0.0f, 0.0f));
+		rotM = glm::rotate(rotM, glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		rotM = glm::rotate(rotM, glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		camera.camera_matrix = camera.projection * (rotM * camera.view);
 	}
 
 	void gns::CameraSystem::UpdateProjection(int w, int h)

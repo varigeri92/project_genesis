@@ -165,6 +165,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CameraSystem.cpp" />
+    <ClCompile Include="src\Components\ClearColorComponent.h" />
     <ClCompile Include="src\Editor\gui\EditorGUI.cpp" />
     <ClCompile Include="src\Editor\gui\EntityInspector.cpp" />
     <ClCompile Include="src\Editor\ProjectExplorer\ContentBrowser.cpp" />
