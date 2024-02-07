@@ -52,8 +52,8 @@ void gns::editor::EntityInspector::OnGUI()
 	{
 		ImGui::Separator();
 		ImGui::Separator();
-		ImGui::Text(component.name);
-		if(strcmp(component.name, "struct gns::RendererComponent") == 0)
+		ImGui::Text(component.name.c_str());
+		if(component.name == "struct gns::RendererComponent")
 		{
 			gns::RendererComponent* comp = (RendererComponent*)component.data;
 			ImGui::Text(comp->material->name.c_str());

@@ -4,10 +4,15 @@
 #include "tiny_obj_loader.h"
 #include <glm/glm.hpp>
 #include "../Rendering/DataObjects/Mesh.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 #include "../Rendering/DataObjects/Texture.h"
 #include "../Rendering/Helpers/Buffer.h"
+
+#define TINYGLTF_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+
+//#include "tinygltf/stb_image.h"
+#include "tinygltf/tiny_gltf.h"
 
 using namespace gns::rendering;
 
@@ -133,6 +138,89 @@ namespace gns
         }
         return mesh;
     }
+
+    std::vector<std::shared_ptr<gns::rendering::Mesh>> AssetLoader::LoadMeshIndexed_MultiObject(std::string path)
+    {
+        tinyobj::attrib_t attrib;
+        std::vector<tinyobj::shape_t> shapes;
+        std::vector<tinyobj::material_t> materials;
+        std::string warn, err;
+
+        std::vector<std::shared_ptr<gns::rendering::Mesh>> meshes = {};
+
+        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, (AssetsPath + path).c_str()))
+        {
+            LOG_ERROR(warn + err);
+        }
+        
+
+        for (const auto& shape : shapes) {
+            uint32_t ind = 0;
+            meshes.emplace_back(std::make_shared<Mesh>());
+            for (const auto& index : shape.mesh.indices) {
+                Vertex vertex{};
+                vertex.position = {
+                    attrib.vertices[3 * index.vertex_index + 0],
+                    attrib.vertices[3 * index.vertex_index + 1],
+                    attrib.vertices[3 * index.vertex_index + 2]
+                };
+
+                vertex.normal = {
+                    attrib.normals[3 * index.normal_index + 0],
+                    attrib.normals[3 * index.normal_index + 1],
+                    attrib.normals[3 * index.normal_index + 2]
+                };
+
+                vertex.color = {
+                    attrib.normals[3 * index.normal_index + 0],
+                    attrib.normals[3 * index.normal_index + 1],
+                    attrib.normals[3 * index.normal_index + 2]
+                };
+
+                vertex.uv = {
+                    attrib.texcoords[2 * index.texcoord_index + 0],
+                    1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+                };
+                meshes[meshes.size()-1]->_vertices.push_back(vertex);
+                meshes[meshes.size() - 1]->_indices.push_back(meshes[meshes.size() - 1]->_indices.size());
+            }
+            meshes[meshes.size() - 1]->name= shape.name;
+            LOG_INFO("Load Shape! " << shape.name);
+        }
+        LOG_INFO(meshes.size());
+        return meshes;
+    }
+
+    std::vector<std::shared_ptr<Mesh>> AssetLoader::LoadGltf(std::string path)
+    {
+        tinygltf::Model model;
+        tinygltf::TinyGLTF loader;
+        std::string err;
+        std::string warn;
+
+        bool res = loader.LoadASCIIFromFile(&model, &err, &warn, (AssetsPath + path).c_str());
+        if (!warn.empty()) {
+            std::cout << "WARN: " << warn << std::endl;
+        }
+
+        if (!err.empty()) {
+            std::cout << "ERR: " << err << std::endl;
+        }
+
+        if (!res)
+            std::cout << "Failed to load glTF: " << (AssetsPath + path).c_str() << std::endl;
+        else
+            std::cout << "Loaded glTF: " << (AssetsPath + path).c_str() << std::endl;
+
+        const tinygltf::Scene& scene = model.scenes[model.defaultScene];
+        for (auto node : scene.nodes)
+        {
+	        
+        }
+
+        return {};
+    }
+
 
     std::vector<uint32_t> AssetLoader::LoadShader(std::string path)
     {

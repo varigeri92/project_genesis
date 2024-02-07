@@ -1,6 +1,7 @@
 #pragma once
 #include <gnsAPI.h>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 #include <glm/gtx/transform.hpp>
@@ -34,6 +35,7 @@ namespace gns::rendering
 		VkDescriptorSet descriptorSet;
 	};
 
+
 	struct Material : public IDisposeable, public GnsObject {
 
 		Material(std::shared_ptr<Shader> shader, std::string name) :m_shader(shader), name(name) {};
@@ -41,7 +43,10 @@ namespace gns::rendering
 		std::string name;
 		std::shared_ptr<Shader> m_shader;
 		std::shared_ptr<Texture> m_texture{ nullptr };
-
+		std::shared_ptr<Texture> m_normalMap{ nullptr };
+		
+		float _roughness;
+		
 		void GEN_API Dispose(Device* device) override;
 		void GEN_API SetTexture(const std::shared_ptr<Texture>& texture);
 	};

@@ -13,7 +13,7 @@ namespace gns {
 
 	struct ComponentMetadata
 	{
-		const char* name;
+		std::string name;
 		void* data;
 	};
 
@@ -36,6 +36,7 @@ namespace gns {
 			T& component = scene->registry.emplace<T>(entity, std::forward<Args>(args)...);
 #ifdef EDITOR_BUILD
 			LOG_INFO("Component " << typeid(T).name() << " Was added to entity");
+			
 			ComponentRegistry[entity].emplace_back(typeid(T).name(), static_cast<void*>(&component));
 #endif
 			return component;

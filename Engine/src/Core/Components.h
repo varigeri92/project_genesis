@@ -3,6 +3,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "../AssetDatabase/Guid.h"
 
+#define EDITOR_BUILD
 constexpr float PI = 3.14159265359f;
 namespace gns::rendering
 {
@@ -11,25 +12,21 @@ namespace gns::rendering
 }
 using namespace gns::rendering;
 
-enum Type
-{
-	none_type = 0,
-	int_type,
-	float_type,
-	char_type,
-	bool_type,
-};
 
-struct Property
+
+struct SerializedProperty
 {
-	const char* name = 0;
+	std::string type = 0;
+	std::string  name = 0;
 	void* data = 0;
-	const char* type = 0;
-	size_t size = 0;
-	size_t offset = 0;
 };
+#ifdef EDITOR_BUILD
+#define SERIALIZE(type, name, value)type name = value;\
+	SerializedProperty serialized_##name = {#type, #name, &name};\
 
+#else
 #define SERIALIZE(type, name, value) type name = value
+#endif
 
 #define COMPONENT(name) struct name : public gns::ComponentBase
 
@@ -39,7 +36,7 @@ namespace gns
 	struct ComponentBase
 	{
 		core::guid guid;
-		std::vector<Property> members;
+		std::vector<SerializedProperty> serializedProperties = {};
 	};
 
 	COMPONENT(EntityComponent)

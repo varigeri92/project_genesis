@@ -24,5 +24,7 @@ namespace gns
 		static GEN_API std::shared_ptr<gns::rendering::Mesh> LoadMeshIndexed(std::string path);
 		static GEN_API std::vector<uint32_t> LoadShader(std::string path);
 		static GEN_API void LoadTextureData(std::string path, rendering::Texture* texture);
+		static GEN_API std::vector<std::shared_ptr<gns::rendering::Mesh>> LoadMeshIndexed_MultiObject(std::string path);
+		static GEN_API std::vector<std::shared_ptr<gns::rendering::Mesh>> LoadGltf(std::string path);
 	};
 }

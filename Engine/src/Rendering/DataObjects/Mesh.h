@@ -6,6 +6,7 @@
 #include <vma/vk_mem_alloc.h>
 #include "DisposableVkObject.h"
 #include <gnsAPI.h>
+#include <string>
 
 
 namespace gns::rendering
@@ -30,7 +31,8 @@ namespace gns::rendering
 	};
 
 	struct Mesh : public IDisposeable {
-		
+
+		std::string name;
 		std::vector<Vertex> _vertices;
 		std::vector<uint32_t> _indices;
 		Buffer _vertexBuffer;

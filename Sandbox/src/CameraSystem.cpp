@@ -25,8 +25,8 @@ namespace gns
 			Window::SetMouseRelative(true);
 
 			float mouse_sensitivity = (Time::GetDelta() * 10);
-			transform.rotation.x += Input::GetMouseVelocity().y * mouse_sensitivity;
-			transform.rotation.y += -Input::GetMouseVelocity().x * mouse_sensitivity;
+			transform.rotation.x += -Input::GetMouseVelocity().y * mouse_sensitivity;
+			transform.rotation.y += Input::GetMouseVelocity().x * mouse_sensitivity;
 
 			glm::vec3 camFront;
 			camFront.x = -cos(glm::radians(transform.rotation.x)) * sin(glm::radians(transform.rotation.y));

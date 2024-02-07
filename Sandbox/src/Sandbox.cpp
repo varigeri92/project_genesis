@@ -21,31 +21,47 @@ int main()
 	gns::Application* app = CreateApplication(ASSETS_PATH);
 	app->Start([app]()
 	{
-		std::shared_ptr<Mesh> suzan_mesh = AssetLoader::LoadMesh(R"(Meshes\OtherModels\Rei\Rei.obj)");
-		RenderSystem::S_Renderer->UploadMesh(suzan_mesh.get());
+		Scene* scene = SceneManager::CreateScene("Default Scene created With the manager!");
+		scene->sceneData.ambientColor = { 0.299f,0.145f,0.145f,0.150f };
+		scene->sceneData.sunlightColor = { 1.f, 1.f, 1.f, 1.f };
+		scene->sceneData.sunlightDirection = { 1.f, 1.f, 0.f , 0.f };
+		
+		auto meshes = AssetLoader::LoadMeshIndexed_MultiObject(R"(Meshes\Sponza-master\sponza.obj)");
+		auto rei = AssetLoader::LoadMesh(R"(Meshes\OtherModels\Rei\Rei.obj)");
+		RenderSystem::S_Renderer->UploadMesh(rei.get());
 
 		std::shared_ptr<Mesh> groundPlaneMesh = AssetLoader::LoadMesh(R"(Meshes\plane.obj)");
 		RenderSystem::S_Renderer->UploadMesh(groundPlaneMesh.get());
 
 		std::shared_ptr<Shader> defaultShader = std::make_shared<Shader>("blinphong.vert.spv", "blinphong.frag.spv");
-		LOG_INFO(defaultShader->GetGuid());
 		RenderSystem::S_Renderer->CreatePipelineForMaterial(defaultShader);
+
 		std::shared_ptr<Material> defaultMaterial = std::make_shared<Material>(defaultShader, "Rei_Material");
-		LOG_INFO(defaultMaterial->GetGuid());
-		defaultMaterial->m_texture = std::make_shared<Texture>(R"(Textures\lost_empire-RGBA.png)");
+		defaultMaterial->m_texture = std::make_shared<Texture>(
+			R"(Meshes\OtherModels\Rei\Textures\Rei_3_LP_Hair_low_BaseColor.png)");
 		defaultMaterial->m_texture->Apply();
-		//std::shared_ptr<Texture> icon = std::make_shared<Texture>(R"(Resources\Icons\icon_file.png)");
-		//icon->Apply();
+		int i = 0;
 
-		//Entity Creation:
 
-		Scene* scene = SceneManager::CreateScene("Default Scene created With the manager!");
-		scene->sceneData.ambientColor = { 0.299f,0.145f,0.145f,0.150f };
-		scene->sceneData.sunlightColor = { 1.f, 1.f, 1.f, 1.f };
-		scene->sceneData.sunlightDirection = { 1.f, 1.f, 0.f , 0.f };
-		Entity suzan = scene->CreateEntity("Ayanami_Rei", scene);
-		suzan.AddComponet<RendererComponent>(suzan_mesh, defaultMaterial);
-		suzan.GetComponent<Transform>().matrix = glm::mat4{ 1 };
+		for (auto mesh : meshes)
+		{
+			if(mesh->_vertices.size()==0)
+			{
+				LOG_WARNING("Mesh has no Vertices");
+			}
+			i ++;
+			RenderSystem::S_Renderer->UploadMesh(mesh.get());
+			
+			Entity suzan = scene->CreateEntity(mesh->name, scene);
+			suzan.AddComponet<RendererComponent>(mesh, defaultMaterial);
+			suzan.GetComponent<Transform>().matrix = glm::mat4{ 1 };
+		}
+
+		Entity reiEntity = scene->CreateEntity(rei->name, scene);
+		reiEntity.AddComponet<RendererComponent>(rei, defaultMaterial);
+		reiEntity.GetComponent<Transform>().matrix = glm::mat4{ 1 };
+
+
 		//Create Scene
 
 
