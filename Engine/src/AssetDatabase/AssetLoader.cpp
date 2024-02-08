@@ -7,16 +7,16 @@
 #include "../Rendering/DataObjects/Texture.h"
 #include "../Rendering/Helpers/Buffer.h"
 
-#define TINYGLTF_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <tinygltf/stb_image.h>
 
-//#include "tinygltf/stb_image.h"
-#include "tinygltf/tiny_gltf.h"
+
+#include <assimp/Importer.hpp>      // C++ importer interface
+#include <assimp/scene.h>           // Output data structure
+#include <assimp/postprocess.h>     // Post processing flags
 
 using namespace gns::rendering;
 
-//#define LOAD_OLD_WAY
 namespace gns
 {
 	void AssetLoader::SetPaths(std::string assetsPath)
@@ -26,71 +26,7 @@ namespace gns
 
     std::shared_ptr<Mesh> AssetLoader::LoadMesh(std::string path)
     {
-
-#ifdef LOAD_OLD_WAY
-        tinyobj::attrib_t attrib;
-        std::vector<tinyobj::shape_t> shapes;
-        std::vector<tinyobj::material_t> materials;
-        std::string warn, err;
-
-        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err,   (AssetsPath+path).c_str()))
-        {
-            LOG_ERROR(warn + err);
-        }
-
-        auto mesh = std::make_shared<Mesh>();
-	    std::vector<uint32_t> indices = {};
-        for (size_t s = 0; s < shapes.size(); s++) {
-            // Loop over faces(polygon)
-            size_t index_offset = 0;
-            for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
-
-                //hardcode loading to triangles
-                int fv = 3;
-
-                // Loop over vertices in the face.
-                for (size_t v = 0; v < fv; v++) {
-                    // access to vertex
-                    tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
-
-                    //vertex position
-                    tinyobj::real_t vx = attrib.vertices[3 * idx.vertex_index + 0];
-                    tinyobj::real_t vy = attrib.vertices[3 * idx.vertex_index + 1];
-                    tinyobj::real_t vz = attrib.vertices[3 * idx.vertex_index + 2];
-                    //vertex normal
-                    tinyobj::real_t nx = attrib.normals[3 * idx.normal_index + 0];
-                    tinyobj::real_t ny = attrib.normals[3 * idx.normal_index + 1];
-                    tinyobj::real_t nz = attrib.normals[3 * idx.normal_index + 2];
-
-                    //copy it into our vertex
-                    Vertex new_vert;
-                    new_vert.position.x = vx;
-                    new_vert.position.y = vy;
-                    new_vert.position.z = vz;
-
-                    new_vert.normal.x = nx;
-                    new_vert.normal.y = ny;
-                    new_vert.normal.z = nz;
-
-                    //we are setting the vertex color as the vertex normal. This is just for display purposes
-                    new_vert.color = new_vert.normal;
-
-                    tinyobj::real_t ux = attrib.texcoords[2 * idx.texcoord_index + 0];
-                    tinyobj::real_t uy = attrib.texcoords[2 * idx.texcoord_index + 1];
-
-                    new_vert.uv.x = ux;
-                    new_vert.uv.y = 1 - uy;
-
-                    mesh->_vertices.push_back(new_vert);
-                }
-                index_offset += fv;
-            }
-        }
-        return mesh;
-#else
         return LoadMeshIndexed(path);
-#endif
-
     }
 
     std::shared_ptr<gns::rendering::Mesh> AssetLoader::LoadMeshIndexed(std::string path)
@@ -185,44 +121,77 @@ namespace gns
                 meshes[meshes.size() - 1]->_indices.push_back(meshes[meshes.size() - 1]->_indices.size());
             }
             meshes[meshes.size() - 1]->name= shape.name;
-            LOG_INFO("Load Shape! " << shape.name);
         }
-        LOG_INFO(meshes.size());
         return meshes;
     }
 
-    std::vector<std::shared_ptr<Mesh>> AssetLoader::LoadGltf(std::string path)
+    std::vector<std::shared_ptr<gns::rendering::Mesh>> AssetLoader::LoadMeshFile(std::string path)
     {
-        tinygltf::Model model;
-        tinygltf::TinyGLTF loader;
-        std::string err;
-        std::string warn;
+        std::vector<std::shared_ptr<gns::rendering::Mesh>> meshes = {};
+        
+        Assimp::Importer importer;
+        const unsigned flags = aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType;
+        const unsigned flags2 = aiProcessPreset_TargetRealtime_Fast;
+        const unsigned flags3 = 0;
 
-        bool res = loader.LoadASCIIFromFile(&model, &err, &warn, (AssetsPath + path).c_str());
-        if (!warn.empty()) {
-            std::cout << "WARN: " << warn << std::endl;
+        const aiScene* scene = importer.ReadFile((AssetsPath + path), flags);
+
+        // If the import failed, report it
+        if (nullptr == scene) {
+            LOG_ERROR(importer.GetErrorString());
+            return meshes;
         }
-
-        if (!err.empty()) {
-            std::cout << "ERR: " << err << std::endl;
-        }
-
-        if (!res)
-            std::cout << "Failed to load glTF: " << (AssetsPath + path).c_str() << std::endl;
-        else
-            std::cout << "Loaded glTF: " << (AssetsPath + path).c_str() << std::endl;
-
-        const tinygltf::Scene& scene = model.scenes[model.defaultScene];
-        for (auto node : scene.nodes)
+        if (scene->HasMeshes())
         {
-	        
+            for (size_t i = 0; i < scene->mNumMeshes; i++)
+            {
+                std::shared_ptr<gns::rendering::Mesh> mesh = std::make_shared<Mesh>();
+				ProcessImpoertedScene(scene->mMeshes[i], mesh);
+                meshes.push_back(mesh);
+            }
         }
-
-        return {};
+        return meshes;
     }
 
 
-    std::vector<uint32_t> AssetLoader::LoadShader(std::string path)
+    void AssetLoader::ProcessImpoertedScene(const void* _mesh, std::shared_ptr<gns::rendering::Mesh>& outMesh)
+    {
+        const aiMesh* mesh = static_cast<const aiMesh*>(_mesh);
+        outMesh->name = mesh->mName.C_Str();
+        for (uint32_t v = 0; v < mesh->mNumVertices; v++)
+        {
+            Vertex vertex{};
+            vertex.position = { mesh->mVertices[v].x, mesh->mVertices[v].y, mesh->mVertices[v].z, };
+            vertex.normal = { mesh->mNormals[v].x,mesh->mNormals[v].y,mesh->mNormals[v].z, };
+            if (mesh->HasVertexColors(0))
+            {
+                vertex.color = { mesh->mColors[0][v].r,mesh->mColors[0][v].g, mesh->mColors[0][v].b };
+            }
+            else
+            {
+                vertex.color = { 1,1,1 };
+            }
+            if(mesh->HasTextureCoords(0))
+            {
+				vertex.uv = { mesh->mTextureCoords[0][v].x, 1-mesh->mTextureCoords[0][v].y };
+            }
+            outMesh->_vertices.push_back(vertex);
+            outMesh->materialIndex = mesh->mMaterialIndex;
+        }
+
+        for (uint32_t i = 0; i < mesh->mNumFaces; i++) {
+            const aiFace& Face = mesh->mFaces[i];
+            for (uint32_t i = 0; i < Face.mNumIndices; i++)
+            {
+                uint32_t v = Face.mIndices[i];
+				outMesh->_indices.push_back(v);
+            }
+        }
+
+    }
+
+
+    std::vector<uint32_t> gns::AssetLoader::LoadShader(std::string path)
     {
         std::ifstream file((ShadersPath + path), std::ios::ate | std::ios::binary);
         if (!file.is_open()) {

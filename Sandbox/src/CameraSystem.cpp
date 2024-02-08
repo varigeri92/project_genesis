@@ -24,7 +24,7 @@ namespace gns
 		{
 			Window::SetMouseRelative(true);
 
-			float mouse_sensitivity = (Time::GetDelta() * 10);
+			float mouse_sensitivity = (Time::GetDelta() * 50);
 			transform.rotation.x += -Input::GetMouseVelocity().y * mouse_sensitivity;
 			transform.rotation.y += Input::GetMouseVelocity().x * mouse_sensitivity;
 
@@ -33,9 +33,11 @@ namespace gns
 			camFront.y = sin(glm::radians(transform.rotation.x));
 			camFront.z = cos(glm::radians(transform.rotation.x)) * cos(glm::radians(transform.rotation.y));
 			camFront = glm::normalize(camFront);
+			camFront.y *= -1;
 
-			glm::vec3 camRight = glm::normalize(glm::cross(camFront, glm::vec3(0.0f, 1.0f, 0.0f)));
-			glm::vec3 camUp = glm::normalize(glm::cross(camRight, camFront));
+
+			const glm::vec3 camRight = glm::cross(camFront, glm::vec3(0.0f, 1.0f, 0.0f));
+			const glm::vec3 camUp = glm::cross(-camFront, -camRight);
 
 
 			//fwd:
@@ -46,25 +48,23 @@ namespace gns
 			if (Input::GetKey(SDLK_s)) {
 				transform.position -= camFront * speed;
 			}
-
 			//left:
 			if (Input::GetKey(SDLK_a)) {
-				transform.position -= camRight * speed;
+				transform.position += glm::normalize(glm::cross(camFront, glm::vec3(0.0f, -1.0f, 0.0f))) * speed;
 			}
 			//right:
 			if (Input::GetKey(SDLK_d)) {
-				transform.position += camRight * speed;
+				transform.position -= glm::normalize(glm::cross(camFront, glm::vec3(0.0f, -1.0f, 0.0f))) * speed;
 			}
 
-			//up:
-			if (Input::GetKey(SDLK_q)) {
-				transform.position -= camUp * speed;
-			}
 			//down:
-			if (Input::GetKey(SDLK_e)) {
-				transform.position += camUp * speed;
+			if (Input::GetKey(SDLK_q)) {
+				transform.position -= glm::vec3(0.0f, -1.0f, 0.0f) * speed;
 			}
-
+			//up:
+			if (Input::GetKey(SDLK_e)) {
+				transform.position += glm::vec3(0.0f, -1.0f, 0.0f)* speed;
+			}
 		}
 		else
 		{

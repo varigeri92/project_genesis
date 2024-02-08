@@ -33,6 +33,7 @@ namespace gns::rendering
 	struct Mesh : public IDisposeable {
 
 		std::string name;
+		size_t materialIndex;
 		std::vector<Vertex> _vertices;
 		std::vector<uint32_t> _indices;
 		Buffer _vertexBuffer;

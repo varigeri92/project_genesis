@@ -32,6 +32,7 @@ namespace gns
 
 		p_mousePos.x = mousePos.x;
 		p_mousePos.y = mousePos.y;
+		mouseVelocity = { 0,0 };
 
 		/*
 		if (mousePos.x < 0) {

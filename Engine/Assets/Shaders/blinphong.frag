@@ -21,8 +21,9 @@ layout(set = 0, binding = 1) uniform  SceneData{
 
 void main()
 {
-	float diff = max(dot(inNormal, sceneData.sunlightDirection.xyz), 0.0);
+	float diff = max((dot(inNormal, sceneData.sunlightDirection.xyz) + 1) * 0.5, 0.0);
+	diff += sceneData.ambientColor.w;
 	vec3 diffuse = sceneData.sunlightColor.xyz * diff * sceneData.sunlightColor.w;
 	vec3 color = texture(tex1,inTexCoord).xyz;
-	outFragColor = vec4( (color * diffuse) + (sceneData.ambientColor.xyz) * sceneData.ambientColor.w ,1.0f);
+	outFragColor = vec4( (color * diffuse) * (sceneData.ambientColor.xyz),1.0f);
 }
