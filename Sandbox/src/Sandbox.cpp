@@ -7,7 +7,6 @@
 #include "Editor/ProjectExplorer/ContentBrowser.h"
 #include "ImGui/imgui.h"
 
-#include "Components/ClearColorComponent.h"
 
 
 using namespace gns;
@@ -22,11 +21,9 @@ int main()
 	app->Start([app]()
 	{
 		Scene* scene = SceneManager::CreateScene("Default Scene created With the manager!");
-		scene->sceneData.ambientColor = { 0.299f,0.145f,0.145f,0.150f };
+		scene->sceneData.ambientColor = { 1.f,1.f,1.f,0.050f };
 		scene->sceneData.sunlightColor = { 1.f, 1.f, 1.f, 1.f };
 		scene->sceneData.sunlightDirection = { 1.f, 1.f, 0.f , 0.f };
-		
-
 
 		std::shared_ptr<Shader> defaultShader = std::make_shared<Shader>("blinphong.vert.spv", "blinphong.frag.spv");
 		RenderSystem::S_Renderer->CreatePipelineForMaterial(defaultShader);
@@ -84,37 +81,69 @@ int main()
 		//Create Scene
 		Entity sceneCamera_entity = SceneManager::GetActiveScene()->CreateEntity("SceneCamera",
 			SceneManager::GetActiveScene());
-		sceneCamera_entity.AddComponet<ClearColor>();
 
 		Transform& cameraTransform = sceneCamera_entity.GetTransform();
 		cameraTransform.position = { 0.f,-1.f,-3.f };
 		CameraComponent& sceneCamera = sceneCamera_entity.AddComponet<CameraComponent>(0.01f, 1000.f, 60.f, 1700, 900, cameraTransform);
 
-		CameraSystem* cameraSystem = new CameraSystem(cameraTransform, sceneCamera);
-		core::SystemsApi::RegisterSystem(cameraSystem);
+		core::SystemsApi::RegisterSystem<CameraSystem>(cameraTransform, sceneCamera);
 
-		
-		ContentBrowser* contentBrowser = new ContentBrowser();
-		EntityInspector* inspector = new EntityInspector();
-		SceneHierarchy* sceneHierarchy = new SceneHierarchy();
+		GUI::RegisterWindow<ContentBrowser>();
+		GUI::RegisterWindow<EntityInspector>();
+		GUI::RegisterWindow<SceneHierarchy>();
+
+		auto* camSystem = core::SystemsApi::GetSystem<CameraSystem>();
+		LOG_INFO(camSystem->name);
 
 
 	});
 	app->Run([app]()
 	{
-			Scene* scene = SceneManager::GetActiveScene();
+		Scene* scene = SceneManager::GetActiveScene();
 
-			ImGui::Begin("Scene Data Editor");
+		ImGui::Begin("Scene Data Editor");
 
-			ImGui::ColorEdit3("Ambient Color", (float*)&scene->sceneData.ambientColor);
-			ImGui::DragFloat("Ambient Intensity", &scene->sceneData.ambientColor.w, 0.01f, 0);
+		ImGui::ColorEdit3("Ambient Color", (float*)&scene->sceneData.ambientColor);
+		ImGui::DragFloat("Ambient Intensity", &scene->sceneData.ambientColor.w, 0.01f, 0);
 
-			ImGui::ColorEdit3("Light Color", (float*)&scene->sceneData.sunlightColor);
-			ImGui::DragFloat("Light Intensity", &scene->sceneData.sunlightColor.w, 0.001f, 0);
+		ImGui::ColorEdit3("Light Color", (float*)&scene->sceneData.sunlightColor);
+		ImGui::DragFloat("Light Intensity", &scene->sceneData.sunlightColor.w, 0.001f, 0);
 
-			ImGui::DragFloat3("light Direction", (float*)&scene->sceneData.sunlightDirection, 0.001f, -1.0f, 1.0f);
+		ImGui::DragFloat3("light Direction", (float*)&scene->sceneData.sunlightDirection, 0.001f, -1.0f, 1.0f);
 
-			ImGui::End();
+		ImGui::End();
+
+		ImGui::Begin("Systems Inspector");
+		static ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp;
+		if (ImGui::BeginTable("table1", 3, flags))
+		{
+			ImGui::TableSetupColumn("Index");
+			ImGui::TableSetupColumn("name");
+			ImGui::TableSetupColumn("Status");
+			ImGui::TableHeadersRow();
+
+			for (int row = 0; row < core::SystemsApi::Systems.size(); row++)
+			{
+				ImGui::TableNextRow();
+				ImGui::TableSetColumnIndex(0);
+				ImGui::TextUnformatted(std::to_string(core::SystemsApi::Systems[row]->index).c_str());
+				ImGui::TableSetColumnIndex(1);
+				ImGui::TextUnformatted(core::SystemsApi::Systems[row]->name.c_str());
+				ImGui::TableSetColumnIndex(2);
+				ImGui::Checkbox("", &core::SystemsApi::Systems[row]->isActive);
+			}
+			ImGui::EndTable();
+		}
+		
+		ImGui::End();
+		ImGui::Begin("Test WindowOpenClose");
+		for (int i  =0; i< GUI::guiWindows.size(); i++)
+		{
+			if (ImGui::Button(GUI::guiWindows[i]->name.c_str()))
+				GUI::guiWindows[i]->SetActive(!GUI::guiWindows[i]->m_isActive);
+		}
+
+		ImGui::End();
 
 	});
 }

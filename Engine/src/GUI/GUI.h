@@ -16,13 +16,47 @@ namespace gns
 		rendering::Device* m_device;
 		Window* m_window;
 		void InitializeGUI();
-		static std::vector<gns::gui::GuiWindow*> guiWindows;
-		static void RegisterWindow(gns::gui::GuiWindow* gui_window);
+
+		static int32_t GetIndexOfType(size_t typeHash)
+		{
+			for (size_t i = 0; i < guiWindows.size(); i++)
+			{
+				if (guiWindows[i]->typeHash == typeHash)
+				{
+					return i;
+				}
+			}
+			return -1;
+		};
+
+		static std::string GetSimpleName(std::string typeName) {
+			size_t lastColonPos = typeName.rfind("::");
+			if (lastColonPos != std::string::npos) {
+				typeName = typeName.substr(lastColonPos + 2);
+			}
+			return typeName;
+		}
+
 	public:
+		static GEN_API std::vector<gns::gui::GuiWindow*> guiWindows;
 		GUI(rendering::Device* device, Window* window);
+
+		template<typename T, typename... Args>
+		static void RegisterWindow(Args&& ... args)
+		{
+			size_t typehash = typeid(T).hash_code();
+			if (GetIndexOfType(typehash) == -1)
+			{
+				T* newWindow = new T{ std::forward<Args>(args)... };
+				guiWindows.push_back(newWindow);
+				size_t windowIndex = guiWindows.size() - 1;
+				guiWindows[windowIndex]->index = windowIndex;
+				guiWindows[windowIndex]->name = GetSimpleName(typeid(T).name());
+				guiWindows[windowIndex]->typeHash = typehash;
+			}
+		}
+
 		static GEN_API gns::gui::GuiWindow* GetWindow_Internal(std::string name);
-
-
 		void BeginGUI();
 		void EndGUI();
 		void DrawGUI();

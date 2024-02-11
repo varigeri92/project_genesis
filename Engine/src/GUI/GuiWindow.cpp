@@ -6,12 +6,18 @@
 
 gns::gui::GuiWindow::GuiWindow(std::string name) : Name(name)
 {
-	GUI::RegisterWindow(this);
+
+}
+
+void gns::gui::GuiWindow::SetActive(bool value)
+{
+	m_isActive = value;
 }
 
 void gns::gui::GuiWindow::DrawWindow()
 {
-	ImGui::Begin(Name.c_str(), &m_isOpen, m_flags);
+	if (!m_isActive) return;
+	ImGui::Begin(Name.c_str(), &m_isActive, m_flags);
 	OnGUI();
 	ImGui::End();
 }

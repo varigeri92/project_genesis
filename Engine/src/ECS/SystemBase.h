@@ -14,6 +14,8 @@ namespace gns::core
 		std::string name;
 		guid guid;
 		size_t index;
+		size_t typeHash;
+		bool isActive;
 	protected:
 		GEN_API virtual void OnCreate() = 0;
 		GEN_API virtual void OnUpdate() = 0;

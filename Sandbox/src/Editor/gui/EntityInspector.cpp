@@ -5,7 +5,6 @@
 #include "EditorGUI.h"
 #include "Log.h"
 #include "ImGui/imgui.h"
-#include "../../Components/ClearColorComponent.h"
 #include "EnTT/entt.hpp"
 
 static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_SpanAvailWidth;
@@ -41,12 +40,6 @@ void gns::editor::EntityInspector::OnGUI()
 		ImGui::Text("Camera");
 	}
 
-	ClearColor* clearColor = m_scene->registry.try_get<ClearColor>(m_entity);
-	if (clearColor != nullptr)
-	{
-		ImGui::Separator();
-		ImGui::Text("clear color component");
-	}
 
 	for (ComponentMetadata component: Entity::ComponentRegistry[m_entity])
 	{

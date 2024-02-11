@@ -34,24 +34,6 @@ namespace gns
 		p_mousePos.y = mousePos.y;
 		mouseVelocity = { 0,0 };
 
-		/*
-		if (mousePos.x < 0) {
-			SDL_WarpMouseInWindow(NULL, 1920, mousePos.y);
-			p_mousePos.x = 1920;
-		}
-		if (mousePos.x > 1921) {
-			SDL_WarpMouseInWindow(NULL, 0, mousePos.y);
-			p_mousePos.x = 0;
-		}
-		if (mousePos.y < 0) {
-			SDL_WarpMouseInWindow(NULL, mousePos.x, 1080 );
-			p_mousePos.y = 1080;
-		}
-		if (mousePos.y > 1081) {
-			SDL_WarpMouseInWindow(NULL, mousePos.x, 0);
-			p_mousePos.y = 0;
-		}
-		*/
 		while (SDL_PollEvent(&event) != 0)
 		{
 			ImGui_ImplSDL2_ProcessEvent(&event);
