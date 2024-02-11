@@ -31,6 +31,7 @@ namespace gns::rendering
 	public:
 		Renderer(Window* window, size_t buffersize);
 		~Renderer();
+		Renderer(Renderer& other);
 		Renderer operator=(Renderer& other) = delete;
 		GEN_API bool BeginFrame(uint32_t& swapchainImageIndex);
 		GEN_API void BeginRenderPass(uint32_t& swapchainImageIndex, bool gui);

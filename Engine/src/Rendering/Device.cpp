@@ -110,13 +110,16 @@ namespace gns::rendering
             .require_api_version(1, 2, 0)
 			.set_app_version(0,0,1)
     	.build();
+        LOG_INFO("Instance built!");
         if (!inst_ret) {
             LOG_ERROR("Failed to create Vulkan instance. Error: " << inst_ret.error().message());
             return false;
         }
         m_vkb_instance = inst_ret.value();
         m_instance = m_vkb_instance.instance;
+        LOG_INFO("Instance assigned!");
         CreateSurface();
+        LOG_INFO("Surface Created!");
         vkb::PhysicalDeviceSelector selector{ m_vkb_instance };
         auto phys_ret = selector.set_surface(m_surface)
             .set_minimum_version(1, 1) // require a vulkan 1.1 capable device
@@ -127,12 +130,13 @@ namespace gns::rendering
             return false;
         }
         m_physicalDevice = phys_ret.value();
+        LOG_INFO("PhysDevice Selected!");
         vkb::DeviceBuilder device_builder{ phys_ret.value() };
         VkPhysicalDeviceShaderDrawParametersFeatures shader_draw_parameters_features = {};
         shader_draw_parameters_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES;
         shader_draw_parameters_features.pNext = nullptr;
         shader_draw_parameters_features.shaderDrawParameters = VK_TRUE;
-        vkb::Device vkbDevice = device_builder.add_pNext(&shader_draw_parameters_features).build().value();
+        //vkb::Device vkbDevice = device_builder.add_pNext(&shader_draw_parameters_features).build().value();
         auto dev_ret = device_builder.build();
         if (!dev_ret) {
             LOG_ERROR("Failed to create Vulkan device. Error: " << dev_ret.error().message());
@@ -141,8 +145,8 @@ namespace gns::rendering
         m_vkb_device = dev_ret.value();
 
         // Get the VkDevice handle used in the rest of a vulkan application
-        m_device = m_vkb_device.device;
-
+        m_device = dev_ret.value().device;
+        LOG_INFO("LogicalDevice Created!");
         // Get the graphics queue with a helper function
         auto graphics_queue_ret = m_vkb_device.get_queue(vkb::QueueType::graphics);
         if (!graphics_queue_ret) {

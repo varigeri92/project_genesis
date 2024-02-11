@@ -1,5 +1,4 @@
 #include "Renderer.h"
-#include <glm/gtx/transform.hpp>
 #include "Log.h"
 #include "rendererInclude.h"
 #include "RenderSystem.h"
@@ -10,18 +9,19 @@
 #include "../Core/Time.h"
 #include "DataObjects/Texture.h"
 #include "Helpers/VkInitializer.h"
-#include "ImGui/imgui_impl_sdl2.h"
 #include "ImGui/imgui_impl_vulkan.h"
 
 namespace gns::rendering
 {
-	int shader_selector = 0;
-	int shaderCount = 2;
 Renderer::Renderer(Window* window, size_t buffersize)
 {
+	LOG_VK_WARNING("Create Renderer");
 	m_device = new Device(window);
+	LOG_VK_WARNING("Created Device");
 	m_device->InitDescriptors(buffersize);
+	LOG_VK_WARNING("Descriuptors initialized!");
 	RenderSystem::S_Device = m_device;
+	LOG_VK_WARNING("Device Assigned");
 }
 
 Renderer::~Renderer()
@@ -32,6 +32,11 @@ Renderer::~Renderer()
 		_disposeQueue[i]->Dispose(m_device);
 	}
 	delete(m_device);
+}
+
+Renderer::Renderer(Renderer& other)
+{
+	LOG_INFO("Hello copy!");
 }
 
 void Renderer::UploadMesh(Mesh* mesh)
@@ -216,11 +221,8 @@ void Renderer::Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> materi
 		0, 1, &mesh->_vertexBuffer._buffer, &offset);
 	vkCmdBindIndexBuffer(m_device->GetCurrentFrame()._mainCommandBuffer,
 		mesh->_indexBuffer._buffer, offset, VK_INDEX_TYPE_UINT32);
-	vkCmdDrawIndexed(m_device->GetCurrentFrame()._mainCommandBuffer, static_cast<uint32_t>(mesh->_indices.size()), 1, 0, 0, 0);
-	/*
-	vkCmdDraw(m_device->GetCurrentFrame()._mainCommandBuffer, 
-		mesh->_vertices.size(), 1, 0, 0);
-	*/
+	vkCmdDrawIndexed(m_device->GetCurrentFrame()._mainCommandBuffer, static_cast<uint32_t>(mesh->_indices.size()),
+		1, 0, 0, 0);
 }
 
 void Renderer::EndFrame(uint32_t& swapchainImageIndex)
@@ -436,19 +438,6 @@ void Renderer::UpdateGlobalUbo(GPUCameraData src_bufferData)
 	memcpy(data, &src_bufferData, sizeof(GPUCameraData));
 	vmaUnmapMemory(m_device->m_allocator, m_device->GetCurrentFrame()._cameraBuffer._allocation);
 }
-
-	/*
-	 
-void Renderer::UpdateSceneDataUbo(const GPUSceneData &data)
-{
-	int frameIndex = m_frameNumber % m_device->m_imageCount;
-	char* sceneData;
-	vmaMapMemory(m_device->m_allocator, m_device->m_sceneParameterBuffer._allocation, (void**)&sceneData);
-	sceneData += m_device->PadUniformBufferSize(sizeof(data)) * frameIndex;
-	memcpy(sceneData, &data, sizeof(data));
-	vmaUnmapMemory(m_device->m_allocator, m_device ->m_sceneParameterBuffer._allocation);
-}
-	 */
 
 void Renderer::UpdateSceneDataUbo(const void* data, size_t size)
 {
