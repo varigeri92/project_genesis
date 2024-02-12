@@ -21,3 +21,9 @@ VkSubmitInfo SubmitInfo(VkCommandBuffer* cmd);
 VkSamplerCreateInfo sampler_create_info(VkFilter filters, VkSamplerAddressMode samplerAddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT);
 
 VkWriteDescriptorSet write_descriptor_image(VkDescriptorType type, VkDescriptorSet dstSet, VkDescriptorImageInfo* imageInfo, uint32_t binding);
+
+VkDescriptorBufferInfo CreateBufferInfo(VkBuffer buffer, VkDeviceSize range, VkDeviceSize offset = 0);
+
+VkDescriptorSetAllocateInfo CreateAllocateInfo(VkDescriptorPool pool, const VkDescriptorSetLayout* setLayout, uint32_t setCount = 1);
+
+VkDescriptorImageInfo CreateDescriptorImageInfo(VkSampler sampler, VkImageView imageView, VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);

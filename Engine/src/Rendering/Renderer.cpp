@@ -59,10 +59,10 @@ void Renderer::CreatePipelineForMaterial(std::shared_ptr<Shader> shader)
 
 	std::vector<VkDescriptorSetLayout> setLayouts = {
 		m_device->m_globalSetLayout,
-		m_device->m_singleTextureSetLayout
+		m_device->m_textureSetLayout
 	};
 
-	//setLayouts.push_back(m_device->m_singleTextureSetLayout);
+	//setLayouts.push_back(m_device->m_textureSetLayout);
 	pipelineBuilder._vertexInputInfo = VertexInputStateCreateInfo();
 	pipelineBuilder._inputAssembly = InputAssemblyCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 	pipelineBuilder._viewport.x = 0.0f;
@@ -465,6 +465,7 @@ void Renderer::UpdateMaterialUniformBuffer(void* src_data, size_t size, Material
 	vmaUnmapMemory(m_device->m_allocator, material->m_shader->materialUniformBuffer._allocation);
 }
 
+/*	 
 void Renderer::CreateTextureResources(std::shared_ptr<Texture> texture)
 {
 	VkImageViewCreateInfo imageinfo = ImageViewCreateInfo(VK_FORMAT_R8G8B8A8_SRGB, texture->image, VK_IMAGE_ASPECT_COLOR_BIT);
@@ -479,7 +480,7 @@ void Renderer::CreateTextureResources(std::shared_ptr<Texture> texture)
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	allocInfo.descriptorPool = m_device->m_descriptorPool;
 	allocInfo.descriptorSetCount = 1;
-	allocInfo.pSetLayouts = &m_device->m_singleTextureSetLayout;
+	allocInfo.pSetLayouts = &m_device->m_textureSetLayout;
 	vkAllocateDescriptorSets(m_device->m_device, &allocInfo, &texture->descriptorSet);
 
 	//write to the descriptor set so that it points to our empire_diffuse m_texture
@@ -493,4 +494,5 @@ void Renderer::CreateTextureResources(std::shared_ptr<Texture> texture)
 
 	vkUpdateDescriptorSets(m_device->m_device, 1, &texture1, 0, nullptr);
 }
+*/
 }

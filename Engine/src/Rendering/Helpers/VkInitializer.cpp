@@ -93,6 +93,38 @@ VkWriteDescriptorSet WriteDescriptorBuffer(VkDescriptorType type, VkDescriptorSe
 	return write;
 }
 
+VkDescriptorBufferInfo CreateBufferInfo(VkBuffer buffer, VkDeviceSize range, VkDeviceSize offset)
+{
+	VkDescriptorBufferInfo bufferInfo = {};
+	bufferInfo.buffer = buffer;
+	bufferInfo.offset = offset;
+	bufferInfo.range = range;
+	return bufferInfo;
+}
+
+VkDescriptorImageInfo CreateDescriptorImageInfo(VkSampler sampler, VkImageView imageView, 
+	VkImageLayout layout)
+{
+	VkDescriptorImageInfo imageBufferInfo;
+	imageBufferInfo.sampler = sampler;
+	imageBufferInfo.imageView = imageView;
+	imageBufferInfo.imageLayout = layout;
+	return imageBufferInfo;
+}
+
+
+VkDescriptorSetAllocateInfo CreateAllocateInfo(VkDescriptorPool pool, 
+	const VkDescriptorSetLayout* setLayout, uint32_t setCount)
+{
+	VkDescriptorSetAllocateInfo allocInfo = {};
+	allocInfo.pNext = nullptr;
+	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	allocInfo.descriptorPool = pool;
+	allocInfo.descriptorSetCount = 1;
+	allocInfo.pSetLayouts = setLayout;
+	return  allocInfo;
+}
+
 VkCommandBufferBeginInfo CommandBufferBeginInfo(VkCommandBufferUsageFlags flags)
 {
 	VkCommandBufferBeginInfo info = {};

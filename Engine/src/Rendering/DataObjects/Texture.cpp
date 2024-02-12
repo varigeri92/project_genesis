@@ -50,7 +50,7 @@ namespace gns::rendering
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		allocInfo.descriptorPool = RenderSystem::S_Device->m_descriptorPool;
 		allocInfo.descriptorSetCount = 1;
-		allocInfo.pSetLayouts = &RenderSystem::S_Device->m_singleTextureSetLayout;
+		allocInfo.pSetLayouts = &RenderSystem::S_Device->m_textureSetLayout;
 		_VK_CHECK(vkAllocateDescriptorSets(RenderSystem::S_Device->m_device, &allocInfo, &descriptorSet), "Descriptor set Allocation Failed!");
 
 		//write to the descriptor set so that it points to our empire_diffuse m_texture

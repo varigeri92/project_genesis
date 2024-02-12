@@ -125,7 +125,12 @@ namespace gns::rendering
 
 		VkDescriptorSetLayout m_globalSetLayout;
 		VkDescriptorSetLayout m_objectSetLayout;
-		VkDescriptorSetLayout m_singleTextureSetLayout;
+		VkDescriptorSetLayout m_textureSetLayout;
+		VkDescriptorSetLayout m_normalMapLayout;
+		VkDescriptorSetLayout m_metallicMapLayout;
+		VkDescriptorSetLayout m_roughnessMapLayout;
+		VkDescriptorSetLayout m_aoMapLayout;
+
 		VkDescriptorPool m_descriptorPool;
 		VkDescriptorPool m_imGuiPool;
 
@@ -145,6 +150,10 @@ namespace gns::rendering
 
 		void InitFrameBuffers();
 		void InitSyncStructures();
+		void CreateDescriptorSetLayout(VkDescriptorSetLayout* setLayout,
+			const VkDescriptorSetLayoutBinding* setLayoutBindings, uint32_t bindingCount, 
+			VkDescriptorSetLayoutCreateFlags flags = 0);
+
 		void InitDescriptors(size_t size);
 		size_t PadUniformBufferSize(size_t originalSize);
 		void EndFrame();

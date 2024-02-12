@@ -76,7 +76,7 @@ namespace gns::rendering
         vkDestroyDescriptorPool(m_device, m_descriptorPool, nullptr);
         vkDestroyDescriptorSetLayout(m_device, m_globalSetLayout, nullptr);
         vkDestroyDescriptorSetLayout(m_device, m_objectSetLayout, nullptr);
-        vkDestroyDescriptorSetLayout(m_device, m_singleTextureSetLayout, nullptr);
+        vkDestroyDescriptorSetLayout(m_device, m_textureSetLayout, nullptr);
         vkDestroyRenderPass(m_device, m_renderPass, nullptr);
         vkDestroyRenderPass(m_device, m_guiPass, nullptr);
         for (int i = 0; i < m_frameBuffers.size(); i++) {
@@ -496,6 +496,19 @@ namespace gns::rendering
         _VK_CHECK(vkCreateFence(m_device, &uploadFenceCreateInfo, nullptr, &m_uploadContext._uploadFence), "Failed to initialize Upload Fence");
     }
 
+    void Device::CreateDescriptorSetLayout(VkDescriptorSetLayout* setLayout, const VkDescriptorSetLayoutBinding* setLayoutBindings, uint32_t bindingCount, 
+        VkDescriptorSetLayoutCreateFlags flags)
+    {
+        VkDescriptorSetLayoutCreateInfo set2info = {};
+        set2info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        set2info.flags = flags;
+        set2info.bindingCount = bindingCount;
+        set2info.pBindings = setLayoutBindings;
+        set2info.pNext = nullptr;
+
+        _VK_CHECK(vkCreateDescriptorSetLayout(m_device, &set2info, nullptr, setLayout), " Failed to create DescriptorSetLayout.");
+    }
+
     void Device::InitDescriptors(size_t size)
     {
         const std::vector<VkDescriptorPoolSize> sizes =
@@ -509,7 +522,7 @@ namespace gns::rendering
         VkDescriptorPoolCreateInfo pool_info = {};
         pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         pool_info.flags = 0;
-        pool_info.maxSets = 10;
+        pool_info.maxSets = 1000;
         pool_info.poolSizeCount = static_cast<uint32_t>(sizes.size());
         pool_info.pPoolSizes = sizes.data();
 
@@ -517,88 +530,50 @@ namespace gns::rendering
             vkCreateDescriptorPool(m_device, &pool_info, nullptr, &m_descriptorPool), "Failed to create Descriptor Pool!");
 
         VkDescriptorSetLayoutBinding objectBind = DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0);
-        VkDescriptorSetLayoutCreateInfo set2info = {};
-        set2info.bindingCount = 1;
-        set2info.flags = 0;
-        set2info.pNext = nullptr;
-        set2info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        set2info.pBindings = &objectBind;
+        CreateDescriptorSetLayout(&m_objectSetLayout, &objectBind, 1);
 
-        vkCreateDescriptorSetLayout(m_device, &set2info, nullptr, &m_objectSetLayout);
+        VkDescriptorSetLayoutBinding cameraBind = DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            VK_SHADER_STAGE_VERTEX_BIT, 0);
+        VkDescriptorSetLayoutBinding sceneBind = DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 
+            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 1);
 
-        VkDescriptorSetLayoutBinding cameraBind = DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0);
-        VkDescriptorSetLayoutBinding sceneBind = DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 1);
     	const std::vector < VkDescriptorSetLayoutBinding> bindings = { cameraBind, sceneBind };
+        CreateDescriptorSetLayout(&m_globalSetLayout, bindings.data(), bindings.size());
 
-        VkDescriptorSetLayoutCreateInfo setInfo = {};
-        setInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        setInfo.bindingCount = static_cast<uint32_t>(bindings.size());
-        setInfo.flags = 0;
-        setInfo.pBindings = bindings.data();
-        setInfo.pNext = nullptr;
-        _VK_CHECK(vkCreateDescriptorSetLayout(m_device, &setInfo, nullptr, &m_globalSetLayout), "Failed To create descriptor set layout!");
-
-        //another set, one that holds a single texture
-        VkDescriptorSetLayoutBinding textureBind = DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 0);
-        VkDescriptorSetLayoutCreateInfo set3info = {};
-        set3info.bindingCount = 1;
-        set3info.flags = 0;
-        set3info.pNext = nullptr;
-        set3info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        set3info.pBindings = &textureBind;
-        vkCreateDescriptorSetLayout(m_device, &set3info, nullptr, &m_singleTextureSetLayout);
+        std::vector<VkDescriptorSetLayoutBinding> textureBindings = {
+        	DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 0),
+        	DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1),
+        	DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 2),
+        	DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 3),
+	        DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 4)
+        };
+        CreateDescriptorSetLayout(&m_textureSetLayout, textureBindings.data(), textureBindings.size());
 
         const size_t sceneParamBufferSize = m_imageCount * PadUniformBufferSize(size);
         m_sceneParameterBuffer = CreateBuffer(m_allocator, sceneParamBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
-        constexpr uint32_t structSize = sizeof(GPUCameraData);
-        LOG_INFO("Structure Size: " << structSize);
         for (uint32_t i = 0; i < m_imageCount; i++)
         {
+			constexpr uint32_t structSize = sizeof(GPUCameraData);
             m_frames[i]._cameraBuffer = CreateBuffer(m_allocator, structSize,
                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
-
             m_frames[i]._objectBuffer = CreateBuffer(m_allocator, sizeof(GPUObjectData) * MAX_OBJECTS,
                 VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
-            VkDescriptorSetAllocateInfo allocInfo = {};
-            allocInfo.pNext = nullptr;
-            allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-            allocInfo.descriptorPool = m_descriptorPool;
-            allocInfo.descriptorSetCount = 1;
-            allocInfo.pSetLayouts = &m_globalSetLayout;
+            VkDescriptorSetAllocateInfo allocInfo = CreateAllocateInfo(m_descriptorPool, &m_globalSetLayout);
             vkAllocateDescriptorSets(m_device, &allocInfo, &m_frames[i]._globalDescriptor);
 
-            //allocate the descriptor set that will point to object buffer
-            VkDescriptorSetAllocateInfo objectSetAlloc = {};
-            objectSetAlloc.pNext = nullptr;
-            objectSetAlloc.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-            objectSetAlloc.descriptorPool = m_descriptorPool;
-            objectSetAlloc.descriptorSetCount = 1;
-            objectSetAlloc.pSetLayouts = &m_objectSetLayout;
+            VkDescriptorSetAllocateInfo objectSetAlloc = CreateAllocateInfo(m_descriptorPool, &m_objectSetLayout);
             vkAllocateDescriptorSets(m_device, &objectSetAlloc, &m_frames[i]._objectDescriptor);
 
-            VkDescriptorBufferInfo cameraInfo = {};
-            cameraInfo.buffer = m_frames[i]._cameraBuffer._buffer;
-            cameraInfo.offset = 0;
-            cameraInfo.range = structSize;
-
-            VkDescriptorBufferInfo sceneInfo;
-            sceneInfo.buffer = m_sceneParameterBuffer._buffer;
-            sceneInfo.offset = 0;
-            sceneInfo.range = size;
-
-            VkDescriptorBufferInfo objectBufferInfo;
-            objectBufferInfo.buffer = m_frames[i]._objectBuffer._buffer;
-            objectBufferInfo.offset = 0;
-            objectBufferInfo.range = sizeof(GPUObjectData) * MAX_OBJECTS;
-
+            VkDescriptorBufferInfo cameraInfo = CreateBufferInfo(m_frames[i]._cameraBuffer._buffer, structSize);
+            VkDescriptorBufferInfo sceneInfo = CreateBufferInfo(m_sceneParameterBuffer._buffer, size);
+            VkDescriptorBufferInfo objectBufferInfo = CreateBufferInfo(m_frames[i]._objectBuffer._buffer, sizeof(GPUObjectData) * MAX_OBJECTS);
+            
             VkWriteDescriptorSet cameraWrite = WriteDescriptorBuffer(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                 m_frames[i]._globalDescriptor, &cameraInfo, 0);
-
             VkWriteDescriptorSet sceneWrite = WriteDescriptorBuffer(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
                 m_frames[i]._globalDescriptor, &sceneInfo, 1);
-
             VkWriteDescriptorSet objectWrite = WriteDescriptorBuffer(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, m_frames[i]._objectDescriptor,
                 &objectBufferInfo, 0);
 
