@@ -43,6 +43,7 @@ namespace gns::rendering
 
 	Device::Device(Window* window): m_window(window)
 	{
+        m_imageIndex = 0;
         LOG_INFO("Initialize Vulkan!");
         if (!InitVulkan())
         {

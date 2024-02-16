@@ -1,871 +1,942 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="API">
+      <UniqueIdentifier>{FFD1870B-6BDB-877C-F456-9E7C605F937C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="API\EnTT">
+      <UniqueIdentifier>{491E6034-35EB-BA3F-5E04-A9E74A30F0CD}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="API\EnTT\config">
+      <UniqueIdentifier>{4EA10EAF-BA2C-7C73-C33D-FF672F48D873}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API\EnTT\container">
+      <UniqueIdentifier>{7B35DC74-6719-9DCA-D079-971DBC7C874C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API\EnTT\core">
+      <UniqueIdentifier>{6124F698-CDE4-71CF-961F-BB4C029FB6AB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API\EnTT\entity">
+      <UniqueIdentifier>{9532AAB3-01BE-1778-0ACF-9A6C76D97378}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API\EnTT\graph">
+      <UniqueIdentifier>{2A7104B8-163F-F8BD-FFD2-68E4EB3FD422}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API\EnTT\locator">
+      <UniqueIdentifier>{AC52E544-984B-0497-C17D-E91BADD5E3A2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API\EnTT\meta">
+      <UniqueIdentifier>{DF75FB98-4B36-77CF-1471-C04C80F0BBAB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API\EnTT\platform">
+      <UniqueIdentifier>{DD184EA8-492F-4C3E-92A6-D75FFEFB1CC6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API\EnTT\poly">
+      <UniqueIdentifier>{9C44FD98-0805-79CF-D13F-C24C3DBFBDAB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API\EnTT\process">
+      <UniqueIdentifier>{17BFA780-03B8-C6D2-2CEA-AB571842A6DE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API\EnTT\resource">
+      <UniqueIdentifier>{A0BEA48F-0CD5-A225-554C-2E47C1A173AD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API\EnTT\signal">
+      <UniqueIdentifier>{B6E2F0D3-226E-5E98-2B7F-E18C9789BA98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API\GUI">
+      <UniqueIdentifier>{93B8294F-FF97-A8EA-08B0-33C1740E0F4C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API\ImGui">
+      <UniqueIdentifier>{698AABC0-D5F4-5F37-1E33-11DD8ADC3D8C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\AssetDatabase">
+      <UniqueIdentifier>{31B5CF53-9DCB-CDE9-E642-590B52989E71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Core">
+      <UniqueIdentifier>{A5D31CCF-91A0-77DA-BAB9-6582A6E5AC68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ECS">
+      <UniqueIdentifier>{F76D2FA9-634D-AE44-6C65-391BD8C314A6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\GUI">
+      <UniqueIdentifier>{C1782FA9-2D58-AE44-3670-391BA2CE14A6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Rendering">
+      <UniqueIdentifier>{BA10DABB-26D1-55F2-EF0B-9F6F5B8B9ACE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Rendering\DataObjects">
+      <UniqueIdentifier>{6DA6ACDA-D968-E064-2219-6FF18E1AB942}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Rendering\Helpers">
+      <UniqueIdentifier>{7CDB4559-E847-0154-B13B-99B11D6723BC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Rendering\vkb">
+      <UniqueIdentifier>{ACA7A347-18BE-A1DD-6135-2DFFCD8A7265}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Window">
+      <UniqueIdentifier>{74C3D837-607B-1A85-C982-F3E0B559B575}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor">
+      <UniqueIdentifier>{B3738122-9F15-ACF8-88D0-BF4C74113349}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\include">
+      <UniqueIdentifier>{269ED467-126C-C86D-FBFF-3894E76CA4D2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\include\assimp">
+      <UniqueIdentifier>{82E21391-EE4E-CF8B-B742-67E9236EF1F3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\include\assimp\Compiler">
+      <UniqueIdentifier>{2C14EC76-183A-B6DD-0180-3BA9ED44DBA9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\include\assimp\port">
+      <UniqueIdentifier>{3695A195-22A5-4D66-8B5E-B284778D3CFF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\include\assimp\port\AndroidJNI">
+      <UniqueIdentifier>{C7D19353-3396-9243-FCFB-C20D687F2E79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\include\tinygltf">
+      <UniqueIdentifier>{266927A2-92A0-6F39-9BAA-D35C07619632}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\include\yaml-cpp">
+      <UniqueIdentifier>{984F3ED4-0487-866B-0D91-EA8E7947AD64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\include\yaml-cpp\contrib">
+      <UniqueIdentifier>{98AFD0F2-0493-DF32-0D96-0D6F79F8A583}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\include\yaml-cpp\node">
+      <UniqueIdentifier>{6D85A8D8-5940-9884-02F8-10CFEE91E214}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\include\yaml-cpp\node\detail">
+      <UniqueIdentifier>{8F80E269-FB39-4D14-8499-67EEF0510384}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="API\gnsAPI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\Log.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Window\Window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Application.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\Scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\Time.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\AssetDatabase\Guid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Random.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\AssetDatabase\tiny_obj_loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\AssetDatabase\AssetLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="API\EnTT\config\config.h">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\config</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\config\macro.h">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\config</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\config\version.h">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\config</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\container\dense_map.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\container</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\container\dense_set.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\container</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\container\fwd.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\container</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\algorithm.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\any.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\attribute.h">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\compressed_pair.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\enum.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\family.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\fwd.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\hashed_string.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\ident.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\iterator.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\memory.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\monostate.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\tuple.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\type_info.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\type_traits.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\core\utility.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\core</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entity\component.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\entity</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entity\entity.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\entity</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entity\fwd.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\entity</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entity\group.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\entity</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entity\handle.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\entity</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entity\helper.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\entity</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entity\mixin.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\entity</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entity\observer.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\entity</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entity\organizer.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\entity</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entity\registry.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\entity</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entity\runtime_view.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\entity</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entity\snapshot.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\entity</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entity\sparse_set.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\entity</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entity\storage.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\entity</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entity\view.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\graph\adjacency_matrix.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\graph\dot.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\graph\flow.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\graph\fwd.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\locator\locator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\meta\adl_pointer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\meta\container.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\meta\context.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\meta\factory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\meta\fwd.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\meta\meta.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\meta\node.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\meta\pointer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\meta\policy.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\meta\range.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\meta\resolve.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\meta\template.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\meta\type_traits.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\meta\utility.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\platform\android-ndk-r17.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\poly\fwd.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\poly\poly.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\process\fwd.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\process\process.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\process\scheduler.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\resource\cache.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\resource\fwd.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\resource\loader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\resource\resource.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\signal\delegate.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\signal\dispatcher.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\signal\emitter.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\signal\fwd.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="API\EnTT\signal\sigh.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT\entity</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\entt.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT</Filter>
     </ClInclude>
     <ClInclude Include="API\EnTT\fwd.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>API\EnTT</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Components.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\graph\adjacency_matrix.hpp">
+      <Filter>API\EnTT\graph</Filter>
     </ClInclude>
-    <ClInclude Include="src\AssetDatabase\path.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\graph\dot.hpp">
+      <Filter>API\EnTT\graph</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\Entity.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\graph\flow.hpp">
+      <Filter>API\EnTT\graph</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\Renderer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\graph\fwd.hpp">
+      <Filter>API\EnTT\graph</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\Device.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\locator\locator.hpp">
+      <Filter>API\EnTT\locator</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\Helpers\Buffer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\meta\adl_pointer.hpp">
+      <Filter>API\EnTT\meta</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\PipelineBuilder.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\meta\container.hpp">
+      <Filter>API\EnTT\meta</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\rendererInclude.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\meta\context.hpp">
+      <Filter>API\EnTT\meta</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\rendererfwd.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\meta\factory.hpp">
+      <Filter>API\EnTT\meta</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\vkb\VkBootstrap.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\meta\fwd.hpp">
+      <Filter>API\EnTT\meta</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\vkb\VkBootstrapDispatch.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\meta\meta.hpp">
+      <Filter>API\EnTT\meta</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\Helpers\VkInitializer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\meta\node.hpp">
+      <Filter>API\EnTT\meta</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\Helpers\PipelineHelper.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\meta\pointer.hpp">
+      <Filter>API\EnTT\meta</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\DataObjects\Mesh.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\meta\policy.hpp">
+      <Filter>API\EnTT\meta</Filter>
     </ClInclude>
-    <ClInclude Include="API\core.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\meta\range.hpp">
+      <Filter>API\EnTT\meta</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\SystemBase.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\meta\resolve.hpp">
+      <Filter>API\EnTT\meta</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\DataObjects\Material.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\meta\template.hpp">
+      <Filter>API\EnTT\meta</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\DataObjects\DisposableVkObject.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\meta\type_traits.hpp">
+      <Filter>API\EnTT\meta</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\DataObjects\Texture.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\meta\utility.hpp">
+      <Filter>API\EnTT\meta</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\tinygltf\stb_image.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\platform\android-ndk-r17.hpp">
+      <Filter>API\EnTT\platform</Filter>
     </ClInclude>
-    <ClInclude Include="API\ImGui\imgui.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\poly\fwd.hpp">
+      <Filter>API\EnTT\poly</Filter>
     </ClInclude>
-    <ClInclude Include="API\ImGui\imconfig.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\poly\poly.hpp">
+      <Filter>API\EnTT\poly</Filter>
     </ClInclude>
-    <ClInclude Include="API\ImGui\imgui_impl_sdl2.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\process\fwd.hpp">
+      <Filter>API\EnTT\process</Filter>
     </ClInclude>
-    <ClInclude Include="API\ImGui\imgui_impl_vulkan.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\process\process.hpp">
+      <Filter>API\EnTT\process</Filter>
     </ClInclude>
-    <ClInclude Include="API\ImGui\imgui_internal.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\process\scheduler.hpp">
+      <Filter>API\EnTT\process</Filter>
     </ClInclude>
-    <ClInclude Include="API\ImGui\imstb_rectpack.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\resource\cache.hpp">
+      <Filter>API\EnTT\resource</Filter>
     </ClInclude>
-    <ClInclude Include="API\ImGui\imstb_textedit.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\resource\fwd.hpp">
+      <Filter>API\EnTT\resource</Filter>
     </ClInclude>
-    <ClInclude Include="API\ImGui\imstb_truetype.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\resource\loader.hpp">
+      <Filter>API\EnTT\resource</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\GUI.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\resource\resource.hpp">
+      <Filter>API\EnTT\resource</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\DataObjects\Lights.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\EnTT\signal\delegate.hpp">
+      <Filter>API\EnTT\signal</Filter>
+    </ClInclude>
+    <ClInclude Include="API\EnTT\signal\dispatcher.hpp">
+      <Filter>API\EnTT\signal</Filter>
+    </ClInclude>
+    <ClInclude Include="API\EnTT\signal\emitter.hpp">
+      <Filter>API\EnTT\signal</Filter>
+    </ClInclude>
+    <ClInclude Include="API\EnTT\signal\fwd.hpp">
+      <Filter>API\EnTT\signal</Filter>
+    </ClInclude>
+    <ClInclude Include="API\EnTT\signal\sigh.hpp">
+      <Filter>API\EnTT\signal</Filter>
     </ClInclude>
     <ClInclude Include="API\GUI\GuiWindow.h">
-      <Filter>Header Files</Filter>
+      <Filter>API\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\RenderSystem.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\ImGui\imconfig.h">
+      <Filter>API\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="src\AssetDatabase\AssetDatabase.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\ImGui\imgui.h">
+      <Filter>API\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\SceneManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="API\ImGui\imgui_impl_sdl2.h">
+      <Filter>API\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="API\ImGui\imgui_impl_vulkan.h">
+      <Filter>API\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="API\ImGui\imgui_internal.h">
+      <Filter>API\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="API\ImGui\imstb_rectpack.h">
+      <Filter>API\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="API\ImGui\imstb_textedit.h">
+      <Filter>API\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="API\ImGui\imstb_truetype.h">
+      <Filter>API\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="API\Log.h">
+      <Filter>API</Filter>
+    </ClInclude>
+    <ClInclude Include="API\core.h">
+      <Filter>API</Filter>
     </ClInclude>
     <ClInclude Include="API\genesis.h">
-      <Filter>Header Files</Filter>
+      <Filter>API</Filter>
+    </ClInclude>
+    <ClInclude Include="API\gnsAPI.h">
+      <Filter>API</Filter>
+    </ClInclude>
+    <ClInclude Include="API\vklog.h">
+      <Filter>API</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Application.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AssetDatabase\AssetDatabase.h">
+      <Filter>src\AssetDatabase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AssetDatabase\AssetLoader.h">
+      <Filter>src\AssetDatabase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AssetDatabase\Guid.h">
+      <Filter>src\AssetDatabase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AssetDatabase\path.h">
+      <Filter>src\AssetDatabase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AssetDatabase\tiny_obj_loader.h">
+      <Filter>src\AssetDatabase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Components.h">
+      <Filter>src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\GnsObject.h">
+      <Filter>src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Scene.h">
+      <Filter>src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SceneManager.h">
+      <Filter>src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Time.h">
+      <Filter>src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECS\Entity.h">
+      <Filter>src\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECS\SystemBase.h">
+      <Filter>src\ECS</Filter>
     </ClInclude>
     <ClInclude Include="src\ECS\SystemsApi.h">
-      <Filter>Header Files</Filter>
+      <Filter>src\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\tinygltf\stb_image_write.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\GUI\GUI.h">
+      <Filter>src\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\contrib\anchordict.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Input.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\contrib\graphbuilder.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Random.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\detail\node_ref.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\DataObjects\DisposableVkObject.h">
+      <Filter>src\Rendering\DataObjects</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\detail\impl.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\DataObjects\Lights.h">
+      <Filter>src\Rendering\DataObjects</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\detail\iterator.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\DataObjects\Material.h">
+      <Filter>src\Rendering\DataObjects</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\detail\iterator_fwd.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\DataObjects\Mesh.h">
+      <Filter>src\Rendering\DataObjects</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\detail\memory.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\DataObjects\Texture.h">
+      <Filter>src\Rendering\DataObjects</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\detail\node.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\Device.h">
+      <Filter>src\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\detail\node_data.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\Helpers\Buffer.h">
+      <Filter>src\Rendering\Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\detail\node_iterator.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\Helpers\PipelineHelper.h">
+      <Filter>src\Rendering\Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\convert.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\Helpers\VkInitializer.h">
+      <Filter>src\Rendering\Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\emit.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\PipelineBuilder.h">
+      <Filter>src\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\iterator.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\RenderSystem.h">
+      <Filter>src\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\impl.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\Renderer.h">
+      <Filter>src\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\node.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\rendererInclude.h">
+      <Filter>src\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\parse.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\rendererfwd.h">
+      <Filter>src\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\ptr.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\vkb\VkBootstrap.h">
+      <Filter>src\Rendering\vkb</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\node\type.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Rendering\vkb\VkBootstrapDispatch.h">
+      <Filter>src\Rendering\vkb</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\anchor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\binary.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\depthguard.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\dll.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\emitfromevents.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\emitterdef.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\emitter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\emittermanip.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\eventhandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\emitterstyle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\exceptions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\mark.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\noexcept.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\null.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\ostream_wrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\stlemitter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\parser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\traits.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\yaml-cpp\yaml.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\Compiler\poppack1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\Compiler\pstdint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\Compiler\pushpack1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\port\AndroidJNI\AndroidJNIIOSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\port\AndroidJNI\BundledAssetIOSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\aabb.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\ai_assert.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\anim.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Window\Window.h">
+      <Filter>src\Window</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\AssertHandler.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\Base64.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\BaseImporter.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\Bitmap.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\BlobIOSystem.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\ByteSwapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\cexport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\cfileio.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\cimport.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\ColladaMetaData.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\assimp\color4.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="vendor\include\assimp\Compiler\poppack1.h">
+      <Filter>vendor\include\assimp\Compiler</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\assimp\commonMetaData.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="vendor\include\assimp\Compiler\pstdint.h">
+      <Filter>vendor\include\assimp\Compiler</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\assimp\config.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="vendor\include\assimp\Compiler\pushpack1.h">
+      <Filter>vendor\include\assimp\Compiler</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\CreateAnimMesh.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\DefaultIOStream.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\DefaultIOSystem.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\DefaultLogger.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\defs.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\Exceptional.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\Exporter.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\fast_atof.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\GenericProperty.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\GltfMaterial.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\Hash.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\Importer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\importerdesc.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\IOStream.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\IOStreamBuffer.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\IOSystem.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\assimp\light.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="vendor\include\assimp\Importer.hpp">
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\LineSplitter.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\LogAux.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\Logger.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\LogStream.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\include\assimp\material.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="vendor\include\assimp\Logger.hpp">
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\MathFunctions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\matrix3x3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\matrix4x4.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\MemoryIOWrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\metadata.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\NullLogger.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\ObjMaterial.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\ParsingUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\pbrmaterial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\postprocess.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\Profiler.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\ProgressHandler.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\qnan.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\quaternion.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\RemoveComments.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\SceneCombiner.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\SGSpatialSort.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\SceneCombiner.h">
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\SkeletonMeshBuilder.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\SmallVector.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\SmoothingGroups.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\SpatialSort.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\StandardShapes.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\StreamReader.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\StreamWriter.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\StringComparison.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\StringUtils.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\Subdivision.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\texture.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\TinyFormatter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\vector2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\vector3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\version.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\Vertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vendor\include\assimp\XmlParser.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\XMLTools.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\XmlParser.h">
+      <Filter>vendor\include\assimp</Filter>
     </ClInclude>
     <ClInclude Include="vendor\include\assimp\ZipArchiveIOSystem.h">
-      <Filter>Header Files</Filter>
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\aabb.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\ai_assert.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\anim.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\camera.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\cexport.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\cfileio.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\cimport.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\color4.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\commonMetaData.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\config.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\defs.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\fast_atof.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\importerdesc.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\light.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\material.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\matrix3x3.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\matrix4x4.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\mesh.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\metadata.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\pbrmaterial.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\port\AndroidJNI\AndroidJNIIOSystem.h">
+      <Filter>vendor\include\assimp\port\AndroidJNI</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\port\AndroidJNI\BundledAssetIOSystem.h">
+      <Filter>vendor\include\assimp\port\AndroidJNI</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\postprocess.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\qnan.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\quaternion.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\scene.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\texture.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\types.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\vector2.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\vector3.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\assimp\version.h">
+      <Filter>vendor\include\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\tinygltf\stb_image.h">
+      <Filter>vendor\include\tinygltf</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\tinygltf\stb_image_write.h">
+      <Filter>vendor\include\tinygltf</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\anchor.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\binary.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\contrib\anchordict.h">
+      <Filter>vendor\include\yaml-cpp\contrib</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\contrib\graphbuilder.h">
+      <Filter>vendor\include\yaml-cpp\contrib</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\depthguard.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\dll.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\emitfromevents.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\emitter.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\emitterdef.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\emittermanip.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\emitterstyle.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\eventhandler.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\exceptions.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\mark.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\convert.h">
+      <Filter>vendor\include\yaml-cpp\node</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\detail\impl.h">
+      <Filter>vendor\include\yaml-cpp\node\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\detail\iterator.h">
+      <Filter>vendor\include\yaml-cpp\node\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\detail\iterator_fwd.h">
+      <Filter>vendor\include\yaml-cpp\node\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\detail\memory.h">
+      <Filter>vendor\include\yaml-cpp\node\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\detail\node.h">
+      <Filter>vendor\include\yaml-cpp\node\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\detail\node_data.h">
+      <Filter>vendor\include\yaml-cpp\node\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\detail\node_iterator.h">
+      <Filter>vendor\include\yaml-cpp\node\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\detail\node_ref.h">
+      <Filter>vendor\include\yaml-cpp\node\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\emit.h">
+      <Filter>vendor\include\yaml-cpp\node</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\impl.h">
+      <Filter>vendor\include\yaml-cpp\node</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\iterator.h">
+      <Filter>vendor\include\yaml-cpp\node</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\node.h">
+      <Filter>vendor\include\yaml-cpp\node</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\parse.h">
+      <Filter>vendor\include\yaml-cpp\node</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\ptr.h">
+      <Filter>vendor\include\yaml-cpp\node</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\node\type.h">
+      <Filter>vendor\include\yaml-cpp\node</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\noexcept.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\null.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\ostream_wrapper.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\parser.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\stlemitter.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\traits.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\include\yaml-cpp\yaml.h">
+      <Filter>vendor\include\yaml-cpp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Window\Window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Application.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="API\vklog.h">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Scene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AssetDatabase\AssetLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ECS\Entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Rendering\Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Rendering\Device.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Rendering\Helpers\Buffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Rendering\PipelineBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Rendering\vkb\VkBootstrap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Rendering\Helpers\VkInitializer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Rendering\Helpers\PipelineHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Rendering\DataObjects\Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ECS\SystemBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Rendering\DataObjects\Material.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Rendering\DataObjects\Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="API\ImGui\imgui.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>API\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="API\ImGui\imgui_demo.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>API\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="API\ImGui\imgui_draw.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>API\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="API\ImGui\imgui_impl_sdl2.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>API\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="API\ImGui\imgui_impl_vulkan.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="API\ImGui\imgui_widgets.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>API\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="API\ImGui\imgui_tables.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>API\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="src\GUI\GUI.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="API\ImGui\imgui_widgets.cpp">
+      <Filter>API\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="src\GUI\GuiWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Rendering\RenderSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\GnsObject.h">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Application.cpp">
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\AssetDatabase\AssetDatabase.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>src\AssetDatabase</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AssetDatabase\AssetLoader.cpp">
+      <Filter>src\AssetDatabase</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Scene.cpp">
+      <Filter>src\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\SceneManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ECS\Entity.cpp">
+      <Filter>src\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ECS\SystemBase.cpp">
+      <Filter>src\ECS</Filter>
     </ClCompile>
     <ClCompile Include="src\ECS\SystemsApi.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>src\ECS</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="vendor\include\assimp\.editorconfig" />
-    <None Include="vendor\include\assimp\color4.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="vendor\include\assimp\config.h.in" />
-    <None Include="vendor\include\assimp\material.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="vendor\include\assimp\matrix3x3.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="vendor\include\assimp\matrix4x4.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="vendor\include\assimp\quaternion.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="vendor\include\assimp\SmoothingGroups.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="vendor\include\assimp\vector2.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="vendor\include\assimp\vector3.inl">
-      <Filter>Header Files</Filter>
-    </None>
+    <ClCompile Include="src\Engine.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\GUI.cpp">
+      <Filter>src\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\GuiWindow.cpp">
+      <Filter>src\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\DataObjects\Material.cpp">
+      <Filter>src\Rendering\DataObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\DataObjects\Mesh.cpp">
+      <Filter>src\Rendering\DataObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\DataObjects\Texture.cpp">
+      <Filter>src\Rendering\DataObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Device.cpp">
+      <Filter>src\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Helpers\Buffer.cpp">
+      <Filter>src\Rendering\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Helpers\PipelineHelper.cpp">
+      <Filter>src\Rendering\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Helpers\VkInitializer.cpp">
+      <Filter>src\Rendering\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\PipelineBuilder.cpp">
+      <Filter>src\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\RenderSystem.cpp">
+      <Filter>src\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Renderer.cpp">
+      <Filter>src\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\vkb\VkBootstrap.cpp">
+      <Filter>src\Rendering\vkb</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window\Window.cpp">
+      <Filter>src\Window</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
