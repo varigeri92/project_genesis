@@ -14,6 +14,7 @@
 #include "../src/Core/SceneManager.h"
 #include "../src/Core/Components.h"
 #include "../src/Core/Scene.h"
+#include "../src/Core/Event.h"
 
 #include "../src/ECS/SystemsApi.h"
 #include "../src/ECS/SystemBase.h"

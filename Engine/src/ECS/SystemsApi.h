@@ -8,6 +8,7 @@ namespace gns::core
 class SystemsApi
 {
 private:
+	inline static size_t AccumulateOverFrames = 15;
 	static int32_t GetIndexOfType(size_t typeHash)
 	{
 		for (size_t i = 0; i < Systems.size(); i++)

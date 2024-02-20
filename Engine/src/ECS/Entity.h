@@ -40,7 +40,6 @@ namespace gns {
 			return component;
 		}
 
-
 		template<typename T>
 		T& GetComponent()
 		{
@@ -48,10 +47,10 @@ namespace gns {
 		}
 
 		template<typename T>
-		bool TryGetComponent(T& component)
+		bool TryGetComponent(T* component)
 		{
-			component = scene->registry.get<T>(entity);
-			return true;
+			component = scene->registry.try_get<T>(entity);
+			return component != nullptr;
 		}
 
 		Transform& GetTransform()

@@ -5,6 +5,7 @@
 #include "Log.h"
 #include "Rendering/RenderSystem.h"
 #include "AssetDatabase/AssetLoader.h"
+#include "Core/Event.h"
 #include "ECS/Entity.h"
 #include "GUI/GUI.h"
 
@@ -55,51 +56,11 @@ gns::Application::~Application()
 	delete(RenderSystem::S_Renderer);
 	delete(m_window);
 }
-
+Event<void, std::string>* testEvent = new Event<void, std::string>();
 void gns::Application::Start(std::function<void()> OnStart)
 {
-	/*
-	std::shared_ptr<Mesh> suzan_mesh = AssetLoader::LoadMesh(R"(Meshes\OtherModels\Rei\Rei.obj)");
-	RenderSystem::S_Renderer->UploadMesh(suzan_mesh.get());
-
-	std::shared_ptr<Mesh> groundPlaneMesh = AssetLoader::LoadMesh(R"(Meshes\plane.obj)");
-	RenderSystem::S_Renderer->UploadMesh(groundPlaneMesh.get());
-
-	std::shared_ptr<Shader> defaultShader = std::make_shared<Shader>("blinphong.vert.spv", "blinphong.frag.spv");
-	LOG_INFO(defaultShader->GetGuid());
-	RenderSystem::S_Renderer->CreatePipelineForMaterial(defaultShader);
-	std::shared_ptr<Material> defaultMaterial = std::make_shared<Material>(defaultShader, "Rei_Material");
-	LOG_INFO(defaultMaterial->GetGuid());
-	defaultMaterial->m_texture = std::make_shared<Texture>(R"(Textures\lost_empire-RGBA.png)");
-	defaultMaterial->m_texture->Apply();
-	std::shared_ptr<Texture> icon = std::make_shared<Texture>(R"(Resources\Icons\icon_file.png)");
-	icon->Apply();
-
-	//Entity Creation:
-	//Create Scene
-	Scene* scene = SceneManager::CreateScene("Default Scene created With the manager!");
-	//scene = std::make_shared<Scene>("Default Scene");
-	
-
-	Entity suzan = scene->CreateEntity("Ayanami_Rei", scene);
-	suzan.AddComponet<RendererComponent>(suzan_mesh, defaultMaterial);
-	suzan.GetComponent<Transform>().matrix = glm::mat4{ 1 };
-
-	Entity floor = scene->CreateEntity("GroundFloor", scene);
-	floor.AddComponet<RendererComponent>(groundPlaneMesh, defaultMaterial);
-	floor.GetComponent<Transform>().matrix = glm::mat4{ 1 };
-
-	Entity sceneCamera_entity = scene->CreateEntity("SceneCamera", scene);
-	Transform& cameraTransform = sceneCamera_entity.GetTransform();
-	cameraTransform.position = { 0.f,-1.f,-3.f };
-	CameraComponent& sceneCamera = sceneCamera_entity.AddComponet<CameraComponent>(0.01f, 1000.f, 60.f, 1700, 900, cameraTransform);
-	cameraSystem = new CameraSystem{ cameraTransform, sceneCamera };
-	gui = new GUI{ RenderSystem::S_Renderer->m_device, m_window };
-	*/
-
 	OnStart();
 	gui = new GUI{ RenderSystem::S_Renderer->m_device, m_window };
-
 }
 
 void gns::Application::Run(std::function<void()> OnUpdate)
@@ -112,40 +73,13 @@ void gns::Application::Run(std::function<void()> OnUpdate)
 		gui->DrawGUI();
 
 		OnUpdate();
-
+		//testEvent->Dispatch("Hello");
 		UpdateSystems();
-		/*
-		ImVec2 size = ImVec2(40.0f, 40.0f);                         // Size of the image we want to make visible
-		ImVec2 uv0 = ImVec2(0.0f, 0.0f);                            // UV coordinates for lower-left
-		ImVec2 uv1 = ImVec2(1.f,1.f);
-		ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
-		ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-
-		ImGui::Begin("Vulkan Texture Test");
-		ImGui::Text("pointer = %p", icon->descriptorSet);
-		ImGui::Text("size = %d x %d", icon->width, icon->height);
-		ImGui::Image(
-			(ImTextureID)defaultMaterial->m_texture->descriptorSet, 
-			ImVec2(defaultMaterial->m_texture->width, 
-				defaultMaterial->m_texture->height)
-		);
-		if (ImGui::ImageButton("btn", (ImTextureID)icon->descriptorSet, size, uv0, uv1, bg_col, tint_col))
-		{
-			LOG_INFO("Button Pressed!");
-		}
-		ImGui::End();
-		*/
-
 		Render(SceneManager::GetActiveScene());
 		Time::EndFrameTime();
 	}
 
 	gui->DisposeGUI();
-	/*
-	RenderSystem::S_Renderer->DisposeObject(defaultMaterial);
-	RenderSystem::S_Renderer->DisposeObject(suzan_mesh);
-	RenderSystem::S_Renderer->DisposeObject(groundPlaneMesh);
-	*/
 }
 
 void gns::Application::CloseApplication()

@@ -16,6 +16,7 @@ namespace gns::core
 		size_t index;
 		size_t typeHash;
 		bool isActive;
+		int64_t time = 0;
 	protected:
 		GEN_API virtual void OnCreate() = 0;
 		GEN_API virtual void OnUpdate() = 0;

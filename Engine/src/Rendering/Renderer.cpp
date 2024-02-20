@@ -15,13 +15,9 @@ namespace gns::rendering
 {
 Renderer::Renderer(Window* window, size_t buffersize)
 {
-	LOG_VK_WARNING("Create Renderer");
 	m_device = new Device(window);
-	LOG_VK_WARNING("Created Device");
 	m_device->InitDescriptors(buffersize);
-	LOG_VK_WARNING("Descriuptors initialized!");
 	RenderSystem::S_Device = m_device;
-	LOG_VK_WARNING("Device Assigned");
 }
 
 Renderer::~Renderer()
@@ -32,11 +28,6 @@ Renderer::~Renderer()
 		_disposeQueue[i]->Dispose(m_device);
 	}
 	delete(m_device);
-}
-
-Renderer::Renderer(Renderer& other)
-{
-	LOG_INFO("Hello copy!");
 }
 
 void Renderer::UploadMesh(Mesh* mesh)
@@ -185,7 +176,6 @@ void Renderer::BeginRenderPass(uint32_t& swapchainImageIndex, bool gui)
 
 void Renderer::EndRenderPass(uint32_t& swapchainImageIndex)
 {
-	//finalize the render pass
 	vkCmdEndRenderPass(m_device->GetCurrentFrame()._mainCommandBuffer);
 }
 

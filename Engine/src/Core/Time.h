@@ -10,6 +10,11 @@ namespace gns
 		friend class  gns::Application;
 	public:
 		static GEN_API float GetDelta() { return m_deltaTime; }
+		inline static int64_t GetNow()
+		{
+			 const auto now = (std::chrono::high_resolution_clock::now().time_since_epoch());
+			 return now.count();
+		}
 	private:
 		inline static float m_deltaTime = 0;
 		inline static std::chrono::time_point<std::chrono::steady_clock> m_startTime;
