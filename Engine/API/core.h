@@ -2,6 +2,6 @@
 #include "gnsAPI.h"
 #include "../src/Application.h"
 
-GEN_API gns::Application* CreateApplication(const char* WorkingDirectory);
-GEN_API void InitClientData();
-GEN_API void RunMainLoop();
+GNS_API gns::Application* CreateApplication(const char* WorkingDirectory);
+GNS_API void InitClientData();
+GNS_API void RunMainLoop();

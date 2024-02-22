@@ -33,17 +33,17 @@ namespace gns::rendering
 		~Renderer();
 		Renderer(Renderer& other) = delete;
 		Renderer operator=(Renderer& other) = delete;
-		GEN_API bool BeginFrame(uint32_t& swapchainImageIndex);
-		GEN_API void BeginRenderPass(uint32_t& swapchainImageIndex, bool gui);
-		GEN_API void EndRenderPass(uint32_t& swapchainImageIndex);
-		GEN_API void Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, 
+		GNS_API bool BeginFrame(uint32_t& swapchainImageIndex);
+		GNS_API void BeginRenderPass(uint32_t& swapchainImageIndex, bool gui);
+		GNS_API void EndRenderPass(uint32_t& swapchainImageIndex);
+		GNS_API void Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, 
 			int index, size_t uniformSize);
 
-		GEN_API void EndFrame(uint32_t& swapchainImageIndex);
-		GEN_API void UploadMesh(Mesh* mesh);
-		GEN_API void CreatePipelineForMaterial(std::shared_ptr<Shader> shader);
+		GNS_API void EndFrame(uint32_t& swapchainImageIndex);
+		GNS_API void UploadMesh(Mesh* mesh);
+		GNS_API void CreatePipelineForMaterial(std::shared_ptr<Shader> shader);
 		
-		GEN_API void DisposeObject(std::shared_ptr<IDisposeable> object);
+		GNS_API void DisposeObject(std::shared_ptr<IDisposeable> object);
 	private:
 
 		VkClearValue m_clearValue;
@@ -67,15 +67,15 @@ namespace gns::rendering
 		std::shared_ptr<Material> m_material_ptr;
 		//MOVE OUT OF HERE:
 	public:
-		GEN_API void UpdatePushConstant(
+		GNS_API void UpdatePushConstant(
 			glm::mat4 modelMatrix, 
 			std::shared_ptr<Material> material);
 
-		GEN_API void UpdateGlobalUbo(GPUCameraData src_bufferData);
-		GEN_API void UpdateSceneDataUbo(const GPUSceneData& data);
-		GEN_API void UpdateSceneDataUbo(const void* data, size_t size);
-		GEN_API void UpdateObjectData(void* src_data, size_t size);
-		GEN_API void UpdateMaterialUniformBuffer(void* src_data, size_t size, Material* material);
-		GEN_API void CreateTextureResources(std::shared_ptr<Texture> texture);
+		GNS_API void UpdateGlobalUbo(GPUCameraData src_bufferData);
+		GNS_API void UpdateSceneDataUbo(const GPUSceneData& data);
+		GNS_API void UpdateSceneDataUbo(const void* data, size_t size);
+		GNS_API void UpdateObjectData(void* src_data, size_t size);
+		GNS_API void UpdateMaterialUniformBuffer(void* src_data, size_t size, Material* material);
+		GNS_API void CreateTextureResources(std::shared_ptr<Texture> texture);
 	};
 }

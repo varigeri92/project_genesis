@@ -54,6 +54,8 @@ namespace gns::rendering
 		_VK_CHECK(vkAllocateDescriptorSets(RenderSystem::S_Device->m_device, &allocInfo, &descriptorSet), "Descriptor set Allocation Failed!");
 
 		//write to the descriptor set so that it points to our empire_diffuse m_texture
+
+/*
 		VkDescriptorImageInfo imageBufferInfo;
 		imageBufferInfo.sampler = m_sampler;
 		imageBufferInfo.imageView = imageView;
@@ -62,6 +64,7 @@ namespace gns::rendering
 		VkWriteDescriptorSet texture1 = write_descriptor_image(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, descriptorSet,
 			&imageBufferInfo, 0);
 		vkUpdateDescriptorSets(RenderSystem::S_Device->m_device, 1, &texture1, 0, nullptr);
+*/
 	}
 	void Texture::Dispose(Device* device)
 	{

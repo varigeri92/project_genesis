@@ -12,7 +12,10 @@ public:
 
 	void Subscribe(const std::function<T(Args&& ...)>& function)
 	{
+		size_t id = (size_t)(&function);
 		queue.push_back(function);
+		size_t id_2 = (size_t)(&(queue[queue.size()-1]));
+		LOG_INFO(id << " ------ " << id_2);
 	}
 	void Dispatch(Args&& ... args)
 	{

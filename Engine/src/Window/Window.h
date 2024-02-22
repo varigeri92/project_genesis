@@ -38,7 +38,7 @@ namespace gns
 		void GetExtent(int& width, int& height);
 		void WindowEvent(const SDL_Event* event);
 
-		static GEN_API void SetMouseRelative(bool isRelative);
+		static GNS_API void SetMouseRelative(bool isRelative);
 
 	private:
 		void CreateSDLWindow();

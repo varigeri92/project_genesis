@@ -45,7 +45,7 @@ gns::gui::ContentBrowser::Directory gns::gui::ContentBrowser::DrawLeftPane(Direc
 gns::gui::ContentBrowser::ContentBrowser() : GuiWindow("Content Browser")
 {
     m_flags = ImGuiWindowFlags_MenuBar;
-    currentPath = R"(D:\GenesisEngine\Engine\Assets)";
+    currentPath = R"(D:\project_genesis\Engine\Assets)";
     selected = currentPath;
     assetsPath = currentPath;
     m_workingDirectory = {currentPath,selected };
@@ -146,7 +146,7 @@ void DrawDirectoryContent(fs::path path)
 
 void gns::gui::ContentBrowser::OnGUI()
 {
-    std::string path = R"(D:\GenesisEngine\Engine\Assets)";
+    std::string path = R"(D:\project_genesis\Engine\Assets)";
     if (ImGui::BeginMenuBar())
     {
         if (ImGui::BeginMenu("File"))

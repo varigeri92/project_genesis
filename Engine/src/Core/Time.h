@@ -9,7 +9,7 @@ namespace gns
 	{
 		friend class  gns::Application;
 	public:
-		static GEN_API float GetDelta() { return m_deltaTime; }
+		static GNS_API float GetDelta() { return m_deltaTime; }
 		inline static int64_t GetNow()
 		{
 			 const auto now = (std::chrono::high_resolution_clock::now().time_since_epoch());

@@ -39,7 +39,7 @@ namespace gns::rendering
 		Buffer _vertexBuffer;
 		Buffer _indexBuffer;
 
-		void GEN_API Dispose(Device* device) override;
+		void GNS_API Dispose(Device* device) override;
 	};
 }
 

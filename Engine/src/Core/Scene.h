@@ -23,8 +23,8 @@ namespace gns
 		GPUSceneData sceneData;
 		Scene(std::string name) : name{ name } {};
 
-		GEN_API Entity CreateEntity(std::string name, Scene* scene);
-		GEN_API void Destroy(Entity& entity);
+		GNS_API Entity CreateEntity(std::string name, Scene* scene);
+		GNS_API void Destroy(Entity& entity);
 	};
 }
 

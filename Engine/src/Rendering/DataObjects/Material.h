@@ -46,9 +46,9 @@ namespace gns::rendering
 		std::vector<std::shared_ptr<Texture>> m_textures;
 		float _roughness;
 		
-		void GEN_API Dispose(Device* device) override;
-		void GEN_API SetTexture(const std::shared_ptr<Texture>& texture);
-		void GEN_API PushTexture(const std::shared_ptr<Texture>& texture);
+		void GNS_API Dispose(Device* device) override;
+		void GNS_API SetTexture(const std::shared_ptr<Texture>& texture);
+		void GNS_API PushTexture(const std::shared_ptr<Texture>& texture);
 	};
 }
 

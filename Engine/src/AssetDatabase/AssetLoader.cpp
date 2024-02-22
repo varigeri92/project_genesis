@@ -22,6 +22,7 @@ namespace gns
 	void AssetLoader::SetPaths(std::string assetsPath)
 	{
         AssetsPath = assetsPath;
+        ShadersPath = AssetsPath + "Shaders\\";
 	}
 
     std::shared_ptr<Mesh> AssetLoader::LoadMesh(std::string path)
@@ -125,7 +126,7 @@ namespace gns
         return meshes;
     }
 
-    std::vector<std::shared_ptr<gns::rendering::Mesh>> AssetLoader::LoadMeshFile(std::string path)
+    std::vector<std::shared_ptr<gns::rendering::Mesh>> AssetLoader::LoadMeshFile(std::string path, bool isFallbackPath/* = false*/)
     {
         std::vector<std::shared_ptr<gns::rendering::Mesh>> meshes = {};
         
@@ -139,6 +140,14 @@ namespace gns
         // If the import failed, report it
         if (nullptr == scene) {
             LOG_ERROR(importer.GetErrorString());
+            LOG_WARNING("Cannot Load Mesh: " << path << " Falling back to Suzan!");
+            if (!isFallbackPath) {
+                meshes = LoadMeshFile(R"(Meshes\Suzan.obj)", true);
+            }
+            else
+            {
+                assert(meshes.size() == 0, "Failed To load the fallback Mesh!");
+            }
             return meshes;
         }
         if (scene->HasMeshes())
@@ -193,9 +202,10 @@ namespace gns
 
     std::vector<uint32_t> gns::AssetLoader::LoadShader(std::string path)
     {
-        std::ifstream file((ShadersPath + path), std::ios::ate | std::ios::binary);
+        std::string p = (ShadersPath + path);
+        std::ifstream file(p, std::ios::ate | std::ios::binary);
         if (!file.is_open()) {
-            LOG_ERROR("Failed To open File: " << path);
+            LOG_ERROR("Failed To open File: " << p);
             return {};
         }
         size_t fileSize = (size_t)file.tellg();
@@ -207,13 +217,24 @@ namespace gns
 
     }
 
-    void AssetLoader::LoadTextureData(std::string path, Texture* texture)
+    void AssetLoader::LoadTextureData(std::string path, Texture* texture, bool isFallbackPath /*= false*/)
     {
         stbi_uc* pixels = stbi_load((AssetsPath + path).c_str(), &texture->width, &texture->height, &texture->chanels, STBI_rgb_alpha);
 
         if (!pixels) {
             LOG_ERROR("Can't Open Texture:" << (AssetsPath + path).c_str());
+            if (!isFallbackPath) {
+                LOG_WARNING("Opening Fallback Texture Instead");
+                LoadTextureData(R"(Textures\uv_color_Grid.png)", texture, true);
+            }
+            else
+            {
+                assert(true, "Could not open any texture!");
+            }
         }
-        texture->pixels = pixels;
+        else
+        {
+            texture->pixels = pixels;
+        }
     }
 }

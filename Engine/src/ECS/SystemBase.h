@@ -8,7 +8,7 @@ namespace gns::core
 	{
 		friend class SystemsApi;
 	public:
-		GEN_API SystemBase(std::string name);
+		GNS_API SystemBase(std::string name);
 		virtual ~SystemBase() = default;
 
 		std::string name;
@@ -18,8 +18,8 @@ namespace gns::core
 		bool isActive;
 		int64_t time = 0;
 	protected:
-		GEN_API virtual void OnCreate() = 0;
-		GEN_API virtual void OnUpdate() = 0;
-		GEN_API virtual void OnDestroy() = 0;
+		GNS_API virtual void OnCreate() = 0;
+		GNS_API virtual void OnUpdate() = 0;
+		GNS_API virtual void OnDestroy() = 0;
 	};
 }

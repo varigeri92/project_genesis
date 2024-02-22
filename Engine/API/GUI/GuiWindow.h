@@ -21,7 +21,7 @@ namespace gns::gui
 		bool m_isFocused;
 		bool m_isOpen;
 		ImGuiWindowFlags_ m_flags = ImGuiWindowFlags_None;
-		GEN_API virtual void OnGUI() = 0;
+		GNS_API virtual void OnGUI() = 0;
 
 	public:
 
@@ -32,9 +32,8 @@ namespace gns::gui
 		std::string Name;
 
 		virtual ~GuiWindow() = default;
-		GEN_API GuiWindow(std::string name);
-
-		GEN_API void SetActive(bool value);
+		GNS_API GuiWindow(std::string name);
+		GNS_API void SetActive(bool value);
 	};
 
 }

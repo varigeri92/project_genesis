@@ -17,20 +17,21 @@ class Texture : public  IDisposeable
 	
 public:
 	Texture() = default;
-	GEN_API Texture(std::string path);
+	GNS_API Texture(std::string path);
 	void* pixels;
 	int width;
 	int height;
 	int chanels;
-	GEN_API void Create();
-	GEN_API void Dispose(Device* device) override;
-	GEN_API void Apply();
-private:
+	GNS_API void Create();
+	GNS_API void Dispose(Device* device) override;
+	GNS_API void Apply();
+
 	VkDescriptorSet descriptorSet;
 	VkImage image;
 	VmaAllocation allocation;
 	VkImageView imageView;
 	VkSampler m_sampler;
 	Buffer stagingBuffer;
+private:
 };
 }

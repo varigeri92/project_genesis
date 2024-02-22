@@ -2,12 +2,8 @@
 #include <memory>
 #include <string>
 #include <vector>
-
 #include "core.h"
 #include "gnsAPI.h"
-
-#define ASSETS_PATH "D:\\GenesisEngine\\Engine\\Assets\\"
-#define SHADERS_PATH "D:\\GenesisEngine\\Engine\\Assets\\Shaders\\"
 
 namespace gns::rendering
 {
@@ -20,17 +16,18 @@ namespace gns
 	class AssetLoader
 	{
 		inline static std::string AssetsPath = "";
-		inline static std::string ShadersPath = SHADERS_PATH;
+		inline static std::string ShadersPath = "";
 
 		static void ProcessImpoertedScene(const void* scene, std::shared_ptr<gns::rendering::Mesh>& mesh);
 
 	public:
-		static GEN_API void SetPaths(std::string assetsPath);
-		static GEN_API std::shared_ptr<gns::rendering::Mesh> LoadMesh(std::string path);
-		static GEN_API std::shared_ptr<gns::rendering::Mesh> LoadMeshIndexed(std::string path);
-		static GEN_API std::vector<uint32_t> LoadShader(std::string path);
-		static GEN_API void LoadTextureData(std::string path, rendering::Texture* texture);
-		static GEN_API std::vector<std::shared_ptr<gns::rendering::Mesh>> LoadMeshIndexed_MultiObject(std::string path);
-		static GEN_API std::vector<std::shared_ptr<gns::rendering::Mesh>> LoadMeshFile(std::string path);
+		static GNS_API void SetPaths(std::string assetsPath);
+		static GNS_API std::shared_ptr<gns::rendering::Mesh> LoadMesh(std::string path);
+		static GNS_API std::shared_ptr<gns::rendering::Mesh> LoadMeshIndexed(std::string path);
+		static GNS_API std::vector<uint32_t> LoadShader(std::string path);
+		static GNS_API void LoadTextureData(std::string path, rendering::Texture* texture, bool isFallbackPath = false);
+		static GNS_API std::vector<std::shared_ptr<gns::rendering::Mesh>> LoadMeshIndexed_MultiObject(std::string path);
+		static GNS_API std::vector<std::shared_ptr<gns::rendering::Mesh>> LoadMeshFile(std::string path, bool isFallbackPath = false);
+		static GNS_API std::string GetAssetsPath(){ return AssetsPath; };
 	};
 }

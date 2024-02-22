@@ -15,8 +15,8 @@ namespace gns
 	class AssetDatabase
 	{
 	public:
-		static GEN_API void ImportAsset(std::string path);
-		static GEN_API AssetMetadata GetAssetByGuid(gns::core::guid guid);
+		static GNS_API void ImportAsset(std::string path);
+		static GNS_API AssetMetadata GetAssetByGuid(gns::core::guid guid);
 	private:
 		static std::unordered_map<gns::core::guid, AssetMetadata> S_AssetDatabase;
 

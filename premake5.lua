@@ -1,5 +1,9 @@
 outDir = "bin/%{cfg.buildcfg}"
-VulkanDir = "C:/VulkanSDK/1.3.261.0/Lib"
+VulkanLibDir = "C:/VulkanSDK/1.3.261.1/Lib"
+VulkanIncludeDir = "C:/VulkanSDK/1.3.261.1/Include"
+p = path.getabsolute("./")
+p=p:gsub('/','\\\\')..'\\\\'
+rootpath = '"'..p..'"'
 
 workspace "GenesisEngine"
     language "C++"
@@ -29,7 +33,7 @@ project "Engine"
     location "Engine"
     libdirs { 
         "Engine/vendor/lib",
-        VulkanDir 
+        VulkanLibDir 
     }
     links {
         "SDL2.lib",
@@ -39,7 +43,7 @@ project "Engine"
         "assimp-vc143-mt.lib"
     }
     defines {"BUILD_DLL"}
-    includedirs { "vendor/include", "C:/VulkanSDK/1.3.261.0/Include", "Engine/API", "Engine/vendor/include" }
+    includedirs { "vendor/include", VulkanIncludeDir, "Engine/API", "Engine/vendor/include" }
     files { "Engine/**.h", "Engine/**.c", "Engine/**.cpp", "Engine/**.hpp" } 
     
 project "Sandbox"
@@ -50,6 +54,44 @@ project "Sandbox"
     location "Sandbox"
     libdirs { "libs", outDir }
     links { "Engine.lib" }
-    includedirs { "vendor/include", "C:/VulkanSDK/1.3.261.0/Include", "Engine/API" }
+    includedirs { "vendor/include", VulkanIncludeDir, "Engine/API" }
     files { "Sandbox/**.h", "Sandbox/**.c", "Sandbox/**.cpp", "Sandbox/**.hpp" }
     dependson { "Engine" }
+
+
+    function ReplacePath(path)
+        srcfile = "./Engine/API/path.h"
+        local file = io.open(srcfile, "r")
+    
+        if not file then
+            print("Error: Unable to open file for reading.")
+            return
+        end
+        
+        -- Read the entire content of the file
+        local content = file:read("*a")
+        
+        -- Close the file
+        file:close()
+        
+        -- Replace the specified string
+        local modifiedContent, replacements = string.gsub(content, '{ROOT}', path)
+        
+        -- Open the file in write mode to overwrite it
+        file = io.open(srcfile, "w")
+        
+        if not file then
+            print("Error: Unable to open file for writing.")
+            return
+        end
+        
+        -- Write the modified content back to the file
+        file:write(modifiedContent)
+        
+        -- Close the file
+        file:close()
+        
+        print("Replaced", "{ROOT}", "occurrences of", searchString, "with", replaceString, "in", filename)
+     end
+
+     ReplacePath(rootpath)

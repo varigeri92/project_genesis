@@ -29,14 +29,14 @@ namespace gns
 	public:
 		inline static FrameInput frameInput{};
 
-		static GEN_API bool GetKey(int keyCode);
-		static GEN_API bool GetKeyUp(int keyCode);
-		static GEN_API bool GetKeyDown(int keyCode);
-		static GEN_API bool ProcessInput(SDL_Event& event);
-		static GEN_API bool GetMouseButtonDown(int mouseButton);
-		static GEN_API bool GetMouseButton(int mouseButton);
-		static GEN_API bool GetMouseButtonUp(int mouseButton);
-		static GEN_API glm::vec2 GetMouseVelocity();
+		static GNS_API bool GetKey(int keyCode);
+		static GNS_API bool GetKeyUp(int keyCode);
+		static GNS_API bool GetKeyDown(int keyCode);
+		static GNS_API bool ProcessInput(SDL_Event& event);
+		static GNS_API bool GetMouseButtonDown(int mouseButton);
+		static GNS_API bool GetMouseButton(int mouseButton);
+		static GNS_API bool GetMouseButtonUp(int mouseButton);
+		static GNS_API glm::vec2 GetMouseVelocity();
 
 		inline static glm::vec2 mousePos;
 		inline static glm::vec2 p_mousePos;

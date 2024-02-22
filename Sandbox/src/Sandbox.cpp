@@ -6,6 +6,7 @@
 #include "Editor/gui/EntityInspector.h"
 #include "Editor/ProjectExplorer/ContentBrowser.h"
 #include "ImGui/imgui.h"
+#include "path.h"
 
 
 
@@ -31,7 +32,8 @@ std::function<void()> HelloRandomFunctionWithArgs_2(const std::string& stringArg
 int main()
 {
     LOG_INFO("HELLO WORLD");
-	gns::Application* app = CreateApplication(ASSETS_PATH);
+	LOG_INFO(ASSETS_DIR);
+	gns::Application* app = CreateApplication(ASSETS_DIR);
 	app->Start([app]()
 		{
 		Scene* scene = SceneManager::CreateScene("Default Scene created With the manager!");
@@ -147,7 +149,6 @@ int main()
 		GUI::RegisterWindow<SceneHierarchy>();
 
 		auto* camSystem = core::SystemsApi::GetSystem<CameraSystem>();
-		LOG_INFO(camSystem->name);
 
 		clientevent.Subscribe([](const std::string& clientMsg, uint32_t randomNumber){
 
@@ -156,6 +157,8 @@ int main()
 		});
 
 		clientevent.Subscribe(HelloRandomFunctionWithArgs_2);
+		clientevent.Subscribe(HelloRandomFunctionWithArgs);
+		clientevent.RemoveListener(HelloRandomFunctionWithArgs);
 		clientevent.Dispatch("Hello sandbox", core::Guid::GetNewGuid());
 
 		});

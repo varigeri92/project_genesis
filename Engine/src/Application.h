@@ -30,8 +30,8 @@ namespace gns
 		void UpdateSystems();
 		void UpdateLate();
 	public:
-		GEN_API void Start(std::function<void()> OnStart);
-		GEN_API void Run(std::function<void()> OnUpdate);
+		GNS_API void Start(std::function<void()> OnStart);
+		GNS_API void Run(std::function<void()> OnUpdate);
 		void HandleEvents();
 	};
 }

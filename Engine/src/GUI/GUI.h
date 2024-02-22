@@ -38,7 +38,7 @@ namespace gns
 		}
 
 	public:
-		static GEN_API std::vector<gns::gui::GuiWindow*> guiWindows;
+		static GNS_API std::vector<gns::gui::GuiWindow*> guiWindows;
 		GUI(rendering::Device* device, Window* window);
 
 		template<typename T, typename... Args>
@@ -56,7 +56,7 @@ namespace gns
 			}
 		}
 
-		static GEN_API gns::gui::GuiWindow* GetWindow_Internal(std::string name);
+		static GNS_API gns::gui::GuiWindow* GetWindow_Internal(std::string name);
 		void BeginGUI();
 		void EndGUI();
 		void DrawGUI();

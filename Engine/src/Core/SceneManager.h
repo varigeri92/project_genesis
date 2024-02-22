@@ -18,10 +18,10 @@ namespace gns
 		static gns::core::guid ActiveSceneGuid;
 	public:
 
-		static GEN_API Scene* LoadScene(std::string path);
-		static GEN_API Scene* LoadScene(gns::core::guid guid);
-		static GEN_API Scene* GetActiveScene();
+		static GNS_API Scene* LoadScene(std::string path);
+		static GNS_API Scene* LoadScene(gns::core::guid guid);
+		static GNS_API Scene* GetActiveScene();
 
-		static GEN_API Scene* CreateScene(std::string name);
+		static GNS_API Scene* CreateScene(std::string name);
 	};
 }

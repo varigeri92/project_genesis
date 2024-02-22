@@ -8,7 +8,6 @@ namespace gns::core
 class SystemsApi
 {
 private:
-	inline static size_t AccumulateOverFrames = 15;
 	static int32_t GetIndexOfType(size_t typeHash)
 	{
 		for (size_t i = 0; i < Systems.size(); i++)
@@ -30,7 +29,7 @@ private:
 	}
 
 public:
-	static GEN_API std::vector<gns::core::SystemBase*> Systems;
+	static GNS_API std::vector<gns::core::SystemBase*> Systems;
 	template<typename T, typename... Args>
 	static void RegisterSystem(Args&& ... args)
 	{
@@ -65,7 +64,7 @@ public:
 		return dynamic_cast<T*>(Systems[index]);
 	}
 
-	static void GEN_API UpdateSystems();
+	static void GNS_API UpdateSystems();
 };
 
 }

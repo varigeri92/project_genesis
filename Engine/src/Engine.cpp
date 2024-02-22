@@ -6,7 +6,7 @@
 #include "AssetDatabase/tiny_obj_loader.h"
 
 using namespace gns;
-GEN_API Application* CreateApplication(const char* WorkingDirectory)
+GNS_API Application* CreateApplication(const char* WorkingDirectory)
 {
 	LOG_INFO("Hello Genesis engine");
 	Application* application = new Application(WorkingDirectory);

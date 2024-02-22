@@ -6,6 +6,7 @@
 #include "ImGui/imgui_impl_sdl2.h"
 #include "ImGui/imgui_impl_vulkan.h"
 #include "../Window/Window.h"
+#include "../AssetDatabase/AssetLoader.h"
 
 
 std::vector<gns::gui::GuiWindow*> gns::GUI::guiWindows = {};
@@ -81,12 +82,11 @@ void gns::GUI::InitializeGUI()
 	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 
 	ImGui::StyleColorsDark();
-	/*
-	*/
-	 
-	ImFont* normal = io.Fonts->AddFontFromFileTTF(R"(D:\GenesisEngine\Engine\Resources\Fonnt\static\Montserrat-Regular.ttf)", 
+	
+	std::string fontsDirectory = gns::AssetLoader::GetAssetsPath() + R"(Fonts\static\)";
+	ImFont* normal = io.Fonts->AddFontFromFileTTF((fontsDirectory + R"(Montserrat-Regular.ttf)").c_str(),
 		14, nullptr, io.Fonts->GetGlyphRangesDefault());
-	ImFont* bold  = io.Fonts->AddFontFromFileTTF(R"(D:\GenesisEngine\Engine\Resources\Fonnt\static\Montserrat-SemiBold.ttf)", 
+	ImFont* bold  = io.Fonts->AddFontFromFileTTF((fontsDirectory + R"(Montserrat-SemiBold.ttf)").c_str(),
 		14, nullptr, io.Fonts->GetGlyphRangesDefault());
 	io.Fonts->Build();
 	m_device->ImmediateSubmit([&](VkCommandBuffer cmd) {
