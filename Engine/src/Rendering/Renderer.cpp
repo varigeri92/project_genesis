@@ -106,6 +106,13 @@ void Renderer::DisposeObject(std::shared_ptr<IDisposeable> object)
 
 bool Renderer::BeginFrame(uint32_t& swapchainImageIndex)
 {
+
+	m_frameNumber++;
+	//wait until the GPU has finished rendering the last frame. Timeout of 1 second
+	_VK_CHECK(vkWaitForFences(m_device->m_device, 1, &m_device->GetCurrentFrame()._renderFence, true, 1000000000), "--");
+	_VK_CHECK(vkResetFences(m_device->m_device, 1, &m_device->GetCurrentFrame()._renderFence), "--");
+
+
 	//request image from the swapchain, one second timeout
 	VkResult result =vkAcquireNextImageKHR(m_device->m_device, m_device->m_swapchain, 1000000000, m_device->GetCurrentFrame()._presentSemaphore,nullptr, &swapchainImageIndex);
 	if(result == VK_ERROR_OUT_OF_DATE_KHR)
@@ -120,10 +127,6 @@ bool Renderer::BeginFrame(uint32_t& swapchainImageIndex)
 		_VK_CHECK(result, "Failed to acquire the next swapchain image!");
 	}
 
-	m_frameNumber++;
-	//wait until the GPU has finished rendering the last frame. Timeout of 1 second
-	_VK_CHECK(vkWaitForFences(m_device->m_device, 1, &m_device->GetCurrentFrame()._renderFence, true, 1000000000), "--");
-	_VK_CHECK(vkResetFences(m_device->m_device, 1, &m_device->GetCurrentFrame()._renderFence), "--");
 
 	//now that we are sure that the commands finished executing, we can safely reset the command buffer to begin recording again.
 	_VK_CHECK(vkResetCommandBuffer(m_device->GetCurrentFrame()._mainCommandBuffer, 0), "Failed to reset command buffer!");
