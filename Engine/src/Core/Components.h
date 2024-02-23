@@ -2,6 +2,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "../AssetDatabase/Guid.h"
+#include "Serializeable.h"
 
 #define EDITOR_BUILD
 constexpr float PI = 3.14159265359f;
@@ -20,16 +21,6 @@ struct SerializedProperty
 	std::string  name = 0;
 	void* data = 0;
 };
-#ifdef EDITOR_BUILD
-#define SERIALIZE(type, name, value)type name = value;\
-	SerializedProperty serialized_##name = {#type, #name, &name};\
-
-#else
-#define SERIALIZE(type, name, value) type name = value
-#endif
-
-#define COMPONENT(name) struct name : public gns::ComponentBase
-
 
 namespace gns
 {

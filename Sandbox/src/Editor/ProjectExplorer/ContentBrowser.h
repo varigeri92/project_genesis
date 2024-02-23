@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <map>
 #include <memory>
-#include <GUI/GuiWindow.h>
+#include <genesis.h>
 
 namespace gns::rendering
 {

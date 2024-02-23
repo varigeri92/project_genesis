@@ -7,6 +7,7 @@
 #include "Editor/ProjectExplorer/ContentBrowser.h"
 #include "ImGui/imgui.h"
 #include "path.h"
+#include "Editor/gui/TexturePreviewWindow.h"
 
 
 
@@ -49,10 +50,10 @@ int main()
 		scene->sceneData.sunlightDirection = { 1.f, 1.f, 0.f , 0.f };
 
 		std::shared_ptr<Shader> defaultShader = std::make_shared<Shader>("blinphong.vert.spv", "blinphong.frag.spv");
-		RenderSystem::S_Renderer->CreatePipelineForMaterial(defaultShader);
+		RenderSystem::S_Renderer->CreatePipeline(defaultShader);
 
 		std::shared_ptr<Texture> bodyTexture_Color = std::make_shared<Texture>(R"(Meshes\OtherModels\Rei\Textures\Rei_3_LP_Body_low_BaseColor.png)");
-		std::shared_ptr<Texture> bodyTexture_Normal = std::make_shared<Texture>(R"(Meshes\OtherModels\Rei\Textures\Rei_3_LP_Body_low_Normal.png)");
+		std::shared_ptr<Texture> bodyTexture_Normal = std::make_shared<Texture>(R"(Textures\PrototypeGridTexture.jpg)");
 		std::shared_ptr<Texture> bodyTexture_Metallic = std::make_shared<Texture>(R"(Meshes\OtherModels\Rei\Textures\Rei_3_LP_Body_low_Metallic.png)");
 		std::shared_ptr<Texture> bodyTexture_Roughness = std::make_shared<Texture>(R"(Meshes\OtherModels\Rei\Textures\Rei_3_LP_Body_low_Roughness.png)");
 		std::shared_ptr<Texture> bodyTexture_AO = std::make_shared<Texture>(R"(Meshes\OtherModels\Rei\Textures\Rei_3_LP_Body_low_AO.png)");
@@ -75,7 +76,7 @@ int main()
 		std::shared_ptr<Texture> bandageTexture_Roughness = std::make_shared<Texture>(R"(Meshes\OtherModels\Rei\Textures\Rei_Bandage_2_LP_Bandage_Roughness.png)");
 		std::shared_ptr<Texture> bandageTexture_AO = std::make_shared<Texture>(R"(Meshes\OtherModels\Rei\Textures\Rei_Bandage_2_LP_Bandage_AO.png)");
 		//uv_color_Grid.png
-
+		
 		/*
 		std::shared_ptr<Material> defaultMaterial = std::make_shared<Material>(defaultShader, "DefaultCheckMaterial");
 		defaultMaterial->m_texture = std::make_shared<Texture>(R"(Textures\uv_color_Grid.png)");
@@ -89,7 +90,6 @@ int main()
 		bodyMaterial->PushTexture(bodyTexture_Metallic);
 		bodyMaterial->PushTexture(bodyTexture_Roughness);
 		bodyMaterial->PushTexture(bodyTexture_AO);
-		//bodyMaterial->m_texture->Apply();
 
 		std::shared_ptr<Material> hairMaterial = std::make_shared<Material>(defaultShader, "Rei_hairMaterial");
 		//hairMaterial->m_texture = std::make_shared<Texture>(R"(Textures\uv_color_Grid.png)");
@@ -98,7 +98,6 @@ int main()
 		hairMaterial->PushTexture(hairTexture_Metallic);
 		hairMaterial->PushTexture(hairTexture_Roughness);
 		hairMaterial->PushTexture(hairTexture_AO);
-		//hairMaterial->m_texture->Apply();
 
 
 		std::shared_ptr<Material> headMaterial = std::make_shared<Material>(defaultShader, "Rei_headMaterial");
@@ -108,7 +107,6 @@ int main()
 		headMaterial->PushTexture(headTexture_Metallic);
 		headMaterial->PushTexture(headTexture_Roughness);
 		headMaterial->PushTexture(headTexture_AO);
-		//headMaterial->m_texture->Apply();
 
 
 		std::shared_ptr<Material> bandageMaterial = std::make_shared<Material>(defaultShader, "Rei_bandageMaterial");
@@ -118,7 +116,6 @@ int main()
 		bandageMaterial->PushTexture(bandageTexture_Metallic);
 		bandageMaterial->PushTexture(bandageTexture_Roughness);
 		bandageMaterial->PushTexture(bandageTexture_AO);
-		//bandageMaterial->m_texture->Apply();
 
 
 
@@ -154,6 +151,9 @@ int main()
 		GUI::RegisterWindow<ContentBrowser>();
 		GUI::RegisterWindow<EntityInspector>();
 		GUI::RegisterWindow<SceneHierarchy>();
+		TexturePreviewWindow* textureWindow = GUI::RegisterWindow<TexturePreviewWindow>();
+		//textureWindow->AddTexture(bodyTexture_Color);
+		//textureWindow->AddTexture(bodyTexture_Normal);
 
 		auto* camSystem = core::SystemsApi::GetSystem<CameraSystem>();
 
@@ -209,5 +209,7 @@ int main()
 		ImGui::End();
 
 	});
+
+	delete(app);
 }
 

@@ -18,6 +18,7 @@ namespace gns::rendering
 	constexpr size_t MAX_OBJECTS = 1000;
 	struct Mesh;
 	struct Material;
+	struct Shader;
 	class Renderer;
 	class PipelineBuilder;
 
@@ -26,16 +27,6 @@ namespace gns::rendering
 		glm::mat4 proj;
 		glm::mat4 viewproj;
 	};
-
-	/* 
-	struct alignas(64) GPUSceneData {
-		glm::vec4 fogColor; // w is for exponent
-		glm::vec4 fogDistances; //x for min, y for max, zw unused.
-		glm::vec4 ambientColor;
-		glm::vec4 sunlightDirection; //w for sun power
-		glm::vec4 sunlightColor;
-	};
-	*/
 
 	struct GPUObjectData {
 		glm::mat4 modelMatrix;
@@ -69,6 +60,7 @@ namespace gns::rendering
 	{
 		friend struct Material;
 		friend struct Mesh;
+		friend struct Shader;
 		friend class Renderer;
 		friend class PipelineBuilder;
 		friend class Buffer;
@@ -125,11 +117,6 @@ namespace gns::rendering
 
 		VkDescriptorSetLayout m_globalSetLayout;
 		VkDescriptorSetLayout m_objectSetLayout;
-		VkDescriptorSetLayout m_textureSetLayout;
-		VkDescriptorSetLayout m_normalMapLayout;
-		VkDescriptorSetLayout m_metallicMapLayout;
-		VkDescriptorSetLayout m_roughnessMapLayout;
-		VkDescriptorSetLayout m_aoMapLayout;
 
 		VkDescriptorPool m_descriptorPool;
 		VkDescriptorPool m_imGuiPool;
@@ -154,7 +141,12 @@ namespace gns::rendering
 			const VkDescriptorSetLayoutBinding* setLayoutBindings, uint32_t bindingCount, 
 			VkDescriptorSetLayoutCreateFlags flags = 0);
 
+		void CreateDescriptorPool();
 		void InitDescriptors(size_t size);
+		
+		void InitGlobalDescriptors(size_t size);
+
+		void InitMaterialSetLayouts(Material* material);
 		size_t PadUniformBufferSize(size_t originalSize);
 		void EndFrame();
 		FrameData& GetCurrentFrame();

@@ -16,7 +16,7 @@ namespace gns::rendering
 Renderer::Renderer(Window* window, size_t buffersize)
 {
 	m_device = new Device(window);
-	m_device->InitDescriptors(buffersize);
+	m_device->InitGlobalDescriptors(buffersize);
 	RenderSystem::S_Device = m_device;
 }
 
@@ -36,7 +36,7 @@ void Renderer::UploadMesh(Mesh* mesh)
 	CreateIndexBuffers(mesh);
 }
 
-void Renderer::CreatePipelineForMaterial(std::shared_ptr<Shader> shader)
+void Renderer::CreatePipeline(std::shared_ptr<Shader> shader)
 {
 	VkShaderModule vertShader = CreateShaderModule(AssetLoader::LoadShader(shader->vertexShaderPath));
 	VkShaderModule fragShader = CreateShaderModule(AssetLoader::LoadShader(shader->fragmentShaderPath));
@@ -48,10 +48,9 @@ void Renderer::CreatePipelineForMaterial(std::shared_ptr<Shader> shader)
 	pipelineBuilder._shaderStages.push_back(
 		PipelineShaderStageCreateInfo(VK_SHADER_STAGE_FRAGMENT_BIT, fragShader));
 
-	std::vector<VkDescriptorSetLayout> setLayouts = {
-		m_device->m_globalSetLayout,
-		m_device->m_textureSetLayout
-	};
+	std::vector<VkDescriptorSetLayout> setLayouts = { m_device->m_globalSetLayout };
+	CreateSetLayoutBindings(shader);
+	setLayouts.push_back(shader->shaderSetLayout);
 
 	//setLayouts.push_back(m_device->m_textureSetLayout);
 	pipelineBuilder._vertexInputInfo = VertexInputStateCreateInfo();
@@ -196,10 +195,9 @@ void Renderer::Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> materi
 			&m_device->GetCurrentFrame()._globalDescriptor, 1, &uniform_offset);
 
 
-		if(material->m_texture != nullptr)
-			vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer, 
-				VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_shader->pipelineLayout, 1, 1, &material->m_texture->descriptorSet,
-				0, nullptr);
+		vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer, 
+			VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_shader->pipelineLayout, 1, 1, &material->m_texture->descriptorSet,
+			0, nullptr);
 
 		/*
 		vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer, 
@@ -407,6 +405,19 @@ void Renderer::CreateIndexBuffers(Mesh* mesh)
 	vmaDestroyBuffer(m_device->m_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
 }
 
+void Renderer::CreateSetLayoutBindings(std::shared_ptr<Shader> shader)
+{
+	std::vector<VkDescriptorSetLayoutBinding> textureBindings = 
+	{
+		DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 0),
+		DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1),
+		DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 2),
+		DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 3),
+		DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 4)
+	};
+	m_device->CreateDescriptorSetLayout(&shader->shaderSetLayout, textureBindings.data(), textureBindings.size());
+}
+
 
 void Renderer::UpdatePushConstant( glm::mat4 modelMatrix, std::shared_ptr<Material> material)
 {
@@ -453,9 +464,9 @@ void Renderer::UpdateObjectData(void* src_data, size_t size)
 void Renderer::UpdateMaterialUniformBuffer(void* src_data, size_t size, Material* material)
 {
 	void* objectData;
-	vmaMapMemory(m_device->m_allocator, material->m_shader->materialUniformBuffer._allocation, &objectData);
+	vmaMapMemory(m_device->m_allocator, material->m_shader->shaderUniformBuffer._allocation, &objectData);
 	memcpy(objectData, src_data, size);
-	vmaUnmapMemory(m_device->m_allocator, material->m_shader->materialUniformBuffer._allocation);
+	vmaUnmapMemory(m_device->m_allocator, material->m_shader->shaderUniformBuffer._allocation);
 }
 
 /*	 

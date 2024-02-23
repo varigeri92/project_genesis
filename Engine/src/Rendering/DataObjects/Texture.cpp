@@ -43,18 +43,6 @@ namespace gns::rendering
 
 		const VkSamplerCreateInfo samplerInfo = sampler_create_info(VK_FILTER_NEAREST);
 		vkCreateSampler(RenderSystem::S_Device->m_device, &samplerInfo, nullptr, &m_sampler);
-
-		//allocate the descriptor set for single-m_texture to use on the material
-		VkDescriptorSetAllocateInfo allocInfo = {};
-		allocInfo.pNext = nullptr;
-		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		allocInfo.descriptorPool = RenderSystem::S_Device->m_descriptorPool;
-		allocInfo.descriptorSetCount = 1;
-		allocInfo.pSetLayouts = &RenderSystem::S_Device->m_textureSetLayout;
-		_VK_CHECK(vkAllocateDescriptorSets(RenderSystem::S_Device->m_device, &allocInfo, &descriptorSet), "Descriptor set Allocation Failed!");
-
-		//write to the descriptor set so that it points to our empire_diffuse m_texture
-
 /*
 		VkDescriptorImageInfo imageBufferInfo;
 		imageBufferInfo.sampler = m_sampler;
@@ -130,5 +118,9 @@ namespace gns::rendering
 				1, &imageBarrier_toReadable);
 			}));
 		stagingBuffer.Dispose(RenderSystem::S_Device);
+	}
+	void Texture::Use()
+	{
+
 	}
 }

@@ -5,14 +5,12 @@
 layout (location = 0) in vec3 inColor;
 layout (location = 1) in vec2 inTexCoord;
 layout (location = 2) in vec3 inNormal;
-
 //textures
 layout(set = 1, binding = 0) uniform sampler2D tex_color;
 layout(set = 1, binding = 1) uniform sampler2D tex_normal;
 layout(set = 1, binding = 2) uniform sampler2D tex_metallic;
 layout(set = 1, binding = 3) uniform sampler2D tex_roughness;
 layout(set = 1, binding = 4) uniform sampler2D tex_ao;
-
 //output write
 layout (location = 0) out vec4 outFragColor;
 
@@ -30,6 +28,6 @@ void main()
 	float diff = max((dot(inNormal, sceneData.sunlightDirection.xyz) + 1) * 0.5, 0.0);
 	diff += sceneData.ambientColor.w;
 	vec3 diffuse = sceneData.sunlightColor.xyz * diff * sceneData.sunlightColor.w;
-	vec3 color = texture(tex_normal, inTexCoord).xyz;
+	vec3 color = texture(tex_color, inTexCoord).xyz;
 	outFragColor = vec4( (color * diffuse) * (sceneData.ambientColor.xyz),1.0f);
 }

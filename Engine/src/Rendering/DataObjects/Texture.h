@@ -25,6 +25,7 @@ public:
 	GNS_API void Create();
 	GNS_API void Dispose(Device* device) override;
 	GNS_API void Apply();
+	GNS_API void Use();
 
 	VkDescriptorSet descriptorSet;
 	VkImage image;

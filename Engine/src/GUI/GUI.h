@@ -42,7 +42,7 @@ namespace gns
 		GUI(rendering::Device* device, Window* window);
 
 		template<typename T, typename... Args>
-		static void RegisterWindow(Args&& ... args)
+		static T* RegisterWindow(Args&& ... args)
 		{
 			size_t typehash = typeid(T).hash_code();
 			if (GetIndexOfType(typehash) == -1)
@@ -53,7 +53,9 @@ namespace gns
 				guiWindows[windowIndex]->index = windowIndex;
 				guiWindows[windowIndex]->name = GetSimpleName(typeid(T).name());
 				guiWindows[windowIndex]->typeHash = typehash;
+				return newWindow;
 			}
+			return nullptr;
 		}
 
 		static GNS_API gns::gui::GuiWindow* GetWindow_Internal(std::string name);

@@ -67,6 +67,7 @@ namespace gns::rendering
         InitGUIRenderPass();
         InitFrameBuffers();
         InitSyncStructures();
+        CreateDescriptorPool();
 	}
 
 	Device::~Device()
@@ -77,7 +78,6 @@ namespace gns::rendering
         vkDestroyDescriptorPool(m_device, m_descriptorPool, nullptr);
         vkDestroyDescriptorSetLayout(m_device, m_globalSetLayout, nullptr);
         vkDestroyDescriptorSetLayout(m_device, m_objectSetLayout, nullptr);
-        vkDestroyDescriptorSetLayout(m_device, m_textureSetLayout, nullptr);
         vkDestroyRenderPass(m_device, m_renderPass, nullptr);
         vkDestroyRenderPass(m_device, m_guiPass, nullptr);
         for (int i = 0; i < m_frameBuffers.size(); i++) {
@@ -510,13 +510,13 @@ namespace gns::rendering
         _VK_CHECK(vkCreateDescriptorSetLayout(m_device, &set2info, nullptr, setLayout), " Failed to create DescriptorSetLayout.");
     }
 
-    void Device::InitDescriptors(size_t size)
+    void Device::CreateDescriptorPool()
     {
         const std::vector<VkDescriptorPoolSize> sizes =
         {
-			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
-			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
-			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
             { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 10000 }
         };
 
@@ -527,9 +527,12 @@ namespace gns::rendering
         pool_info.poolSizeCount = static_cast<uint32_t>(sizes.size());
         pool_info.pPoolSizes = sizes.data();
 
-        _VK_CHECK(
-            vkCreateDescriptorPool(m_device, &pool_info, nullptr, &m_descriptorPool), "Failed to create Descriptor Pool!");
+        _VK_CHECK(vkCreateDescriptorPool(m_device, &pool_info, nullptr, &m_descriptorPool), 
+            "Failed to create Descriptor Pool!");
+    }
 
+    void Device::InitDescriptors(size_t size)
+    {
         VkDescriptorSetLayoutBinding objectBind = DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0);
         CreateDescriptorSetLayout(&m_objectSetLayout, &objectBind, 1);
 
@@ -541,17 +544,10 @@ namespace gns::rendering
     	const std::vector < VkDescriptorSetLayoutBinding> bindings = { cameraBind, sceneBind };
         CreateDescriptorSetLayout(&m_globalSetLayout, bindings.data(), bindings.size());
 
-        std::vector<VkDescriptorSetLayoutBinding> textureBindings = {
-        	DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 0),
-        	DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1),
-        	DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 2),
-        	DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 3),
-	        DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 4)
-        };
-        CreateDescriptorSetLayout(&m_textureSetLayout, textureBindings.data(), textureBindings.size());
-
         const size_t sceneParamBufferSize = m_imageCount * PadUniformBufferSize(size);
         m_sceneParameterBuffer = CreateBuffer(m_allocator, sceneParamBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+
 
         for (uint32_t i = 0; i < m_imageCount; i++)
         {
@@ -582,6 +578,45 @@ namespace gns::rendering
             const size_t writesCount = setWrites.size();
             vkUpdateDescriptorSets(m_device, static_cast<uint32_t>(writesCount), setWrites.data(), 0, nullptr);
         }
+    }
+
+    void Device::InitGlobalDescriptors(size_t size)
+    {
+        VkDescriptorSetLayoutBinding cameraBind = DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            VK_SHADER_STAGE_VERTEX_BIT, 0);
+        VkDescriptorSetLayoutBinding sceneBind = DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
+            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+
+        const std::vector < VkDescriptorSetLayoutBinding> bindings = { cameraBind, sceneBind };
+        CreateDescriptorSetLayout(&m_globalSetLayout, bindings.data(), bindings.size());
+
+        const size_t sceneParamBufferSize = m_imageCount * PadUniformBufferSize(size);
+        m_sceneParameterBuffer = CreateBuffer(m_allocator, sceneParamBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+        for (uint32_t i = 0; i < m_imageCount; i++)
+        {
+            constexpr uint32_t structSize = sizeof(GPUCameraData);
+            m_frames[i]._cameraBuffer = CreateBuffer(m_allocator, structSize,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+            VkDescriptorSetAllocateInfo allocInfo = CreateAllocateInfo(m_descriptorPool, &m_globalSetLayout);
+            vkAllocateDescriptorSets(m_device, &allocInfo, &m_frames[i]._globalDescriptor);
+
+            VkDescriptorBufferInfo cameraInfo = CreateBufferInfo(m_frames[i]._cameraBuffer._buffer, structSize);
+            VkDescriptorBufferInfo sceneInfo = CreateBufferInfo(m_sceneParameterBuffer._buffer, size);
+
+            std::vector<VkWriteDescriptorSet> setWrites = {
+                WriteDescriptorBuffer(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, m_frames[i]._globalDescriptor, &cameraInfo, 0),
+                WriteDescriptorBuffer(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, m_frames[i]._globalDescriptor, &sceneInfo, 1)
+            };
+            const size_t writesCount = setWrites.size();
+            vkUpdateDescriptorSets(m_device, static_cast<uint32_t>(writesCount), setWrites.data(), 0, nullptr);
+        }
+
+    }
+
+    void Device::InitMaterialSetLayouts(Material* material)
+    {
     }
 
     size_t Device::PadUniformBufferSize(size_t originalSize)

@@ -41,7 +41,7 @@ namespace gns::rendering
 
 		GNS_API void EndFrame(uint32_t& swapchainImageIndex);
 		GNS_API void UploadMesh(Mesh* mesh);
-		GNS_API void CreatePipelineForMaterial(std::shared_ptr<Shader> shader);
+		GNS_API void CreatePipeline(std::shared_ptr<Shader> shader);
 		
 		GNS_API void DisposeObject(std::shared_ptr<IDisposeable> object);
 	private:
@@ -64,6 +64,7 @@ namespace gns::rendering
 		VkShaderModule CreateShaderModule(std::vector<uint32_t> buffer);
 		void CreateVertexBuffers(Mesh* mesh);
 		void CreateIndexBuffers(Mesh* mesh);
+		void CreateSetLayoutBindings(std::shared_ptr<Shader> shader);
 		std::shared_ptr<Material> m_material_ptr;
 		//MOVE OUT OF HERE:
 	public:

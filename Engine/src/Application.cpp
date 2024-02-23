@@ -53,8 +53,9 @@ gns::Application::Application(std::string assetsPath)
 
 gns::Application::~Application()
 {
-	delete(RenderSystem::S_Renderer);
+	//delete(RenderSystem::S_Renderer);
 	delete(m_window);
+	LOG_INFO("APPLICATION DESTRUCTED!");
 }
 Event<void, std::string>* testEvent = new Event<void, std::string>();
 void gns::Application::Start(std::function<void()> OnStart)
@@ -80,6 +81,8 @@ void gns::Application::Run(std::function<void()> OnUpdate)
 	}
 
 	gui->DisposeGUI();
+
+	//TODO::REVISIT CLEANUP PROCESSES
 }
 
 void gns::Application::CloseApplication()

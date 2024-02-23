@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <glm/gtx/transform.hpp>
+#include <glm/glm.hpp>
 #include "vulkan/vulkan.h"
 #include "DisposableVkObject.h"
 #include "../../AssetDatabase/Guid.h"
@@ -19,22 +20,29 @@ namespace gns::rendering
 namespace gns::rendering
 {
 	class Mesh;
+	struct ShaderMetadata
+	{
+		uint32_t textureCount;
+	};
+
 	struct Shader : public GnsObject
 	{
 		Shader(std::string vertexShaderPath, std::string fragmentShaderPath) : GnsObject(),
 			vertexShaderPath(vertexShaderPath),
 			fragmentShaderPath(fragmentShaderPath)
 		{};
+		GNS_API ~Shader();
+
+		ShaderMetadata meta = {};
 		std::string vertexShaderPath;
 		std::string fragmentShaderPath;
 
 		VkPipeline pipeline;
 		VkPipelineLayout pipelineLayout;
-
-		Buffer materialUniformBuffer;
+		Buffer shaderUniformBuffer;
 		VkDescriptorSet descriptorSet;
+		VkDescriptorSetLayout shaderSetLayout;
 	};
-
 
 	struct Material : public IDisposeable, public GnsObject {
 
@@ -44,7 +52,6 @@ namespace gns::rendering
 		std::shared_ptr<Shader> m_shader;
 		std::shared_ptr<Texture> m_texture{ nullptr };
 		std::vector<std::shared_ptr<Texture>> m_textures;
-		float _roughness;
 		
 		void GNS_API Dispose(Device* device) override;
 		void GNS_API SetTexture(const std::shared_ptr<Texture>& texture);

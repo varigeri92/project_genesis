@@ -19,7 +19,7 @@ namespace gns
 	{
 	public:
 		Application(std::string assetsPath);
-		~Application();
+		GNS_API ~Application();
 	private:
 		//
 		GUI* gui;

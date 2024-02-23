@@ -21,6 +21,7 @@
 #include "../src/ECS/Entity.h"
 
 #include "../src/GUI/GUI.h"
+#include "GUI/GuiWindow.h"
 
 #include "../src/Core/Time.h"
 #include "../src/Input.h"
