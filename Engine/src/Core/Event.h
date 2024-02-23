@@ -2,20 +2,32 @@
 #include <functional>
 #include <vector>
 #include "../Application.h"
+#include "Log.h"
+
+#define EVT_FN(retType, fnName, ...) std::function<retType()> fnName( __VA_ARGS__ )
 
 template<class T, typename... Args>
 class Event
 {
 private:
 	std::vector<std::function<T(Args&& ...)>> queue;
+
+	size_t getAddress(std::function<T(Args&& ...)> f) 
+	{	
+		using fntype = T(Args&& ...);
+		fntype** fnPtr = f.template target<fntype*>();
+		if (fnPtr == nullptr)
+			return 0;
+		return reinterpret_cast<size_t>(*fnPtr);
+	}
+
 public:
 
 	void Subscribe(const std::function<T(Args&& ...)>& function)
 	{
-		size_t id = (size_t)(&function);
+		size_t id = getAddress(function);
 		queue.push_back(function);
-		size_t id_2 = (size_t)(&(queue[queue.size()-1]));
-		LOG_INFO(id << " ------ " << id_2);
+		size_t id_2 = getAddress(queue[queue.size() - 1]);
 	}
 	void Dispatch(Args&& ... args)
 	{
@@ -39,20 +51,14 @@ public:
 
 	void RemoveListener(const std::function<T(Args&& ...)>& function)
 	{
-		size_t index = 0;
-		bool found = false;
-		for (const auto& storedFunc : queue) {
-			if (function.target_type() == storedFunc.target_type() && function.target<std::function<T(Args&& ...)>>()
-				== storedFunc.target<std::function<T(Args&& ...)>>()) {
-				found = true;
+		auto it = queue.begin();
+		/*
+		for (it = queue.begin(); it != queue.end(); it++) {
+			if (getAddress(queue[it]) == getAddress(function))
 				break;
-			}
-			index++;
 		}
-		if(found)
-		{
-			auto it = queue.begin() + index;
+		if(it != queue.end())
 			queue.erase(it);
-		}
+		*/
 	}
 };

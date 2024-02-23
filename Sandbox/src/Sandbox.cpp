@@ -18,6 +18,11 @@ using namespace gns::rendering;
 Event<void, std::string, uint32_t> clientevent;
 
 
+EVT_FN(void, macroFunction, std::string string, int integer, float fpNumber) 
+{
+	LOG_INFO(string << " " << integer << " " << fpNumber);
+	return nullptr;
+}
 std::function<void()> HelloRandomFunctionWithArgs(const std::string& stringArg, uint32_t numberArg)
 {
 	LOG_INFO("Hello Random Function with arguments: " << stringArg << " " << numberArg);
@@ -28,6 +33,8 @@ std::function<void()> HelloRandomFunctionWithArgs_2(const std::string& stringArg
 	LOG_INFO("Call it only once: " << stringArg << " " << numberArg);
 	return nullptr;
 }
+
+auto HelloRandomFunctionWithArgs_var = HelloRandomFunctionWithArgs;
 
 int main()
 {
@@ -150,15 +157,7 @@ int main()
 
 		auto* camSystem = core::SystemsApi::GetSystem<CameraSystem>();
 
-		clientevent.Subscribe([](const std::string& clientMsg, uint32_t randomNumber){
-
-			LOG_INFO("ClientEvent: " << clientMsg << ", The randomNumber is: " << randomNumber);
-
-		});
-
-		clientevent.Subscribe(HelloRandomFunctionWithArgs_2);
-		clientevent.Subscribe(HelloRandomFunctionWithArgs);
-		clientevent.RemoveListener(HelloRandomFunctionWithArgs);
+		clientevent.Subscribe(HelloRandomFunctionWithArgs_var);
 		clientevent.Dispatch("Hello sandbox", core::Guid::GetNewGuid());
 
 		});

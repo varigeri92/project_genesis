@@ -1,6 +1,8 @@
 outDir = "bin/%{cfg.buildcfg}"
-VulkanLibDir = "C:/VulkanSDK/1.3.261.1/Lib"
-VulkanIncludeDir = "C:/VulkanSDK/1.3.261.1/Include"
+--C:\VulkanSDK\1.3.275.0
+--1.3.261.1
+VulkanLibDir = "C:/VulkanSDK/1.3.275.0/Lib"
+VulkanIncludeDir = "C:/VulkanSDK/1.3.275.0/Include"
 p = path.getabsolute("./")
 p=p:gsub('/','\\\\')..'\\\\'
 rootpath = '"'..p..'"'
@@ -59,39 +61,48 @@ project "Sandbox"
     dependson { "Engine" }
 
 
-    function ReplacePath(path)
-        srcfile = "./Engine/API/path.h"
-        local file = io.open(srcfile, "r")
+     function replaceRootValue(filePath, newValue)
+        -- Open the file in read mode
+        local file = io.open(filePath, "r")
+        if not file then
+            print("Error opening file")
+            return
+        end
     
-        if not file then
-            print("Error: Unable to open file for reading.")
-            return
+        -- Read all lines into a table
+        local lines = {}
+        for line in file:lines() do
+            table.insert(lines, line)
         end
-        
-        -- Read the entire content of the file
-        local content = file:read("*a")
-        
+    
         -- Close the file
         file:close()
-        
-        -- Replace the specified string
-        local modifiedContent, replacements = string.gsub(content, '{ROOT}', path)
-        
-        -- Open the file in write mode to overwrite it
-        file = io.open(srcfile, "w")
-        
+    
+        -- Find and replace the line starting with "#define ROOT"
+        for i, line in ipairs(lines) do
+            if line:match("^#define ROOT") then
+                -- Replace the old value with the new one
+                lines[i] = "#define ROOT_DIR " .. newValue
+                break
+            end
+        end
+    
+        -- Open the file in write mode
+        file = io.open(filePath, "w")
         if not file then
-            print("Error: Unable to open file for writing.")
+            print("Error opening file for writing")
             return
         end
-        
-        -- Write the modified content back to the file
-        file:write(modifiedContent)
-        
+    
+        -- Write the modified lines back to the file
+        file:write(table.concat(lines, "\n"))
+    
         -- Close the file
         file:close()
-        
-        print("Replaced", "{ROOT}", "occurrences of", searchString, "with", replaceString, "in", filename)
-     end
-
-     ReplacePath(rootpath)
+    
+        print("Replacement completed successfully")
+    end
+    
+    -- Example usage
+    local filePath = "./Engine/API/path.h"
+    replaceRootValue(filePath, rootpath)
