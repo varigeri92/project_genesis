@@ -22,12 +22,11 @@ namespace gns
 
 	public:
 		static GNS_API void SetPaths(std::string assetsPath);
-		static GNS_API std::shared_ptr<gns::rendering::Mesh> LoadMesh(std::string path);
-		static GNS_API std::shared_ptr<gns::rendering::Mesh> LoadMeshIndexed(std::string path);
+
 		static GNS_API std::vector<uint32_t> LoadShader(std::string path);
 		static GNS_API void LoadTextureData(std::string path, rendering::Texture* texture, bool isFallbackPath = false);
-		static GNS_API std::vector<std::shared_ptr<gns::rendering::Mesh>> LoadMeshIndexed_MultiObject(std::string path);
 		static GNS_API std::vector<std::shared_ptr<gns::rendering::Mesh>> LoadMeshFile(std::string path, bool isFallbackPath = false);
-		static GNS_API std::string GetAssetsPath(){ return AssetsPath; };
+		static GNS_API std::string LoadSceneFromFile();
+		static GNS_API std::string GetAssetsPath() { return AssetsPath; }
 	};
 }

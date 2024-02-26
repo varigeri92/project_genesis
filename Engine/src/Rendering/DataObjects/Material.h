@@ -27,7 +27,7 @@ namespace gns::rendering
 
 	struct Shader : public GnsObject
 	{
-		Shader(std::string vertexShaderPath, std::string fragmentShaderPath) : GnsObject(),
+		GNS_API Shader(std::string vertexShaderPath, std::string fragmentShaderPath) : GnsObject(),
 			vertexShaderPath(vertexShaderPath),
 			fragmentShaderPath(fragmentShaderPath)
 		{};
@@ -40,14 +40,14 @@ namespace gns::rendering
 		VkPipeline pipeline;
 		VkPipelineLayout pipelineLayout;
 		Buffer shaderUniformBuffer;
-		VkDescriptorSet descriptorSet;
 		VkDescriptorSetLayout shaderSetLayout;
 	};
 
 	struct Material : public IDisposeable, public GnsObject {
 
-		Material(std::shared_ptr<Shader> shader, std::string name) :m_shader(shader), name(name) {};
+		GNS_API Material(std::shared_ptr<Shader> shader, std::string name);
 
+		VkDescriptorSet descriptorSet;
 		std::string name;
 		std::shared_ptr<Shader> m_shader;
 		std::shared_ptr<Texture> m_texture{ nullptr };
@@ -56,6 +56,7 @@ namespace gns::rendering
 		void GNS_API Dispose(Device* device) override;
 		void GNS_API SetTexture(const std::shared_ptr<Texture>& texture);
 		void GNS_API PushTexture(const std::shared_ptr<Texture>& texture);
+
 	};
 }
 

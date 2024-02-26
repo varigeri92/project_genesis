@@ -53,7 +53,7 @@ int main()
 		RenderSystem::S_Renderer->CreatePipeline(defaultShader);
 
 		std::shared_ptr<Texture> bodyTexture_Color = std::make_shared<Texture>(R"(Meshes\OtherModels\Rei\Textures\Rei_3_LP_Body_low_BaseColor.png)");
-		std::shared_ptr<Texture> bodyTexture_Normal = std::make_shared<Texture>(R"(Textures\PrototypeGridTexture.jpg)");
+		std::shared_ptr<Texture> bodyTexture_Normal = std::make_shared<Texture>(R"(Meshes\OtherModels\Rei\Textures\Rei_3_LP_Body_low_Normal.png)");
 		std::shared_ptr<Texture> bodyTexture_Metallic = std::make_shared<Texture>(R"(Meshes\OtherModels\Rei\Textures\Rei_3_LP_Body_low_Metallic.png)");
 		std::shared_ptr<Texture> bodyTexture_Roughness = std::make_shared<Texture>(R"(Meshes\OtherModels\Rei\Textures\Rei_3_LP_Body_low_Roughness.png)");
 		std::shared_ptr<Texture> bodyTexture_AO = std::make_shared<Texture>(R"(Meshes\OtherModels\Rei\Textures\Rei_3_LP_Body_low_AO.png)");
@@ -151,14 +151,16 @@ int main()
 		GUI::RegisterWindow<ContentBrowser>();
 		GUI::RegisterWindow<EntityInspector>();
 		GUI::RegisterWindow<SceneHierarchy>();
-		TexturePreviewWindow* textureWindow = GUI::RegisterWindow<TexturePreviewWindow>();
+		//TexturePreviewWindow* textureWindow = GUI::RegisterWindow<TexturePreviewWindow>();
 		//textureWindow->AddTexture(bodyTexture_Color);
-		//textureWindow->AddTexture(bodyTexture_Normal);
+		//textureWindow->AddTexture(RandomTexture);
 
 		auto* camSystem = core::SystemsApi::GetSystem<CameraSystem>();
 
 		clientevent.Subscribe(HelloRandomFunctionWithArgs_var);
 		clientevent.Dispatch("Hello sandbox", core::Guid::GetNewGuid());
+
+		scene->Serialize();
 
 		});
 	app->Run([app]()

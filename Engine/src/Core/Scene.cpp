@@ -5,14 +5,25 @@
 namespace gns {
 	Entity Scene::CreateEntity(std::string name, Scene* scene)
 	{
-		entt::entity entity = registry.create();
-		registry.emplace<EntityComponent>(entity, name);
-		registry.emplace<Transform>(entity);
-		return Entity(entity, scene);
+		entt::entity e = registry.create();
+		Entity entity(e, scene);
+		entity.AddComponet<EntityComponent>(name);
+		entity.AddComponet<Transform>();
+		return entity;
 	}
 	void Scene::Destroy(Entity& entity)
 	{
 		registry.destroy(entity.entity);
 		delete(&entity);
+	}
+
+	void Scene::Serialize()
+	{
+		SerializeRegistry();
+	}
+
+	void Scene::SerializeRegistry()
+	{
+		LOG_INFO("WIP");
 	}
 }

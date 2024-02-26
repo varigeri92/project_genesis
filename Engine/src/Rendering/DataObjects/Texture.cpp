@@ -54,6 +54,29 @@ namespace gns::rendering
 		vkUpdateDescriptorSets(RenderSystem::S_Device->m_device, 1, &texture1, 0, nullptr);
 */
 	}
+
+	void Texture::Update(uint32_t binding)
+	{
+		/*
+		VkDescriptorSetAllocateInfo allocInfo = {};
+		allocInfo.pNext = nullptr;
+		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		allocInfo.descriptorPool = RenderSystem::S_Device->m_descriptorPool;
+		allocInfo.descriptorSetCount = 1;
+		allocInfo.pSetLayouts = &m_shader->shaderSetLayout;
+		_VK_CHECK(vkAllocateDescriptorSets(RenderSystem::S_Device->m_device, &allocInfo, &descriptorSet), "Descriptor set Allocation Failed!");
+
+		VkDescriptorImageInfo imageBufferInfo;
+		imageBufferInfo.sampler = m_sampler;
+		imageBufferInfo.imageView = imageView;
+		imageBufferInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+		VkWriteDescriptorSet texture1 = write_descriptor_image(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, descriptorSet,
+			&imageBufferInfo, binding);
+		vkUpdateDescriptorSets(RenderSystem::S_Device->m_device, 1, &texture1, 0, nullptr);
+		*/
+	}
+
 	void Texture::Dispose(Device* device)
 	{
 	    vmaDestroyImage(device->m_allocator, image, allocation);

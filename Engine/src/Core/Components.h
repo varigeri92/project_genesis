@@ -1,19 +1,22 @@
 #pragma once
+#include <iostream>
+#include <typeinfo>
+
+#include "Log.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "../AssetDatabase/Guid.h"
 #include "Serializeable.h"
 
 #define EDITOR_BUILD
+using namespace gns::rendering;
+
 constexpr float PI = 3.14159265359f;
 namespace gns::rendering
 {
 	struct Mesh;
 	struct Material;
 }
-using namespace gns::rendering;
-
-
 
 struct SerializedProperty
 {
@@ -22,30 +25,58 @@ struct SerializedProperty
 	void* data = 0;
 };
 
+#ifdef EDITOR_BUILD
+#define SERIALIZE(type, name, value)type name = value;\
+	SerializedProperty serialized_##name = {#type, #name, &name}
+
+#define REGISTER(name) serializedProperties.push_back(&serialized_##name)
+
+#else
+#define SERIALIZE(type, name, value) type name = value
+#endif
+
+#define COMPONENT(name) struct name : public gns::ComponentBase
+
+
 namespace gns
 {
 	struct ComponentBase
 	{
 		core::guid guid;
-		std::vector<SerializedProperty> serializedProperties = {};
+		std::vector<SerializedProperty*> serializedProperties = {};
+		ComponentBase() : guid(core::Guid::GetNewGuid()){}
 	};
 
 	COMPONENT(EntityComponent)
 	{
-		EntityComponent(std::string name) : name{ name } {}
-		std::string name;
+		SERIALIZE(std::string, name, "");
 		SERIALIZE(bool, isEnabled, true);
 		SERIALIZE(bool, isStatic, true);
 
+		EntityComponent(std::string name) : name{ name }
+		{
+			REGISTER(name);
+			REGISTER(isEnabled);
+			REGISTER(isStatic);
+			LOG_INFO("FASZ KIVAN " << name);
+			if (std::empty(name)) name = "New Entity";
+		}
 	};
 
 	COMPONENT(Transform)
 	{
-		glm::vec3 position;
-		glm::vec3 rotation;
-		glm::vec3 scale;
+		SERIALIZE(glm::vec3, position, {});
+		SERIALIZE(glm::vec3, rotation, {});
+		SERIALIZE(glm::vec3, scale, {});
 
 		glm::mat4 matrix;
+
+		void Register()
+		{
+			REGISTER(position);
+			REGISTER(rotation);
+			REGISTER(scale);
+		}
 
 		Transform() : position{0,0,0}, rotation { 0,0,0 }, scale { 1,1,1 }
 		{
@@ -53,6 +84,8 @@ namespace gns
 			matrix = glm::translate(matrix, glm::vec3(0.f));
 			matrix = glm::scale(matrix, glm::vec3(1.f));
 			matrix = glm::rotate(matrix, 0.f, glm::vec3(0.f, 1.f, 0.f));
+
+			Register();
 		}
 
 		Transform(
@@ -63,6 +96,8 @@ namespace gns
 			matrix = glm::translate(matrix, glm::vec3(0.f));
 			matrix = glm::scale(matrix, glm::vec3(1.f));
 			matrix = glm::rotate(matrix, 0.f, glm::vec3(0.f, 1.f, 0.f));
+
+			Register();
 		}
 
 		void UpdateMatrix() {

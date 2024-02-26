@@ -19,8 +19,7 @@ namespace gns {
 
 	struct Entity
 	{
-		inline static std::unordered_map<entt::entity, std::vector<ComponentMetadata>>
-			ComponentRegistry = {{}};
+		inline static std::unordered_map<entt::entity, std::vector<ComponentMetadata>> ComponentRegistry = {{}};
 		Scene* scene;
 		entt::entity entity;
 		Entity(entt::entity entity, Scene* scene) :

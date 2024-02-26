@@ -1,7 +1,5 @@
 #pragma once
 #include <string>
-#include <memory>
-
 #include "gnsAPI.h"
 #include "EnTT/entt.hpp"
 #include "../Rendering/Device.h"
@@ -22,9 +20,12 @@ namespace gns
 		entt::registry registry;
 		GPUSceneData sceneData;
 		Scene(std::string name) : name{ name } {};
-
 		GNS_API Entity CreateEntity(std::string name, Scene* scene);
 		GNS_API void Destroy(Entity& entity);
+		GNS_API void Serialize();
+
+	private:
+		void SerializeRegistry();
 	};
 }
 

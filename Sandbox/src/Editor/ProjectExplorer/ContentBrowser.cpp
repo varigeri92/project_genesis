@@ -4,6 +4,7 @@
 
 #include "Log.h"
 #include "ImGui/imgui.h"
+#include "path.h"
 
 namespace fs = std::filesystem;
 float f =  0.5f;
@@ -45,7 +46,7 @@ gns::gui::ContentBrowser::Directory gns::gui::ContentBrowser::DrawLeftPane(Direc
 gns::gui::ContentBrowser::ContentBrowser() : GuiWindow("Content Browser")
 {
     m_flags = ImGuiWindowFlags_MenuBar;
-    currentPath = R"(D:\project_genesis\Engine\Assets)";
+    currentPath = ASSETS_DIR;
     selected = currentPath;
     assetsPath = currentPath;
     m_workingDirectory = {currentPath,selected };
@@ -146,7 +147,7 @@ void DrawDirectoryContent(fs::path path)
 
 void gns::gui::ContentBrowser::OnGUI()
 {
-    std::string path = R"(D:\project_genesis\Engine\Assets)";
+    std::string path = ASSETS_DIR;
     if (ImGui::BeginMenuBar())
     {
         if (ImGui::BeginMenu("File"))
@@ -162,7 +163,6 @@ void gns::gui::ContentBrowser::OnGUI()
 
     ImGui::EndChild();
     ImGui::SameLine();
-
     {
         ImGui::BeginGroup();
     	ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()));

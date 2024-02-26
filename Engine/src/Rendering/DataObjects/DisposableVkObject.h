@@ -9,5 +9,6 @@ namespace gns::rendering
 	public:
 		virtual ~IDisposeable() = default;
 		virtual GNS_API void Dispose(Device* device) = 0;
+		//virtual GNS_API void Dispose() = 0;
 	};
 }

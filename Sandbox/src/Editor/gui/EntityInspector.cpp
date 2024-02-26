@@ -1,31 +1,50 @@
-#include "EntityInspector.h"
-
-#include <genesis.h>
-
 #include "EditorGUI.h"
-#include "Log.h"
-#include "ImGui/imgui.h"
+#include "EntityInspector.h"
 #include "EnTT/entt.hpp"
+#include "ImGui/imgui.h"
+#include "Log.h"
+#include <genesis.h>
 
 static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_SpanAvailWidth;
 ImGuiTreeNodeFlags node_flags = base_flags;
 
-std::vector<const char*> componentList = {};
+
+void DrawProperty(SerializedProperty* property)
+{
+	if(property->type == "bool")
+	{
+		ImGui::Checkbox(property->name.c_str(), static_cast<bool*>(property->data));
+	}
+
+	if (property->type == "std::string")
+	{
+		char buffer[255];
+		ImGui::InputText(property->name.c_str(), buffer, 255);
+		property->data = buffer;
+	}
+	if (property->type == "glm::vec3")
+	{
+		ImGui::Text(property->name.c_str());
+		ImGui::SameLine();
+		ImGui::DragFloat3("", static_cast<float*>(property->data), 0.01f);
+	}
+}
+
+void DrawComponent(const gns::ComponentBase* component)
+{
+	for(const auto property : component->serializedProperties)
+	{
+		DrawProperty(property);
+	}
+}
 
 void gns::editor::EntityInspector::OnGUI()
 {
 	if (!is_entitySelected) return;
-
 	EntityComponent& entityComponent = m_scene->registry.get<EntityComponent>(m_entity);
-	ImGui::Text(entityComponent.name.c_str());
-	ImGui::Separator();
-	ImGui::Text("Transform:");
-
-
+	DrawComponent(&entityComponent);
 	Transform& transform = m_scene->registry.get<Transform>(m_entity);
-	ImGui::DragFloat3("Position", (float*)&transform.position, 0.01f);
-	ImGui::DragFloat3("Rotation", (float*)&transform.rotation, 0.01f);
-	ImGui::DragFloat3("Scale", (float*)&transform.scale, 0.01f);
+	DrawComponent(&transform);
 	transform.UpdateMatrix();
 	ImGui::Separator();
 	RendererComponent* rendererComponent = m_scene->registry.try_get<RendererComponent>(m_entity);
@@ -40,26 +59,23 @@ void gns::editor::EntityInspector::OnGUI()
 		ImGui::Text("Camera");
 	}
 
-
-	for (ComponentMetadata component: Entity::ComponentRegistry[m_entity])
+	for (ComponentMetadata& component: Entity::ComponentRegistry[m_entity])
 	{
 		ImGui::Separator();
 		ImGui::Separator();
 		ImGui::Text(component.name.c_str());
-		if(component.name == "struct gns::RendererComponent")
-		{
-			gns::RendererComponent* comp = (RendererComponent*)component.data;
-			ImGui::Text(comp->material->name.c_str());
-		}
+		DrawComponent(static_cast<ComponentBase*>(component.data));
+		ImGui::Separator();
+		ImGui::Text("WTF?");
 	}
 	
 }
 
 void gns::editor::EntityInspector::SetInspectedEntity(entt::entity entity, Scene* scene)
 {
-	componentList.clear();
 	m_scene = scene;
 	m_entity = entity;
+	/* 
 	auto reg = m_scene->registry.storage();
 	for (auto&& curr : reg)
 	{
@@ -71,6 +87,7 @@ void gns::editor::EntityInspector::SetInspectedEntity(entt::entity entity, Scene
 			<< storage.type().name() << std::endl;
 		}
 	}
+	*/
 	is_entitySelected = true;
 }
 

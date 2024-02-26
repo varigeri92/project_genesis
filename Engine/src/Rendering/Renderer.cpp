@@ -196,7 +196,7 @@ void Renderer::Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> materi
 
 
 		vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer, 
-			VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_shader->pipelineLayout, 1, 1, &material->m_texture->descriptorSet,
+			VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_shader->pipelineLayout, 1, 1, &material->descriptorSet,
 			0, nullptr);
 
 		/*
