@@ -18,15 +18,15 @@ void DrawProperty(SerializedProperty* property)
 
 	if (property->type == "std::string")
 	{
-		char buffer[255];
-		ImGui::InputText(property->name.c_str(), buffer, 255);
-		property->data = buffer;
+		ImGui::Text(property->name.c_str());
 	}
 	if (property->type == "glm::vec3")
 	{
-		ImGui::Text(property->name.c_str());
-		ImGui::SameLine();
-		ImGui::DragFloat3("", static_cast<float*>(property->data), 0.01f);
+		ImGui::DragFloat3(property->name.c_str(), static_cast<float*>(property->data), 0.01f);
+	}
+	if (property->type == "float")
+	{
+		ImGui::DragFloat(property->name.c_str(), static_cast<float*>(property->data), 0.01f);
 	}
 }
 
@@ -41,12 +41,14 @@ void DrawComponent(const gns::ComponentBase* component)
 void gns::editor::EntityInspector::OnGUI()
 {
 	if (!is_entitySelected) return;
+	/*
 	EntityComponent& entityComponent = m_scene->registry.get<EntityComponent>(m_entity);
 	DrawComponent(&entityComponent);
 	Transform& transform = m_scene->registry.get<Transform>(m_entity);
 	DrawComponent(&transform);
 	transform.UpdateMatrix();
 	ImGui::Separator();
+
 	RendererComponent* rendererComponent = m_scene->registry.try_get<RendererComponent>(m_entity);
 	if(rendererComponent != nullptr)
 	{
@@ -58,15 +60,13 @@ void gns::editor::EntityInspector::OnGUI()
 	{
 		ImGui::Text("Camera");
 	}
+*/
 
 	for (ComponentMetadata& component: Entity::ComponentRegistry[m_entity])
 	{
-		ImGui::Separator();
-		ImGui::Separator();
 		ImGui::Text(component.name.c_str());
-		DrawComponent(static_cast<ComponentBase*>(component.data));
+		DrawComponent((ComponentBase*)(component.data));
 		ImGui::Separator();
-		ImGui::Text("WTF?");
 	}
 	
 }

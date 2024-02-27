@@ -13,7 +13,11 @@ namespace gns
 
 	void gns::CameraSystem::UpdateViewMatrix()
 	{
-	};
+	}
+	void CameraSystem::LogSomething()
+	{
+		LOG_INFO("HELLO CMAERA!!!");
+	}
 
 
 	void gns::CameraSystem::UpdateCamera()

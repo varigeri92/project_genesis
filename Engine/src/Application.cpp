@@ -71,10 +71,8 @@ void gns::Application::Run(std::function<void()> OnUpdate)
 		Time::StartFrameTime();
 		HandleEvents();
 		gui->BeginGUI();
-		gui->DrawGUI();
-
 		OnUpdate();
-		//testEvent->Dispatch("Hello");
+		gui->DrawGUI();
 		UpdateSystems();
 		Render(SceneManager::GetActiveScene());
 		Time::EndFrameTime();

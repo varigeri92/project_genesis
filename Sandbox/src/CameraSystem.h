@@ -20,6 +20,8 @@ namespace gns {
 		void OnDestroy() override;
 	private:
 		void UpdateViewMatrix();
+	public:
+		void LogSomething();
 	};
 }
 

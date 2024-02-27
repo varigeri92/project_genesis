@@ -18,7 +18,6 @@ using namespace gns::rendering;
 
 Event<void, std::string, uint32_t> clientevent;
 
-
 EVT_FN(void, macroFunction, std::string string, int integer, float fpNumber) 
 {
 	LOG_INFO(string << " " << integer << " " << fpNumber);
@@ -75,7 +74,6 @@ int main()
 		std::shared_ptr<Texture> bandageTexture_Metallic = std::make_shared<Texture>(R"(Meshes\OtherModels\Rei\Textures\Rei_Bandage_2_LP_Bandage_Metallic.png)");
 		std::shared_ptr<Texture> bandageTexture_Roughness = std::make_shared<Texture>(R"(Meshes\OtherModels\Rei\Textures\Rei_Bandage_2_LP_Bandage_Roughness.png)");
 		std::shared_ptr<Texture> bandageTexture_AO = std::make_shared<Texture>(R"(Meshes\OtherModels\Rei\Textures\Rei_Bandage_2_LP_Bandage_AO.png)");
-		//uv_color_Grid.png
 		
 		/*
 		std::shared_ptr<Material> defaultMaterial = std::make_shared<Material>(defaultShader, "DefaultCheckMaterial");
@@ -139,23 +137,23 @@ int main()
 
 
 		//Create Scene
-		Entity sceneCamera_entity = SceneManager::GetActiveScene()->CreateEntity("SceneCamera",
-			SceneManager::GetActiveScene());
+		Entity sceneCamera_entity = SceneManager::GetActiveScene()->CreateEntity("SceneCamera", SceneManager::GetActiveScene());
 
 		Transform& cameraTransform = sceneCamera_entity.GetTransform();
 		cameraTransform.position = { 0.f,-1.f,-3.f };
 		CameraComponent& sceneCamera = sceneCamera_entity.AddComponet<CameraComponent>(0.01f, 1000.f, 60.f, 1700, 900, cameraTransform);
+		sceneCamera_entity.AddComponet<DummyComponent>();
 
 		core::SystemsApi::RegisterSystem<CameraSystem>(cameraTransform, sceneCamera);
-
 		GUI::RegisterWindow<ContentBrowser>();
 		GUI::RegisterWindow<EntityInspector>();
 		GUI::RegisterWindow<SceneHierarchy>();
-		//TexturePreviewWindow* textureWindow = GUI::RegisterWindow<TexturePreviewWindow>();
+		TexturePreviewWindow* textureWindow = GUI::RegisterWindow<TexturePreviewWindow>();
 		//textureWindow->AddTexture(bodyTexture_Color);
 		//textureWindow->AddTexture(RandomTexture);
 
 		auto* camSystem = core::SystemsApi::GetSystem<CameraSystem>();
+		camSystem->LogSomething();
 
 		clientevent.Subscribe(HelloRandomFunctionWithArgs_var);
 		clientevent.Dispatch("Hello sandbox", core::Guid::GetNewGuid());

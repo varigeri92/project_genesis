@@ -19,7 +19,7 @@ namespace gns {
 
 	struct Entity
 	{
-		inline static std::unordered_map<entt::entity, std::vector<ComponentMetadata>> ComponentRegistry = {{}};
+		GNS_API static std::unordered_map<entt::entity, std::vector<ComponentMetadata>> ComponentRegistry;
 		Scene* scene;
 		entt::entity entity;
 		Entity(entt::entity entity, Scene* scene) :
@@ -34,7 +34,7 @@ namespace gns {
 		{
 			T& component = scene->registry.emplace<T>(entity, std::forward<Args>(args)...);
 #ifdef EDITOR_BUILD
-			ComponentRegistry[entity].emplace_back(typeid(T).name(), static_cast<void*>(&component));
+			ComponentRegistry[entity].emplace_back(typeid(T).name(), &component);
 #endif
 			return component;
 		}

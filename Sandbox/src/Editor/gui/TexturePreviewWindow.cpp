@@ -7,15 +7,7 @@ gns::gui::TexturePreviewWindow::TexturePreviewWindow() : GuiWindow("Texture Prev
 
 void gns::gui::TexturePreviewWindow::OnGUI()
 {
-    int i = 0;
-    for (auto Texture : texturesToShow) {
-        if (ImGui::Button(std::to_string(i).c_str()))
-            Current = i;
-        ImGui::SameLine();
-    }
-    ImGui::NewLine();
-    if(texturesToShow.size()>0)
-        ImGui::Image(texturesToShow[Current]->descriptorSet, size);
+    ImGui::Text("HELLO GUYS!");
 }
 
 void gns::gui::TexturePreviewWindow::AddTexture(std::shared_ptr<gns::rendering::Texture> texture)

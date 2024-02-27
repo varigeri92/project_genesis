@@ -26,7 +26,7 @@ struct SerializedProperty
 };
 
 #ifdef EDITOR_BUILD
-#define SERIALIZE(type, name, value)type name = value;\
+#define SERIALIZE(type, name, value) type name = value;\
 	SerializedProperty serialized_##name = {#type, #name, &name}
 
 #define REGISTER(name) serializedProperties.push_back(&serialized_##name)
@@ -58,7 +58,8 @@ namespace gns
 			REGISTER(name);
 			REGISTER(isEnabled);
 			REGISTER(isStatic);
-			LOG_INFO("FASZ KIVAN " << name);
+			size_t offset = offsetof(EntityComponent, isEnabled);
+			LOG_INFO("Offset: " << offset);
 			if (std::empty(name)) name = "New Entity";
 		}
 	};
@@ -131,6 +132,19 @@ namespace gns
 	COMPONENT(CameraComponent)
 	{
 		CameraComponent() = delete;
+		SERIALIZE(float, _near, 0);
+		SERIALIZE(float, _far, 0);
+		SERIALIZE(float, fov, 0);
+		SERIALIZE(float, width, 0);
+		SERIALIZE(float, height, 0);
+		/*
+		float _near;
+		float _far;
+		float fov;
+		float width;
+		float height;
+		*/
+
 		CameraComponent(float near, float far, float fov, float width, float height, Transform& transform) :
 			_near(near), _far(far), fov(fov), width(width), height(height)
 		{
@@ -141,16 +155,24 @@ namespace gns
 			projection = glm::perspective(glm::radians(fov), (width / height), _near, _far);
 			projection[1][1] *= -1;
 			camera_matrix = projection * view;
-		}
 
-		float _near;
-		float _far;
-		float fov;
-		float width;
-		float height;
+			REGISTER(_near);
+			REGISTER(_far);
+			REGISTER(fov);
+			REGISTER(width);
+			REGISTER(height);
+		}
 
 		glm::mat4 view;
 		glm::mat4 projection;
 		glm::mat4 camera_matrix;
+	};
+
+	COMPONENT(DummyComponent)
+	{
+		SERIALIZE(float, prop, 0);
+		DummyComponent(){
+			REGISTER(prop);
+		};
 	};
 }
