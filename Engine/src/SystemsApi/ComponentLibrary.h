@@ -19,6 +19,11 @@ namespace gns
 		EntityComponent(std::string entityName) : name(entityName){}
 	};
 
+	struct SceneComponent
+	{
+		size_t runtimeSceneId;
+	};
+
 	struct Transform
 	{
 		glm::vec3 position;
@@ -26,14 +31,6 @@ namespace gns
 		glm::vec3 scale;
 
 		glm::mat4 matrix;
-
-		Transform()
-			: position{ 0,0,0 }, rotation{ 0,0,0 }, scale{ 1,1,1 }
-		{}
-
-		Transform(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
-			: position{ position }, rotation{ rotation }, scale{ scale }
-		{}
 
 		void UpdateMatrix()
 		{
@@ -44,6 +41,26 @@ namespace gns
 			matrix = glm::rotate(matrix, rotation.y * (PI / 180), glm::vec3(0.f, 1.f, 0.f));
 			matrix = glm::rotate(matrix, rotation.z * (PI / 180), glm::vec3(0.f, 0.f, 1.f));
 		}
+		Transform()
+			: position{ 0,0,0 }, rotation{ 0,0,0 }, scale{ 1,1,1 }
+		{
+			UpdateMatrix();
+		}
+
+		Transform(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+			: position{ position }, rotation{ rotation }, scale{ scale }
+		{
+			UpdateMatrix();
+		}
+
+	};
+	struct Children
+	{
+		std::vector<std::shared_ptr<Transform>> children;
+	};
+	struct Parent
+	{
+		std::shared_ptr<Transform> parent;
 	};
 
 	struct RendererComponent

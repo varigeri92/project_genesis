@@ -30,7 +30,7 @@ namespace gns::gui
 		size_t typeHash;
 		bool m_isActive = true;
 
-		virtual ~GuiWindow() = default;
+		GNS_API virtual ~GuiWindow() = default;
 		GNS_API GuiWindow(const std::string name);
 		GNS_API void SetActive(bool value);
 

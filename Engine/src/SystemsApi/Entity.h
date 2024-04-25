@@ -22,6 +22,7 @@ namespace gns
 
 		Entity() = delete;
 
+		inline bool IsValid() { return entity != entt::null; }
 		template<typename T, typename... Args>
 		T& AddComponet(Args&& ... args)
 		{
@@ -44,5 +45,11 @@ namespace gns
 			component = SystemsAPI::GetDefaultRegistry().try_get<T>(entity);
 			return component != nullptr;
 		}
+		/*
+		Entity GetChild(std::string name);
+		Entity GetChild(size_t index);
+		void SetParent(Entity entity);
+		void GetParent();
+		 */
 	};
 }

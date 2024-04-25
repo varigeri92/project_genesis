@@ -14,5 +14,7 @@ protected:
 private:
 	void DrawComponent(std::string name);
 	void DrawField(size_t typeId, void* valuePtr, std::string name);
+	gns::EventFunction<void, entt::entity>* onEntitySelected;
+	gns::Entity inspectedEntity;
 };
 

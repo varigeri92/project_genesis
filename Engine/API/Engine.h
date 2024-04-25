@@ -10,6 +10,7 @@
 #include "../src/Window/InputBackend.h"
 #include "../src/SystemsApi/SystemsAPI.h"
 #include "../src/SystemsApi/Entity.h"
+#include "../src/SystemsApi/ComponentLibrary.h"
 #include "../src/Window/Window.h"
 #include "../src/Window/Screen.h"
 #include "../src/Gui/GuiSystem.h"

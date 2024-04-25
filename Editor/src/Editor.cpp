@@ -5,6 +5,9 @@
 #include "EditorGui/DummyWindow.h"
 #include "EditorGui/InspectorWindow.h"
 #include "EditorGui/SceneViewWindow.h"
+#include "EditorGui/ContentBrowserWindow.h"
+#include "EditorGui/SceneHierarchy.h"
+
 
 gns::editor::Editor::Editor(Engine* engine) : engine(engine)
 {
@@ -14,6 +17,8 @@ gns::editor::Editor::Editor(Engine* engine) : engine(engine)
             gui::GuiSystem::RegisterWindow<SceneViewWindow>("Scene");
             gui::GuiSystem::RegisterWindow<DummyWindow>("Dummy");
             gui::GuiSystem::RegisterWindow<InspectorWindow>();
+            gui::GuiSystem::RegisterWindow<ContentBrowserWindow>();
+            gui::GuiSystem::RegisterWindow<SceneHierarchy>();
         });
     engine->Run();
     engine->ShutDown();

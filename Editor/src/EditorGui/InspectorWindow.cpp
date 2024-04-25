@@ -1,6 +1,7 @@
 ﻿#include "InspectorWindow.h"
-
 #include "../../../Engine/src/Gui/ImGui/IconsMaterialDesign.h"
+#include "../SelectionManager.h"
+#include "DockspaceWindow.h"
 
 ImGuiTableFlags table_flags = ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_SizingFixedFit;
 
@@ -9,10 +10,17 @@ ImVec2 ChildSize = { 0,0 };
 ImGuiChildFlags child_flags = ImGuiChildFlags_Border | ImGuiChildFlags_AutoResizeY;
 
 bool show_component = true;
-
-InspectorWindow::InspectorWindow() : GuiWindow("Inspector")
+entt::entity nullentity = entt::null;
+InspectorWindow::InspectorWindow() : GuiWindow("Inspector"), inspectedEntity(nullentity)
 {
-	
+	gns::editor::DockspaceWindow* dockSpaceWindow = gns::gui::GuiSystem::GetWindow<gns::editor::DockspaceWindow>();
+	dockSpaceWindow->PushWindowMenu("Inspector Window", "", &m_isActive);
+	onEntitySelected = new gns::EventFunction<void, entt::entity>([&](entt::entity selectedEntity)
+	{
+			LOG_INFO(static_cast<uint64_t>(selectedEntity));
+			inspectedEntity = gns::Entity(selectedEntity);
+	});
+	SelectionManager::onSelectionChanged.Subscribe<void, entt::entity>(onEntitySelected);
 }
 
 void InspectorWindow::OnBeforeWindowDraw()
@@ -23,6 +31,8 @@ void InspectorWindow::OnBeforeWindowDraw()
 void InspectorWindow::OnGUI()
 {
 	ChildSize.y = 0;
+	if(inspectedEntity.IsValid())
+		ImGui::Text(inspectedEntity.GetComponent<gns::EntityComponent>().name.c_str());
 
 	DrawComponent("Transform");
 	DrawComponent("Transform_2");
