@@ -1,0 +1,11 @@
+#pragma once
+#include <vulkan/vulkan.h>
+
+VkPipelineShaderStageCreateInfo PipelineShaderStageCreateInfo(VkShaderStageFlagBits stage, VkShaderModule shader_module);
+VkPipelineVertexInputStateCreateInfo VertexInputStateCreateInfo();
+VkPipelineInputAssemblyStateCreateInfo InputAssemblyCreateInfo(VkPrimitiveTopology topology);
+VkPipelineRasterizationStateCreateInfo RasterizationStateCreateInfo(VkPolygonMode polygon_mode);
+VkPipelineMultisampleStateCreateInfo MultisamplingStateCreateInfo();
+VkPipelineColorBlendAttachmentState ColorBlendAttachmentState();
+VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo();
+VkPipelineDepthStencilStateCreateInfo DepthStencilCreateInfo(bool bDepthTest, bool bDepthWrite, VkCompareOp compareOp);
