@@ -2,6 +2,7 @@ Bin/
 Bin-Int/
 Engine/Assets/Meshes/OtherModels/
 .vs/
+.idea/
 obj/
 Engine/*.vcxproj
 Engine/*.vcxproj.filters
