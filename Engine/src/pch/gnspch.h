@@ -13,8 +13,8 @@
 #include "../Utils/Event.h"
 #include "../SystemsApi/Entity.h"
 #include "../SystemsApi/SystemsAPI.h"
-#include "../Utils/Debug/Instrumentor.h"
-#include "../Utils/Debug/Profiler.h"
+#include "../Utils/Debuging/Instrumentor.h"
+#include "../Utils/Debuging/Profiler.h"
 #include "Log.h"
 
 #include "glm/glm.hpp"

@@ -127,7 +127,7 @@ namespace gns::rendering
 		bool InitVulkan();
 		void CreateSurface();
 		void CreateSwapchain();
-		void RebuildSwapchain();
+		void RebuildSwapchain(int width, int height);
 		void CreateCommandPool();
 		void CreateRenderTarget(uint32_t width, uint32_t height);
 		void InitDefaultRenderPass();

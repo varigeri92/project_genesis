@@ -237,7 +237,7 @@ void gns::rendering::Device::CreateSwapchain()
     _VK_CHECK(vkCreateImageView(m_device, &dview_info, nullptr, &_depthImageView), "Failed to create ImageView!");
 }
 
-void gns::rendering::Device::RebuildSwapchain()
+void gns::rendering::Device::RebuildSwapchain(int width, int height)
 {
     LOG_INFO("Swapchain rebuilt!");
     PROFILE_FUNC
@@ -259,9 +259,7 @@ void gns::rendering::Device::RebuildSwapchain()
     }
     m_imageViews = m_vkb_swapchain.get_image_views().value();
 
-    int w = 0, h = 0;
-    m_window->GetExtent(w, h);
-    VkExtent3D depthImageExtent = { static_cast<uint32_t>(w),static_cast<uint32_t>(h),1 };
+    VkExtent3D depthImageExtent = { static_cast<uint32_t>(width),static_cast<uint32_t>(height),1 };
     VkImageCreateInfo dimg_info = ImageCreateInfo(m_depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, depthImageExtent);
     vmaDestroyImage(m_allocator, _depthImage._image, nullptr);
     vmaFreeMemory(m_allocator, _depthImage._allocation);

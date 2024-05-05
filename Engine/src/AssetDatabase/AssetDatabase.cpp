@@ -12,5 +12,10 @@ void gns::AssetDatabase::ImportAsset(std::string path)
 void gns::AssetDatabase::SetProjectRoot(const std::string& path)
 {
 	AssetLoader::AssetsPath = path + R"(\Assets\)";
-	AssetLoader::ShadersPath = path + R"(\Assets\Shaders\)";
+}
+
+void gns::AssetDatabase::SetResourcesDir(const std::string& path)
+{
+	AssetLoader::ResourcesPath = path;
+	AssetLoader::ShadersPath = path + R"(\Shaders\)";
 }

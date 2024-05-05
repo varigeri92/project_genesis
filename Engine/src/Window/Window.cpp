@@ -3,7 +3,7 @@
 #include "Log.h"
 #include "InputBackend.h"
 
-gns::Window::Window(uint32_t width, uint32_t height)
+gns::Window::Window(uint32_t width, uint32_t height) : isMinimized{ false }
 {
 	PROFILE_FUNC
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -41,7 +41,7 @@ gns::Window::~Window()
 bool gns::Window::PollEvents()
 {
 	PROFILE_FUNC
-	return InputBackend::ProcessInput(sdl_event);
+	return InputBackend::ProcessInput(sdl_event, this);
 }
 
 void gns::Window::GetExtentions(uint32_t& count, const char** names)
@@ -81,15 +81,19 @@ void gns::Window::WindowEvent(const SDL_Event* event)
 			break;
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
 			LOG_INFO("Window size change!");
+			isMinimized = false;
 			break;
 		case SDL_WINDOWEVENT_MINIMIZED:
 			LOG_INFO("Window minimized!");
+			isMinimized = true;
 			break;
 		case SDL_WINDOWEVENT_MAXIMIZED:
 			LOG_INFO("Window maximized!");
+			isMinimized = false;
 			break;
 		case SDL_WINDOWEVENT_RESTORED:
 			LOG_INFO("Window restored!");
+			isMinimized = false;
 			break;
 		case SDL_WINDOWEVENT_ENTER:
 			break;

@@ -6,8 +6,10 @@
 #include "Renderer/Rendering.h"
 #include "../Utils/CameraSystem.h"
 #include "Gui/GuiSystem.h"
+#include "Level/SceneManager.h"
 #include "Window/Screen.h"
 #include "Window/Screen.h"
+#include "Utils/Serialization/Serializer.h"
 
 #ifdef TRACE_ALLOCATION
 struct AllocationTrace
@@ -53,6 +55,12 @@ gns::Engine::Engine() :close(false), m_window(new Window(1920, 1080))
 	START_PROFILER("Engine")
 	PROFILE_FUNC
 	Screen::InitDefaultScreen(1920, 1080, Screen::ScreenMode::sm_none);
+	Serializer::RegisterSerializableComponents([](){
+		gns::RegisterComponent<gns::EntityComponent>();
+		gns::RegisterComponent<gns::Transform>();
+		gns::RegisterComponent<gns::Camera>();
+		gns::RegisterComponent<gns::RendererComponent>();
+	});
 }
 
 gns::Engine::~Engine()
@@ -67,7 +75,7 @@ gns::Engine::~Engine()
 
 void gns::Engine::Init(std::function<void()> startupCallback)
 {
-
+	core::SceneManager::CreateScene("DefaultScene");
 	RenderSystem* renderSystem = SystemsAPI::RegisterSystem<RenderSystem>(m_window);
 	m_guiSystemInstance = new gns::gui::GuiSystem(renderSystem->GetDevice(), m_window);
 	startupCallback();
@@ -81,19 +89,8 @@ void gns::Engine::Init(std::function<void()> startupCallback)
 	TestEvent.Subscribe<void, std::string>(&DoNotCallThis_EventFunction);
 	TestEvent.Subscribe<void, std::string>(CallThis_EventFunction_InClass);
 	TestEvent.RemoveListener<void, std::string>(&DoNotCallThis_EventFunction);
-	// Entity tests:
-	Entity cameraEntity = Entity::CreateEntity("Camera");
-	Transform& cameraTransform = cameraEntity.GetComponent<Transform>();
-	Camera& cam = cameraEntity.AddComponet<Camera>(0.01, 1000, 60, 1920, 1080, cameraTransform);
-	cam._near = 0.01f;
-	cam._far = 1000.f;
-	LOG_INFO(cam._near);
-	LOG_INFO(cam._far);
 
-	cameraTransform.position = { 0.f,-1.f,-5.f };
-	
-	CameraSystem* cameraSystem = SystemsAPI::RegisterSystem<CameraSystem>();
-	cameraSystem->UpdateProjection(1920, 1080);
+	// Entity tests:
 	const std::shared_ptr<Shader> defaultShader = std::make_shared<Shader>("blinphong.vert.spv", "blinphong.frag.spv");
 	renderSystem->GetRenderer()->CreatePipeline(defaultShader);
 
@@ -121,9 +118,12 @@ void gns::Engine::Run()
 		PROFILE_FUNC
 		Time::StartFrameTime();
 		close = m_window->PollEvents();
-		m_guiSystemInstance->BeginGUI();
-		m_guiSystemInstance->UpdateGui();
-		SystemsAPI::UpdateSystems(Time::GetDelta());
+		if(!m_window->isMinimized)
+		{
+			m_guiSystemInstance->BeginGUI();
+			m_guiSystemInstance->UpdateGui();
+			SystemsAPI::UpdateSystems(Time::GetDelta());
+		}
 		Time::EndFrameTime();
 	}
 }

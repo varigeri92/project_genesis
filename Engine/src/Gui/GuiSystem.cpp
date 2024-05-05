@@ -73,10 +73,11 @@ gns::gui::GuiSystem::GuiSystem(rendering::Device* device, Window* window) : m_de
 
 	ImGui::StyleColorsDark();
 
-	std::string fontsDirectory = gns::AssetLoader::GetAssetsPath() + R"(Fonts\static\)";
+	LOG_INFO(gns::AssetLoader::GetEngineResourcesPath());
+	std::string fontsDirectory = gns::AssetLoader::GetEngineResourcesPath() + R"(Fonts\static\)";
 	defaultFont = io.Fonts->AddFontFromFileTTF((fontsDirectory + R"(Montserrat-Regular.ttf)").c_str(),
 		14, nullptr, io.Fonts->GetGlyphRangesDefault());
-	std::string iconFonts = gns::AssetLoader::GetAssetsPath() + R"(Fonts\MaterialIcons-Regular.ttf)";
+	std::string iconFonts = gns::AssetLoader::GetEngineResourcesPath() + R"(Fonts\MaterialIcons-Regular.ttf)";
 	static ImWchar ranges[] = {ICON_MIN_MD, ICON_MAX_16_MD};
 	ImFontConfig config;
 	config.MergeMode = true;

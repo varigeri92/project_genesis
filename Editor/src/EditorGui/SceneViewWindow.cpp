@@ -25,7 +25,16 @@ void gns::editor::SceneViewWindow::OnGUI()
 	varPopped = true;
 	ImGui::PopStyleVar(1);
 	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+	
 	ImGui::Image(m_Dset, ImVec2{viewportPanelSize.x, viewportPanelSize.y});
+	if(ImGui::BeginDragDropTarget())
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_FILE"))
+		{
+			LOG_INFO("Dropped into scene!");
+		}
+		ImGui::EndDragDropTarget();
+	}
 	if(IsWindowResized(viewportPanelSize) && m_WindowInitialized)
 	{
 		LOG_INFO("Viewport resized! >> " << viewportPanelSize.x << " / "<<viewportPanelSize.y);

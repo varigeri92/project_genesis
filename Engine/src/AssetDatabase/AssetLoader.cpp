@@ -20,6 +20,7 @@ namespace gns
 {
     std::string AssetLoader::AssetsPath = R"(C:\)";
     std::string AssetLoader::ShadersPath = R"(C:\)";
+    std::string AssetLoader::ResourcesPath = R"(C:\)";
 
     std::vector<std::shared_ptr<gns::rendering::Mesh>> AssetLoader::LoadMeshFile(std::string path, bool isFallbackPath)
     {
@@ -126,6 +127,19 @@ namespace gns
             {
                 assert(true, "Could not open any texture!");
             }
+        }
+        else
+        {
+            texture->pixels = pixels;
+        }
+    }
+
+    void AssetLoader::LoadTextureFromResources(std::string path, rendering::Texture* texture)
+    {
+        stbi_uc* pixels = stbi_load((ResourcesPath + path).c_str(), &texture->width, &texture->height, &texture->chanels, STBI_rgb_alpha);
+
+        if (!pixels) {
+            LOG_ERROR("Can't Open Texture:" << (ResourcesPath + path).c_str());
         }
         else
         {

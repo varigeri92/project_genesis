@@ -59,6 +59,7 @@ namespace gns::rendering
 
 		bool m_frameBufferResized = false;
 		bool m_pipelineBound = false;
+		
 
 		std::vector<std::shared_ptr<IDisposeable>> _disposeQueue;
 		std::shared_ptr<Material> m_currentMaterial;

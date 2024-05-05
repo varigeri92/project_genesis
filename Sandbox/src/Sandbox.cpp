@@ -8,6 +8,11 @@ void SetProjectArguments(std::string command, std::string value)
     {
         gns::AssetDatabase::SetProjectRoot(value);
     }
+
+    if (command == "-r" || command == "-resources" || command == "-res")
+    {
+        gns::AssetDatabase::SetResourcesDir(value);
+    }
 }
 
 int main(int argc, char* argv[])

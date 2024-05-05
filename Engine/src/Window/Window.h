@@ -26,7 +26,7 @@ namespace gns
 		~Window();
 		HWND hwndHandle;
 		HINSTANCE hinstance;
-
+		bool isMinimized;
 
 		bool PollEvents();
 		void GetExtentions(uint32_t& count, const char** names);

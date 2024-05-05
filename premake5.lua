@@ -46,7 +46,8 @@ project "Engine"
         "SDL2.lib",
         "SDL2main.lib",
         "vulkan-1.lib",
-        "assimp-vc143-mt.lib"
+        "assimp-vc143-mt.lib",
+        "yaml-cpp.lib"
     }
     defines {"BUILD_ENGINE_LIB"}
     includedirs { "vendor/include", VulkanIncludeDir, "Engine/API", "Engine/vendor/include","Engine/src/pch" }

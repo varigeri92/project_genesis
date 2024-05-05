@@ -25,14 +25,11 @@ public:
 	static GNS_API bool GetKey(int keyCode);
 	static GNS_API bool GetKeyUp(int keyCode);
 	static GNS_API bool GetKeyDown(int keyCode);
-	static GNS_API bool ProcessInput(SDL_Event& event);
+	static GNS_API bool ProcessInput(SDL_Event& event, gns::Window* window);
 	static GNS_API bool GetMouseButtonDown(int mouseButton);
 	static GNS_API bool GetMouseButton(int mouseButton);
 	static GNS_API bool GetMouseButtonUp(int mouseButton);
 	static GNS_API glm::vec2 GetMouseVelocity();
-
-
-	inline static gns::Window* window;
 private:
 	void ProcessKeyboard();
 	static FrameInput frameInput;

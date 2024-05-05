@@ -17,6 +17,7 @@
 #include "../src/Gui/GuiWindow.h"
 #include "../src/Gui/ImGui/imgui.h"
 #include "../src/Renderer/Rendering.h"
+#include "../src/Utils/Serialization/Serializer.h"
 
 namespace gns
 {

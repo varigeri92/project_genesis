@@ -3,13 +3,21 @@
 
 #include "RenderSystem.h"
 #include "../AssetDatabase/AssetLoader.h"
+#include "Utils/VkDebug.h"
 #include "Utils/VkHelpers.h"
 
 namespace gns::rendering
 {
+	VkFilter Texture::defaultFilter = VK_FILTER_LINEAR;
 	Texture::Texture(std::string path) : m_descriptorSet (VK_NULL_HANDLE), m_resourcesCleared(false)
 	{
 		AssetLoader::LoadTextureData(path, this);
+		Create();
+	}
+
+	Texture::Texture(std::string path, bool IsEditorResource) : m_descriptorSet(VK_NULL_HANDLE), m_resourcesCleared(false)
+	{
+		AssetLoader::LoadTextureFromResources(path, this);
 		Create();
 	}
 
@@ -52,7 +60,7 @@ namespace gns::rendering
 		VkImageViewCreateInfo imageinfo = ImageViewCreateInfo(VK_FORMAT_R8G8B8A8_SRGB, m_vulkanImage._image, VK_IMAGE_ASPECT_COLOR_BIT);
 		vkCreateImageView(device->m_device, &imageinfo, nullptr, &m_imageView);
 
-		const VkSamplerCreateInfo samplerInfo = SamplerCreateInfo(VK_FILTER_NEAREST);
+		const VkSamplerCreateInfo samplerInfo = SamplerCreateInfo(defaultFilter);
 		vkCreateSampler(device->m_device, &samplerInfo, nullptr, &m_sampler);
 	}
 
@@ -129,5 +137,17 @@ namespace gns::rendering
 		m_vulkanImage.Destroy(device);
 		vkDestroyImageView(device->m_device, m_imageView, nullptr);
 		vkDestroySampler(device->m_device, m_sampler, nullptr);
+	}
+
+	void Texture::CreateResources()
+	{
+		Device* device = SystemsAPI::GetSystem<RenderSystem>()->GetDevice();
+		VkDescriptorSetAllocateInfo allocInfo = {};
+		allocInfo.pNext = nullptr;
+		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		allocInfo.descriptorPool = device->m_descriptorPool;
+		allocInfo.descriptorSetCount = 1;
+		allocInfo.pSetLayouts = &device->m_globalSetLayout;
+		_VK_CHECK(vkAllocateDescriptorSets(device->m_device, &allocInfo, &m_descriptorSet), "Descriptor set Allocation Failed!");
 	}
 }

@@ -27,7 +27,7 @@ namespace gns
 		return frameInput.keysDown[keyCode];
 	}
 
-	bool InputBackend::ProcessInput(SDL_Event& event)
+	bool InputBackend::ProcessInput(SDL_Event& event, gns::Window* window)
 	{
 		frameInput.keysDown.clear();
 		frameInput.keysUp.clear();

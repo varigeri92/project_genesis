@@ -3,24 +3,37 @@
 #include "../SelectionManager.h"
 #include "DockspaceWindow.h"
 
-ImGuiTableFlags table_flags = ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_SizingFixedFit;
 
-float dummyfloat[3] = {0,0,0};
-ImVec2 ChildSize = { 0,0 };
-ImGuiChildFlags child_flags = ImGuiChildFlags_Border | ImGuiChildFlags_AutoResizeY;
+static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders;
+static ImVec2 ChildSize = { 0,0 };
+static ImGuiChildFlags child_flags = ImGuiChildFlags_Border | ImGuiChildFlags_AutoResizeY;
+static entt::entity nullentity = entt::null;
+static std::unordered_map<size_t, bool> DrawFullComponentData = {};
+static std::unordered_map<uint32_t, const char*> iconLookup = {};
+const char* GetIcon(uint32_t type)
+{
+	if (iconLookup.contains(type))
+		return iconLookup[type];
+	else
+		return iconLookup[0];
+}
 
-bool show_component = true;
-entt::entity nullentity = entt::null;
 InspectorWindow::InspectorWindow() : GuiWindow("Inspector"), inspectedEntity(nullentity)
 {
 	gns::editor::DockspaceWindow* dockSpaceWindow = gns::gui::GuiSystem::GetWindow<gns::editor::DockspaceWindow>();
 	dockSpaceWindow->PushWindowMenu("Inspector Window", "", &m_isActive);
 	onEntitySelected = new gns::EventFunction<void, entt::entity>([&](entt::entity selectedEntity)
 	{
-			LOG_INFO(static_cast<uint64_t>(selectedEntity));
-			inspectedEntity = gns::Entity(selectedEntity);
+		LOG_INFO(static_cast<uint64_t>(selectedEntity));
+		inspectedEntity = gns::Entity(selectedEntity);
+		DrawFullComponentData.clear();
 	});
 	SelectionManager::onSelectionChanged.Subscribe<void, entt::entity>(onEntitySelected);
+	iconLookup[0] = ICON_MD_CODE;
+	iconLookup[entt::type_hash<gns::Camera>::value()] = ICON_MD_VIDEOCAM;
+	iconLookup[entt::type_hash<gns::EntityComponent>::value()] = ICON_MD_LABEL;
+	iconLookup[entt::type_hash<gns::Transform>::value()] = ICON_MD_TRANSFORM;
+	iconLookup[entt::type_hash<gns::RendererComponent>::value()] = ICON_MD_CATEGORY;
 }
 
 void InspectorWindow::OnBeforeWindowDraw()
@@ -31,12 +44,17 @@ void InspectorWindow::OnBeforeWindowDraw()
 void InspectorWindow::OnGUI()
 {
 	ChildSize.y = 0;
-	if(inspectedEntity.IsValid())
-		ImGui::Text(inspectedEntity.GetComponent<gns::EntityComponent>().name.c_str());
+	if(!inspectedEntity.IsValid()) return;
 
-	DrawComponent("Transform");
-	DrawComponent("Transform_2");
+	ImGui::PushFont(gns::gui::GuiSystem::boldFont);
+	ImGui::Text(inspectedEntity.GetComponent<gns::EntityComponent>().name.c_str());
+	ImGui::PopFont();
 
+	std::vector<gns::ComponentMetadata> components = inspectedEntity.GetAllComponent();
+	for(const auto& component : components)
+	{
+		DrawComponent(component.data, component.typehash);
+	}
 }
 
 void InspectorWindow::OnAfterWindowDraw()
@@ -44,43 +62,88 @@ void InspectorWindow::OnAfterWindowDraw()
 	GuiWindow::OnAfterWindowDraw();
 }
 
-inline void InspectorWindow::DrawComponent(std::string name)
+void InspectorWindow::DrawComponent(void* component, size_t typeHash)
 {
-	ImGui::BeginChild(name.c_str(), ChildSize, child_flags);
-
+	if(!DrawFullComponentData.contains(typeHash))
+	{
+		DrawFullComponentData[typeHash] = true;
+	}
+	ImGui::BeginChild(typeHash, ChildSize, child_flags);
 	ImGui::PushFont(gns::gui::GuiSystem::boldFont);
-
-	ImGui::Text(name.c_str());
+	ImGui::Text("%s %s", GetIcon(typeHash), Serializer::ComponentData_Table[typeHash].name.c_str());
 
 	ImGui::SameLine(ImGui::GetWindowWidth() - 80);
 	if(ImGui::Button(ICON_MD_ARROW_DROP_DOWN))
-		show_component = !show_component;
+		DrawFullComponentData[typeHash] = !DrawFullComponentData[typeHash];
 
 	ImGui::SameLine(ImGui::GetWindowWidth() - 40);
 	ImGui::Button(ICON_MD_DELETE_FOREVER);
 
 	ImGui::Separator();
 	ImGui::PopFont();
-	if(show_component)
+	if(DrawFullComponentData[typeHash])
 	{
 		ImGui::BeginTable(name.c_str(), 2, table_flags);
-
+		for (size_t i =0; i < Serializer::ComponentData_Table[typeHash].fields.size(); i++)
+		{
+			DrawField(static_cast<char*>(component), Serializer::ComponentData_Table[typeHash].fields[i]);
+		}
+		/* 
 		DrawField(120, &dummyfloat, "Position");
 		DrawField(121, &dummyfloat, "Rotation");
 		DrawField(122, &dummyfloat, "Scale");
+		*/
 
 		ImGui::EndTable();
 	}
 	ImGui::EndChild();
 }
 
-void InspectorWindow::DrawField(size_t typeId, void* valuePtr, std::string name)
+void InspectorWindow::DrawField(size_t typeId, void* valuePtr, std::string& name)
 {
 	std::string fieldName = "##" + name;
 	ImGui::TableNextRow();
 	ImGui::TableNextColumn(); ImGui::Text(name.c_str());
 	ImGui::TableNextColumn();
 	ImGui::PushItemWidth(-1);
-	ImGui::DragFloat3(fieldName.c_str(), static_cast<float*>(valuePtr));
+	DrawValue(typeId, valuePtr, name);
 	ImGui::PopItemWidth();
+}
+
+void InspectorWindow::DrawField(char* componentPtr, FieldData fieldData)
+{
+		DrawField(fieldData.typeID, (void*)(componentPtr + fieldData.offset), fieldData.name);
+}
+
+void InspectorWindow::DrawValue(size_t typeId, void* valuePtr, std::string& name)
+{
+	if (typeId == typeid(glm::vec3).hash_code())
+	{
+		ImGui::DragFloat3(name.c_str(), static_cast<float*>(valuePtr), DragValueSensitivity);
+		return;
+	}
+	if(typeId == typeid(float).hash_code())
+	{
+		ImGui::DragFloat(name.c_str(), static_cast<float*>(valuePtr), DragValueSensitivity);
+	}
+	if (typeId == typeid(std::string).hash_code())
+	{
+		ImGui::Text(static_cast<std::string*>(valuePtr)->c_str());
+	}
+	if (typeId == typeid(gns::core::guid).hash_code())
+	{
+		gns::core::guid guid = *static_cast<gns::core::guid*>(valuePtr);
+		ImGui::PushItemWidth(-1.0f);
+		ImGui::Button(std::to_string(guid).c_str(),{ ImGui::GetContentRegionAvail().x,0});
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_FILE"))
+			{
+				
+				LOG_INFO("Dropped into Field");
+			}
+			ImGui::EndDragDropTarget();
+		}
+		ImGui::PopItemWidth();
+	}
 }

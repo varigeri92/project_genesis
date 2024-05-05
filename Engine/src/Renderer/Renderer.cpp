@@ -12,6 +12,7 @@
 #include "glm/gtx/transform.hpp"
 #include "Material.h"
 #include "../AssetDatabase/AssetLoader.h"
+#include "../Window/Window.h"
 
 namespace gns::rendering
 {
@@ -109,7 +110,9 @@ namespace gns::rendering
 		if (result == VK_ERROR_OUT_OF_DATE_KHR)
 		{
 			LOG_VK_WARNING("NEED TO RECREATE SWAPCHAIN!");
-			m_device->RebuildSwapchain();
+			int w = 0, h = 0;
+			m_device->m_window->GetExtent(w, h);
+			m_device->RebuildSwapchain(w,h);
 			m_frameBufferResized = true;
 			return false;
 		}
@@ -300,7 +303,9 @@ namespace gns::rendering
 		{
 			LOG_WARNING("NEED TO RECREATE SWAPCHAIN!");
 			m_frameBufferResized = false;
-			m_device->RebuildSwapchain();
+			int w = 0, h = 0;
+			m_device->m_window->GetExtent(w, h);
+			m_device->RebuildSwapchain(w, h);
 		}
 		else
 		{

@@ -6,13 +6,14 @@ namespace gns
 {
 	struct ComponentMetadata
 	{
-		std::string name;
 		void* data;
+		uint32_t typehash;
 	};
+
+	struct ComponentBase;
 
 	struct Entity
 	{
-		GNS_API static std::unordered_map<entt::entity, std::vector<ComponentMetadata>> ComponentRegistry;
 		GNS_API static Entity CreateEntity(std::string entityName,uint32_t registry = 0);
 
 		entt::entity entity;
@@ -27,9 +28,7 @@ namespace gns
 		T& AddComponet(Args&& ... args)
 		{
 			T& component = SystemsAPI::GetDefaultRegistry().emplace<T>(entity, std::forward<Args>(args)...);
-#ifdef EDITOR_BUILD
-			ComponentRegistry[entity].emplace_back(typeid(T).name(), &component);
-#endif
+
 			return component;
 		}
 
@@ -45,6 +44,9 @@ namespace gns
 			component = SystemsAPI::GetDefaultRegistry().try_get<T>(entity);
 			return component != nullptr;
 		}
+
+		GNS_API std::vector<gns::ComponentMetadata>GetAllComponent();
+
 		/*
 		Entity GetChild(std::string name);
 		Entity GetChild(size_t index);
