@@ -4,7 +4,7 @@
 #include "DockspaceWindow.h"
 
 
-static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders;
+static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_SizingFixedFit;
 static ImVec2 ChildSize = { 0,0 };
 static ImGuiChildFlags child_flags = ImGuiChildFlags_Border | ImGuiChildFlags_AutoResizeY;
 static entt::entity nullentity = entt::null;
