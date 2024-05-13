@@ -1,8 +1,23 @@
 ﻿#include "gnspch.h"
 #include "SceneManager.h"
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 
 namespace gns::core
 {
+	struct SerializedEntityData
+	{
+		std::string Name;
+		uint64_t Guid;
+		std::vector<std::string> ComponentName;
+		std::vector<uint32_t> ComponentID;
+	};
+	struct SerialzedSceneData
+	{
+		std::string name;
+		std::vector<SerializedEntityData> entities;
+	};
+
 	Scene* SceneManager::ActiveScene = nullptr;
 	Scene* SceneManager::CreateScene(std::string name)
 	{
@@ -11,31 +26,42 @@ namespace gns::core
 			ActiveScene = newScene;
 
 		IntegrateScene(newScene);
-		SerializeScene(newScene);
 		return newScene;
 	}
 
 	Scene* SceneManager::SerializeScene(Scene* scene)
 	{
-		SystemsAPI::GetDefaultRegistry().each([scene](entt::entity e)
+		SerialzedSceneData sceneData = {};
+		sceneData.name = scene->name;
+		sceneData.entities = {};
+		for (const auto e : scene->entities)
 		{
-			Entity entity(e);
-			LOG_INFO(entity.GetComponent<EntityComponent>().name);
-			scene->sceneEntities.emplace_back();
-			SceneEntity& sceneEntity = scene->sceneEntities[scene->sceneEntities.size() - 1];
-		});
+			gns::Entity entity{ e };
+			SerializedEntityData serializedEntity = {};
+			serializedEntity.Name = entity.GetComponent<EntityComponent>().name;
+			serializedEntity.Guid = entity.GetComponent<EntityComponent>().guid;
+			const std::vector<ComponentMetadata>& components = entity.GetAllComponent();
+			for (const auto& compdata : components)
+			{
+				serializedEntity.ComponentName.emplace_back(Serializer::ComponentData_Table[compdata.typehash].name);
+				serializedEntity.ComponentID.emplace_back(Serializer::ComponentData_Table[compdata.typehash].typeID);
+				
+			}
+		}
+
+		YAML::Emitter out;
+		out << YAML::BeginSeq;
+		out << "eggs";
+		out << "bread";
+		out << "milk";
+		out << YAML::EndSeq;
+
+		LOG_INFO("Yaml result:\n" << out.c_str()<<"\n");
 		return scene;
 	}
 
 	void SceneManager::IntegrateScene(Scene* scene)
 	{
-		for (const auto& sceneEntity : scene->sceneEntities)
-		{
-			entt::entity entt = SystemsAPI::GetRegistry(0).create();
-			for (const auto& component : sceneEntity.componentDataArray)
-			{
 
-			}
-		}
 	}
 }

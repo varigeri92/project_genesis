@@ -12,8 +12,7 @@ namespace gns::core
 	struct Scene
 	{
 		std::string name;
-		std::vector<SceneEntity> sceneEntities;
-		std::vector<entt::entity> loadedEntities;
+		std::vector<entt::entity> entities;
 	};
 
 	class SceneManager

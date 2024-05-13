@@ -16,4 +16,5 @@ public:
 	GNS_API void SerializeScene(gns::core::Scene* scene);
 
 	GNS_API static void RegisterSerializableComponents(const std::function<void()>& callback);
+
 };

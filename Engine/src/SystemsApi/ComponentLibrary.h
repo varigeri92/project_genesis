@@ -33,14 +33,15 @@ namespace gns
 
 	struct EntityComponent : public ComponentBase {
 		std::string name;
-
+		core::guid guid;
 		void Register() override
 		{
 			REGISTER_CMP(EntityComponent);
 			REGISTER_FIELD(std::string, name);
+			REGISTER_FIELD(core::guid, guid);
 		}
 		EntityComponent() = default;
-		EntityComponent(std::string entityName) : name(entityName){}
+		EntityComponent(std::string entityName) : name(entityName), guid(core::Guid::GetNewGuid()){}
 	};
 
 	struct SceneComponent

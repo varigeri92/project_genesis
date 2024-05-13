@@ -45,7 +45,7 @@ namespace gns
 			return component != nullptr;
 		}
 
-		GNS_API std::vector<gns::ComponentMetadata>GetAllComponent();
+		GNS_API const std::vector<gns::ComponentMetadata>& GetAllComponent ();
 
 		/*
 		Entity GetChild(std::string name);
@@ -53,5 +53,7 @@ namespace gns
 		void SetParent(Entity entity);
 		void GetParent();
 		 */
+		private:
+			std::vector<gns::ComponentMetadata> componentsVector;
 	};
 }

@@ -75,7 +75,7 @@ gns::Engine::~Engine()
 
 void gns::Engine::Init(std::function<void()> startupCallback)
 {
-	core::SceneManager::CreateScene("DefaultScene");
+	core::Scene* scene =  core::SceneManager::CreateScene("DefaultScene");
 	RenderSystem* renderSystem = SystemsAPI::RegisterSystem<RenderSystem>(m_window);
 	m_guiSystemInstance = new gns::gui::GuiSystem(renderSystem->GetDevice(), m_window);
 	startupCallback();
@@ -109,6 +109,7 @@ void gns::Engine::Init(std::function<void()> startupCallback)
 		RendererComponent& rc = reiEntity.AddComponet<RendererComponent>(mesh, defaultMaterial);
 		reiEntity.GetComponent<Transform>().position = { 0,0,0 };
 	}
+	core::SceneManager::SerializeScene(scene);
 }
 
 void gns::Engine::Run()

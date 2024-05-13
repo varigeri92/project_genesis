@@ -50,7 +50,7 @@ void InspectorWindow::OnGUI()
 	ImGui::Text(inspectedEntity.GetComponent<gns::EntityComponent>().name.c_str());
 	ImGui::PopFont();
 
-	std::vector<gns::ComponentMetadata> components = inspectedEntity.GetAllComponent();
+	const std::vector<gns::ComponentMetadata>& components = inspectedEntity.GetAllComponent();
 	for(const auto& component : components)
 	{
 		DrawComponent(component.data, component.typehash);

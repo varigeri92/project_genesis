@@ -47,7 +47,8 @@ project "Engine"
         "SDL2main.lib",
         "vulkan-1.lib",
         "assimp-vc143-mt.lib",
-        "yaml-cpp.lib"
+        --"yaml-cpp.lib",
+        "yaml-cppd.lib"
     }
     defines {"BUILD_ENGINE_LIB"}
     includedirs { "vendor/include", VulkanIncludeDir, "Engine/API", "Engine/vendor/include","Engine/src/pch" }
@@ -64,7 +65,7 @@ project "Sandbox"
     includedirs { "vendor/include", VulkanIncludeDir, "Engine/API" }
     files { "Sandbox/**.h", "Sandbox/**.c", "Sandbox/**.cpp", "Sandbox/**.hpp" }
     dependson { "Engine", "Game", "Editor" }
-    debugargs { "-p", "D:\\GenesisProjects\\GenesisTestProject" }
+    debugargs { "-p", "D:\\Genesis-TestProjects\\TestProj_1", "-r", "D:\\GenesisEngine\\Resources\\" }
 
 project "Game"
     kind "SharedLib"
@@ -84,7 +85,7 @@ project "Editor"
     objdir "bin-int/Editor/%{cfg.buildcfg}"
     location "Editor"
     libdirs { "libs", outDir }
-    links { "Engine.lib" }
+    links { "Engine.lib"}
     defines {"BUILD_EEDITOR_LIB"}
     includedirs { "vendor/include", VulkanIncludeDir, "Engine/API" }
     files { "Editor/**.h", "Editor/**.c", "Editor/**.cpp", "Editor/**.hpp" }
