@@ -101,9 +101,9 @@ namespace gns
 	struct RendererComponent : public ComponentBase
 	{
 		core::guid meshGuid;
-		//rendering::Mesh* mesh;
 		core::guid materialGuid;
-		//rendering::Material* material;
+		rendering::Mesh* mesh;
+		rendering::Material* material;
 
 		std::vector<rendering::Mesh*> m_subMeshes;
 		std::vector<rendering::Material*> m_materials;
@@ -115,6 +115,8 @@ namespace gns
 		{
 			m_subMeshes.push_back(mesh);
 			m_materials.push_back(material);
+			mesh = m_subMeshes[0];
+			material = m_materials[0];
 		}
 
 		RendererComponent(core::guid meshReferenceGuid, core::guid materialReferenceGuid)
@@ -123,17 +125,20 @@ namespace gns
 			AssetMetadata meshMeta = AssetDatabase::GetAssetByGuid(meshReferenceGuid);
 			rendering::Mesh* mesh = Object::Get<rendering::Mesh>(meshMeta.guid);
 			m_subMeshes.push_back(mesh);
+			mesh = m_subMeshes[0];
 			rendering::Material* material = nullptr;
 			if(materialReferenceGuid == 0)
 			{
 				AssetMetadata default_materialMeta = AssetDatabase::GetAssetByName("__default_material");
 				material = Object::Get<rendering::Material>(default_materialMeta.guid);
 				m_materials.push_back(material);
+				material = m_materials[0];
 				return;
 			}
 			AssetMetadata materialMeta = AssetDatabase::GetAssetByGuid(materialReferenceGuid);
 			material = Object::Get<rendering::Material>(materialMeta.guid);
 			m_materials.push_back(material);
+			material = m_materials[0];
 		}
 
 
