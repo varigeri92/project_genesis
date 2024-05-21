@@ -13,8 +13,8 @@ namespace gns::rendering
 		std::string m_fragmentShaderPath;
 	public:
 		Shader() = delete;
-		Shader(const std::string vertexShaderPath, const std::string fragmentShaderPath);
-		~Shader();
+		GNS_API Shader(const std::string vertexShaderPath, const std::string fragmentShaderPath);
+		GNS_API ~Shader();
 
 		std::string vertexShaderPath;
 		std::string fragmentShaderPath;

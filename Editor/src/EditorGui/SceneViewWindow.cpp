@@ -2,7 +2,11 @@
 
 #include "DockspaceWindow.h"
 #include "Engine.h"
+#include "../DragDropManager.h"
+#include "../../../Engine/src/AssetDatabase/AssetLoader.h"
 #include "../../../Engine/src/Gui/ImGui/imgui_internal.h"
+#include "../../../Engine/src/Level/SceneManager.h"
+#include "../AssetManager/AssetImporter.h"
 
 gns::editor::SceneViewWindow::SceneViewWindow(const std::string& name): GuiWindow(name), m_WindowInitialized(false)
 {
@@ -12,7 +16,6 @@ gns::editor::SceneViewWindow::SceneViewWindow(const std::string& name): GuiWindo
 	m_renderSystem = SystemsAPI::GetSystem<RenderSystem>();
 	DockspaceWindow* dockSpaceWindow = gui::GuiSystem::GetWindow<DockspaceWindow>();
 	dockSpaceWindow->PushWindowMenu("Scene View", "", &m_isActive);
-
 }
 
 gns::editor::SceneViewWindow::~SceneViewWindow()
@@ -32,6 +35,19 @@ void gns::editor::SceneViewWindow::OnGUI()
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_FILE"))
 		{
 			LOG_INFO("Dropped into scene!");
+			AssetImporter importer;
+			AssetMetadata assetMeta = {};
+			if(importer.ImportAsset(DragDropManager::GetCurrentPayload()->path, assetMeta))
+			{
+				LOG_INFO("Asset imported sucessfully, or it was already imported... guid:" << assetMeta.guid);
+
+				AssetMetadata importedAsset = AssetDatabase::AddAssetToDatabase(assetMeta);
+				auto* mesh = AssetLoader::LoadAssetFromFile<gns::rendering::Mesh>(importedAsset.guid);
+				SystemsAPI::GetSystem<RenderSystem>()->UploadMesh(mesh);
+				Entity entity = Entity::CreateEntity("Drag-drop entity", core::SceneManager::ActiveScene);
+				entity.AddComponet <RendererComponent>(importedAsset.guid, 0);
+			}
+			
 		}
 		ImGui::EndDragDropTarget();
 	}

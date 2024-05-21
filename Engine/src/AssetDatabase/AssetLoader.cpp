@@ -13,6 +13,8 @@
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 
+#include "AssetDatabase.h"
+
 
 using namespace gns::rendering;
 
@@ -22,9 +24,9 @@ namespace gns
     std::string AssetLoader::ShadersPath = R"(C:\)";
     std::string AssetLoader::ResourcesPath = R"(C:\)";
 
-    std::vector<std::shared_ptr<gns::rendering::Mesh>> AssetLoader::LoadMeshFile(std::string path, bool isFallbackPath)
+    std::vector<Mesh*> AssetLoader::LoadMeshFile(gns::core::guid guid, std::string path, bool isFallbackPath)
     {
-        std::vector<std::shared_ptr<gns::rendering::Mesh>> meshes = {};
+        std::vector<Mesh*> meshes = {};
         
         Assimp::Importer importer;
         const unsigned flags = aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType;
@@ -38,7 +40,7 @@ namespace gns
             LOG_ERROR(importer.GetErrorString());
             LOG_WARNING("Cannot Load Mesh: " << path << " Falling back to Suzan!");
             if (!isFallbackPath) {
-                meshes = LoadMeshFile(R"(Meshes\Suzan.obj)", true);
+                meshes = LoadMeshFile(guid,"(Meshes\Suzan.obj)", true);
             }
             else
             {
@@ -50,7 +52,7 @@ namespace gns
         {
             for (size_t i = 0; i < scene->mNumMeshes; i++)
             {
-                std::shared_ptr<gns::rendering::Mesh> mesh = std::make_shared<Mesh>();
+                Mesh* mesh = Object::Create<Mesh>(guid);
 				ProcessImpoertedScene(scene->mMeshes[i], mesh);
                 meshes.push_back(mesh);
             }
@@ -59,7 +61,7 @@ namespace gns
     }
 
 
-    void AssetLoader::ProcessImpoertedScene(const void* _mesh, std::shared_ptr<gns::rendering::Mesh>& outMesh)
+    void AssetLoader::ProcessImpoertedScene(const void* _mesh, Mesh* outMesh)
     {
         const aiMesh* mesh = static_cast<const aiMesh*>(_mesh);
         outMesh->name = mesh->mName.C_Str();
@@ -93,6 +95,24 @@ namespace gns
             }
         }
 
+    }
+
+    void* AssetLoader::LoadAssetFromFile_internal(AssetMetadata& metaData)
+    {
+        if (metaData.state == AssetState::loaded)
+        {
+            LOG_INFO("Asset: " << metaData.guid << " is already loaded!");
+            return Object::Get<Mesh>(metaData.guid);
+        }
+
+	    switch (metaData.assetType)
+	    {
+	    case AssetType::mesh:
+            metaData.state = AssetState::loaded;
+            Mesh* mesh = LoadMeshFile(metaData.guid, metaData.sourcePath).data();
+            return mesh;
+	    }
+	    return nullptr;
     }
 
 

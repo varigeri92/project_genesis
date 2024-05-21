@@ -7,7 +7,7 @@
 void gns::CameraSystem::OnCreate()
 {
 	LOG_INFO("Camera System Created!");
-	auto cameraView = SystemsAPI::GetDefaultRegistry().view<Transform, Camera>();
+	auto cameraView = SystemsAPI::GetRegistry().view<Transform, Camera>();
 
 	for (auto [entt, transform, camera] : cameraView.each())
 	{

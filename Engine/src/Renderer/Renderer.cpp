@@ -219,7 +219,7 @@ namespace gns::rendering
 		vkCmdEndRenderPass(m_device->GetCurrentFrame()._mainCommandBuffer);
 	}
 
-	void Renderer::Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, int index, size_t uniformSize)
+	void Renderer::Draw(Mesh* mesh, Material* material, int index, size_t uniformSize)
 	{
 		if (m_currentMaterial != material || m_pipelineBound == false)
 		{
@@ -459,7 +459,7 @@ namespace gns::rendering
 	}
 
 
-	void Renderer::UpdatePushConstant(glm::mat4 modelMatrix, std::shared_ptr<Material> material)
+	void Renderer::UpdatePushConstant(glm::mat4 modelMatrix, Material* material)
 	{
 		MeshPushConstants push_constants = {};
 		push_constants.model_matrix = modelMatrix;

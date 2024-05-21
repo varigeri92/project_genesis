@@ -134,6 +134,7 @@ class YAML_CPP_API Node {
   // String representation of invalid key, if the node is invalid.
   std::string m_invalidKey;
   mutable detail::shared_memory_holder m_pMemory;
+public:
   mutable detail::node* m_pNode;
 };
 

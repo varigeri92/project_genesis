@@ -1,5 +1,6 @@
 #pragma once
 #include "RenderSystem.h"
+#include "../Object/Object.h"
 #include "Utils/Buffer.h"
 
 
@@ -70,7 +71,7 @@ namespace gns::rendering
 		}
 	};
 
-	struct Mesh
+	struct Mesh : public gns::Object
 	{
 		std::string name;
 		size_t materialIndex;
@@ -81,15 +82,8 @@ namespace gns::rendering
 		Mesh()
 		{
 			LOG_INFO("Mesh Constructed:");
-		};
-		~Mesh();
+		}
+		~Mesh() override;
+		void Dispose() override;
 	};
-
-	inline Mesh::~Mesh()
-	{
-		Device* device = SystemsAPI::GetSystem<RenderSystem>()->GetDevice();
-		device->DisposeBuffer(_vertexBuffer);
-		device->DisposeBuffer(_indexBuffer);
-		LOG_INFO("Mesh destructed:");
-	}
 }

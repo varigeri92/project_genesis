@@ -1,6 +1,8 @@
 #pragma once
 #include <memory>
 #include <glm/gtx/transform.hpp>
+
+#include "../AssetDatabase/AssetDatabase.h"
 #include "glm/glm.hpp"
 #include "../Renderer/Rendering.h"
 #include "../Utils/Guid.h"
@@ -98,16 +100,40 @@ namespace gns
 
 	struct RendererComponent : public ComponentBase
 	{
-		gns::core::guid meshGuid;
-		std::shared_ptr<rendering::Mesh> mesh;
-		gns::core::guid materialGuid;
-		std::shared_ptr<rendering::Material> material;
+		core::guid meshGuid;
+		//rendering::Mesh* mesh;
+		core::guid materialGuid;
+		//rendering::Material* material;
+
+		std::vector<rendering::Mesh*> m_subMeshes;
+		std::vector<rendering::Material*> m_materials;
+
 		RendererComponent() = default;
 
-		RendererComponent(std::shared_ptr<rendering::Mesh> mesh, std::shared_ptr<rendering::Material> material)
-			: meshGuid(gns::core::Guid::GetNewGuid()), mesh(mesh),
-		materialGuid(gns::core::Guid::GetNewGuid()), material(material)
+		RendererComponent(gns::rendering::Mesh* mesh, rendering::Material* material)
+			: meshGuid(gns::core::Guid::GetNewGuid()), materialGuid(gns::core::Guid::GetNewGuid()), m_subMeshes(), m_materials()
 		{
+			m_subMeshes.push_back(mesh);
+			m_materials.push_back(material);
+		}
+
+		RendererComponent(core::guid meshReferenceGuid, core::guid materialReferenceGuid)
+			: meshGuid(meshReferenceGuid), materialGuid(materialReferenceGuid),m_subMeshes{},m_materials{}
+		{
+			AssetMetadata meshMeta = AssetDatabase::GetAssetByGuid(meshReferenceGuid);
+			rendering::Mesh* mesh = Object::Get<rendering::Mesh>(meshMeta.guid);
+			m_subMeshes.push_back(mesh);
+			rendering::Material* material = nullptr;
+			if(materialReferenceGuid == 0)
+			{
+				AssetMetadata default_materialMeta = AssetDatabase::GetAssetByName("__default_material");
+				material = Object::Get<rendering::Material>(default_materialMeta.guid);
+				m_materials.push_back(material);
+				return;
+			}
+			AssetMetadata materialMeta = AssetDatabase::GetAssetByGuid(materialReferenceGuid);
+			material = Object::Get<rendering::Material>(materialMeta.guid);
+			m_materials.push_back(material);
 		}
 
 

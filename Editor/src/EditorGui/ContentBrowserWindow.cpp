@@ -4,6 +4,7 @@
 #include <iostream>
 #include <filesystem>
 
+#include "../DragDropManager.h"
 #include "../../../Engine/src/AssetDatabase/AssetLoader.h"
 #include "../../../Engine/src/Gui/ImGui/IconsMaterialDesign.h"
 
@@ -118,7 +119,7 @@ namespace gns::editor
 		}
 		if (ImGui::BeginDragDropSource())
 		{
-			ImGui::SetDragDropPayload("CONTENT_BROWSER_FILE", nullptr, 0);
+			ImGui::SetDragDropPayload("CONTENT_BROWSER_DIR", nullptr, 0);
 			ImGui::Text(base_name(entry.path().string()).c_str());
 			ImGui::EndDragDropSource();
 		}
@@ -136,7 +137,11 @@ namespace gns::editor
 		}
 		if (ImGui::BeginDragDropSource())
 		{
-			ImGui::SetDragDropPayload("CONTENT_BROWSER_FILE", nullptr, 0);
+			if(ImGui::SetDragDropPayload("CONTENT_BROWSER_FILE", nullptr, 0))
+			{
+				DragDropManager::SetCurrentPayload(nullptr, entry.path().string());
+			}
+			
 			ImGui::Text(base_name(entry.path().string()).c_str());
 			ImGui::EndDragDropSource();
 		}

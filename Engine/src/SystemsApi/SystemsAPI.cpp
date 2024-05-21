@@ -28,12 +28,7 @@ void gns::SystemsAPI::ClearSystems()
 
 }
 
-entt::registry& gns::SystemsAPI::GetDefaultRegistry()
-{
-	return m_registry;
-}
-
-entt::registry& gns::SystemsAPI::GetRegistry(uint32_t registryIndex)
+entt::registry& gns::SystemsAPI::GetRegistry()
 {
 	return m_registry;
 }

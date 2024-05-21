@@ -1,13 +1,15 @@
 ﻿#include "gnspch.h"
 #include "Entity.h"
 #include "ComponentLibrary.h"
+#include "../Level/SceneManager.h"
 #include "../Utils/Serialization/Serializer.h"
 
-gns::Entity gns::Entity::CreateEntity(std::string entityName, uint32_t registry)
+gns::Entity gns::Entity::CreateEntity(std::string entityName, core::Scene* scene)
 {
-	entt::entity ent = SystemsAPI::GetRegistry(registry).create();
-	SystemsAPI::GetRegistry(registry).emplace<EntityComponent>(ent, entityName);
-	SystemsAPI::GetRegistry(registry).emplace<Transform>(ent);
+	entt::entity ent = SystemsAPI::GetRegistry().create();
+	SystemsAPI::GetRegistry().emplace<EntityComponent>(ent, entityName);
+	SystemsAPI::GetRegistry().emplace<Transform>(ent);
+    scene->AddEntity(ent);
     Entity entity(ent);
 	entity.componentsVector = {};
 	return entity;
@@ -17,7 +19,7 @@ gns::Entity gns::Entity::CreateEntity(std::string entityName, uint32_t registry)
 const std::vector<gns::ComponentMetadata>& gns::Entity::GetAllComponent()
 {
     componentsVector.clear();
-    for (auto&& curr : SystemsAPI::GetDefaultRegistry().storage())
+    for (auto&& curr : SystemsAPI::GetRegistry().storage())
     {
         entt::id_type id = curr.first;
 

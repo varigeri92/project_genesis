@@ -89,27 +89,6 @@ void gns::Engine::Init(std::function<void()> startupCallback)
 	TestEvent.Subscribe<void, std::string>(&DoNotCallThis_EventFunction);
 	TestEvent.Subscribe<void, std::string>(CallThis_EventFunction_InClass);
 	TestEvent.RemoveListener<void, std::string>(&DoNotCallThis_EventFunction);
-
-	// Entity tests:
-	const std::shared_ptr<Shader> defaultShader = std::make_shared<Shader>("blinphong.vert.spv", "blinphong.frag.spv");
-	renderSystem->GetRenderer()->CreatePipeline(defaultShader);
-
-	const std::shared_ptr<Texture> defaultTexture = std::make_shared<Texture>(R"(Textures\uv_color_Grid.png)");
-
-	const std::shared_ptr<Material> defaultMaterial = std::make_shared<Material>(defaultShader, "default Material");
-	defaultMaterial->SetTexture(defaultTexture, 0);
-
-	const auto meshInstance = AssetLoader::LoadMeshFile(R"(Meshes\Suzan.obj)");
-	LOG_INFO(meshInstance.size());
-	for (const std::shared_ptr<Mesh>& mesh : meshInstance)
-	{
-		LOG_INFO(mesh->name);
-		renderSystem->GetRenderer()->UploadMesh(mesh.get());
-		Entity reiEntity = Entity::CreateEntity(mesh->name);
-		RendererComponent& rc = reiEntity.AddComponet<RendererComponent>(mesh, defaultMaterial);
-		reiEntity.GetComponent<Transform>().position = { 0,0,0 };
-	}
-	core::SceneManager::SerializeScene(scene);
 }
 
 void gns::Engine::Run()
@@ -134,8 +113,7 @@ void gns::Engine::ShutDown()
 	PROFILE_FUNC
 
 	m_guiSystemInstance->DisposeGUI();
-	RenderSystem* renderSystem = SystemsAPI::GetSystem<RenderSystem>();
-	renderSystem -> CleanupRenderer();
+	Object::DisposeAll();
 	SystemsAPI::ClearSystems();
 
 	TestEvent.Dispatch("This is a Dispatch message test!");

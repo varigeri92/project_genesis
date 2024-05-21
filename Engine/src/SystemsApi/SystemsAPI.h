@@ -39,9 +39,8 @@ namespace gns
 
 	public:
 
-		GNS_API static entt::registry& GetDefaultRegistry();
-		GNS_API static entt::registry& GetRegistry(uint32_t registryIndex);
-
+		GNS_API static entt::registry& GetRegistry();
+		
 
 		template<typename T, typename... Args>
 		static T* RegisterSystem(Args&& ... args)

@@ -40,6 +40,7 @@ project "Engine"
 
     libdirs { 
         "Engine/vendor/lib",
+        "vendor/lib",
         VulkanLibDir 
     }
     links {
@@ -60,7 +61,7 @@ project "Sandbox"
     objdir "bin-int/Sandbox/%{cfg.buildcfg}"
     location "Sandbox"
     libdirs { "libs", outDir }
-    links {"Engine.lib", "Editor.lib" }
+    links { "Engine.lib", "Editor.lib"  }
     defines {"BUILD_SANDBOX_EXE"}
     includedirs { "vendor/include", VulkanIncludeDir, "Engine/API" }
     files { "Sandbox/**.h", "Sandbox/**.c", "Sandbox/**.cpp", "Sandbox/**.hpp" }
@@ -84,8 +85,8 @@ project "Editor"
     targetdir(outDir)
     objdir "bin-int/Editor/%{cfg.buildcfg}"
     location "Editor"
-    libdirs { "libs", outDir }
-    links { "Engine.lib"}
+    libdirs { "vendor/lib", outDir }
+    links { "Engine.lib", "yaml-cppd.lib"}
     defines {"BUILD_EEDITOR_LIB"}
     includedirs { "vendor/include", VulkanIncludeDir, "Engine/API" }
     files { "Editor/**.h", "Editor/**.c", "Editor/**.cpp", "Editor/**.hpp" }

@@ -4,6 +4,11 @@
 #include "SystemsAPI.h"
 namespace gns
 {
+	namespace core
+	{
+		struct Scene;
+	}
+
 	struct ComponentMetadata
 	{
 		void* data;
@@ -14,7 +19,7 @@ namespace gns
 
 	struct Entity
 	{
-		GNS_API static Entity CreateEntity(std::string entityName,uint32_t registry = 0);
+		GNS_API static Entity CreateEntity(std::string entityName, core::Scene* scene);
 
 		entt::entity entity;
 		Entity(entt::entity entity) :
@@ -27,7 +32,7 @@ namespace gns
 		template<typename T, typename... Args>
 		T& AddComponet(Args&& ... args)
 		{
-			T& component = SystemsAPI::GetDefaultRegistry().emplace<T>(entity, std::forward<Args>(args)...);
+			T& component = SystemsAPI::GetRegistry().emplace<T>(entity, std::forward<Args>(args)...);
 
 			return component;
 		}
@@ -35,13 +40,13 @@ namespace gns
 		template<typename T>
 		T& GetComponent()
 		{
-			return SystemsAPI::GetDefaultRegistry().get<T>(entity);
+			return SystemsAPI::GetRegistry().get<T>(entity);
 		}
 
 		template<typename T>
 		bool TryGetComponent(T* component)
 		{
-			component = SystemsAPI::GetDefaultRegistry().try_get<T>(entity);
+			component = SystemsAPI::GetRegistry().try_get<T>(entity);
 			return component != nullptr;
 		}
 

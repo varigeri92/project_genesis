@@ -51,4 +51,9 @@ namespace gns::rendering
 
 		texture->Apply();
 	}
+
+	void Material::Dispose()
+	{
+		Object::Dispose();
+	}
 }

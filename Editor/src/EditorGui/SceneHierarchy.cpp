@@ -14,7 +14,7 @@ namespace gns::editor
 	void SceneHierarchy::OnGUI()
 	{
 		ImGui::Text("SceneHierarchy");
-		auto entityView = SystemsAPI::GetDefaultRegistry().view<EntityComponent>();
+		auto entityView = SystemsAPI::GetRegistry().view<EntityComponent>();
         ImGui::TreePush("SceneHierarchy");
 		for (auto [entt, entityComponent] : entityView.each())
 		{

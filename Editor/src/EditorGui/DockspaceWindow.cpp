@@ -1,6 +1,7 @@
 ﻿#include "DockspaceWindow.h"
 #include "Engine.h"
 #include "EditorStyles.h"
+#include "../../../Engine/src/Level/SceneManager.h"
 
 gns::editor::DockspaceWindow::DockspaceWindow(const std::string& name) : GuiWindow(name)
 {
@@ -20,8 +21,15 @@ void gns::editor::DockspaceWindow::OnGUI()
     {
         if (ImGui::BeginMenu("File"))
         {
-            ImGui::MenuItem("dummy", "Ctrl + S", &dummy);
+            if(ImGui::MenuItem("Save Scene(s)", "Ctrl + S", &dummy))
+            {
+                core::SceneManager::SerializeScene(core::SceneManager::ActiveScene);
+            }
             ImGui::Separator();
+            if(ImGui::MenuItem("Open Default Scene", "Ctrl + O", &dummy))
+            {
+                core::SceneManager::LoadScene("EmptyPath for now!");
+            }
             ImGui::MenuItem("dummy ...", "Ctrl + O", &dummy);
         	ImGui::Separator();
         	ImGui::EndMenu();

@@ -7,7 +7,6 @@ namespace gns::rendering
 	class Shader;
 	class Device;
 	class DrawData;
-	class IDisposeable;
 	struct Mesh;
 	struct Material;
 	class Texture;
@@ -28,15 +27,14 @@ namespace gns::rendering
 		void BeginRenderPass(uint32_t& swapchainImageIndex, bool gui);
 		void BeginTextureRenderPass(uint32_t& swapchainImageIndex);
 		void BeginGuiRenderPass(uint32_t& swapchainImageIndex);
-		void Draw(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, int index, size_t uniformSize);
+		void Draw(Mesh* mesh, Material* material, int index, size_t uniformSize);
 		void EndRenderPass(uint32_t& swapchainImageIndex);
 		void EndFrame(uint32_t& swapchainImageIndex);
 
 
 		void UploadMesh(Mesh* mesh);
 		void CreatePipeline(const std::shared_ptr<Shader>& shader);
-		void DisposeObject(const std::shared_ptr<IDisposeable>& object);
-		void UpdatePushConstant(glm::mat4 modelMatrix, const std::shared_ptr<Material> material);
+		void UpdatePushConstant(glm::mat4 modelMatrix, Material* material);
 		void UpdateGlobalUbo(void* src_bufferData, size_t size);
 		void UpdateSceneDataUbo(const void* data, size_t size);
 		void UpdateObjectData(void* src_data, size_t size);
@@ -59,9 +57,7 @@ namespace gns::rendering
 
 		bool m_frameBufferResized = false;
 		bool m_pipelineBound = false;
-		
 
-		std::vector<std::shared_ptr<IDisposeable>> _disposeQueue;
-		std::shared_ptr<Material> m_currentMaterial;
+		Material* m_currentMaterial;
 	};
 }

@@ -68,7 +68,7 @@ void gns::RenderSystem::OnUpdate(float deltaTime)
 	PROFILE_FUNC
 
 	
-	auto cameraView = SystemsAPI::GetDefaultRegistry().view<Transform, Camera>();
+	auto cameraView = SystemsAPI::GetRegistry().view<Transform, Camera>();
 	for (auto [entt, transform, camera] : cameraView.each())
 	{
 		camData.view = camera.view;
@@ -86,7 +86,7 @@ void gns::RenderSystem::OnUpdate(float deltaTime)
 		m_renderer->BeginTextureRenderPass(swapchainImageIndex);
 		m_renderer->UpdateGlobalUbo(&camData, sizeof(CameraData));
 		m_renderer->UpdateSceneDataUbo(&sceneData, sizeof(SceneData));
-		auto entityView = SystemsAPI::GetDefaultRegistry().view<Transform, RendererComponent, EntityComponent>();
+		auto entityView = SystemsAPI::GetRegistry().view<Transform, RendererComponent, EntityComponent>();
 		for (auto [entt, transform, rendererComponent, entity] : entityView.each())
 		{
 			transform.UpdateMatrix();
@@ -137,24 +137,6 @@ void gns::RenderSystem::DisposeMaterial(rendering::Material* material)
 	//m_device->DisposeBuffer(material->m_uniformBuffer);
 }
 
-void gns::RenderSystem::CleanupRenderer()
-{
-	vkDeviceWaitIdle(m_device->m_device);
-	auto entityView = SystemsAPI::GetDefaultRegistry().view<Transform, RendererComponent, EntityComponent>();
-	for (auto [entt, transform, rendererComponent, entity] : entityView.each())
-	{
-		DisposeShader(rendererComponent.material->m_shader.get());
-		for(auto tex : rendererComponent.material->m_textures)
-		{
-			if(tex != nullptr)
-			{
-				tex->Destroy();
-				tex = nullptr;
-			}
-		}
-	}
-	LOG_INFO(AQUA << "[Clenup Render System]" << DEFAULT);
-}
 
 gns::rendering::OffscreenPass& gns::RenderSystem::GetOffscreenPass() const
 {
@@ -167,4 +149,14 @@ void gns::RenderSystem::RecreateFrameBuffer(uint32_t width, uint32_t height)
 	m_device->CreateRenderTarget(width, height);
 	m_device->InitTextureRenderPass();
 	m_device->InitOffscreenFrameBuffers();
+}
+
+void gns::RenderSystem::CreatePipeline(const std::shared_ptr<rendering::Shader>& shader)
+{
+	m_renderer->CreatePipeline(shader);
+}
+
+void gns::RenderSystem::UploadMesh(rendering::Mesh* mesh)
+{
+	m_renderer->UploadMesh(mesh);
 }

@@ -10,16 +10,16 @@
 	using __cmp = cmp
 
 #define REGISTER_FIELD(type ,name)\
-	Serializer::ComponentData_Table[(uint32_t)entt::type_hash<__cmp>::value()].Add(typeid(type).hash_code(), offsetof(__cmp, name), #name, false)
+	Serializer::ComponentData_Table[(uint32_t)entt::type_hash<__cmp>::value()].Add(typeid(type).hash_code(), offsetof(__cmp, name), sizeof(name), #name, false)
 
 #define REGISTER_FIELD_RO(type ,name)\
-	Serializer::ComponentData_Table[(uint32_t)entt::type_hash<__cmp>::value()].Add(typeid(type).hash_code(), offsetof(__cmp, name), #name, true)
-
+	Serializer::ComponentData_Table[(uint32_t)entt::type_hash<__cmp>::value()].Add(typeid(type).hash_code(), offsetof(__cmp, name), sizeof(name), #name, true)
 
 struct FieldData
 {
 	size_t typeID;
 	size_t offset;
+	size_t size;
 	std::string name;
 	bool editorReadOnly;
 };
@@ -31,9 +31,8 @@ struct ComponentData
 	std::string name;
 	std::vector<FieldData> fields;
 
-	void Add(size_t typeID, size_t offset, std::string name, bool editorReadOnly)
+	void Add(size_t typeID, size_t offset, size_t size, std::string name, bool editorReadOnly)
 	{
-		LOG_INFO(name << " -->> " << typeID);
-		fields.emplace_back(typeID, offset, name, editorReadOnly);
+		fields.emplace_back(typeID, offset, size, name, editorReadOnly);
 	}
 };
