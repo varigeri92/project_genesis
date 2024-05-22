@@ -90,8 +90,11 @@ void gns::RenderSystem::OnUpdate(float deltaTime)
 		for (auto [entt, transform, rendererComponent, entity] : entityView.each())
 		{
 			transform.UpdateMatrix();
-			m_renderer->UpdatePushConstant(transform.matrix, rendererComponent.material);
-			m_renderer->Draw(rendererComponent.mesh, rendererComponent.material, swapchainImageIndex, sizeof(SceneData));
+			m_renderer->UpdatePushConstant(transform.matrix, rendererComponent.m_materials[0]);
+			for (size_t i = 0; i < rendererComponent.m_mesh->m_subMeshes.size(); i++)
+			{
+				m_renderer->Draw(rendererComponent.m_mesh->m_subMeshes[i], rendererComponent.m_materials[0], swapchainImageIndex, sizeof(SceneData));
+			}
 		}
 		m_renderer->EndRenderPass(swapchainImageIndex);
 		m_renderer->BeginRenderPass(swapchainImageIndex, true);
@@ -151,12 +154,17 @@ void gns::RenderSystem::RecreateFrameBuffer(uint32_t width, uint32_t height)
 	m_device->InitOffscreenFrameBuffers();
 }
 
-void gns::RenderSystem::CreatePipeline(const std::shared_ptr<rendering::Shader>& shader)
+void gns::RenderSystem::CreatePipeline(rendering::Shader* shader)
 {
 	m_renderer->CreatePipeline(shader);
 }
 
 void gns::RenderSystem::UploadMesh(rendering::Mesh* mesh)
 {
-	m_renderer->UploadMesh(mesh);
+	if (mesh->loaded) return;
+	for (size_t i = 0; i < mesh->m_subMeshes.size(); i++)
+	{
+		m_renderer->UploadMesh(mesh->m_subMeshes[i]);
+	}
+	mesh->loaded = true;
 }

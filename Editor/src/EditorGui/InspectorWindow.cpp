@@ -125,25 +125,66 @@ void InspectorWindow::DrawValue(size_t typeId, void* valuePtr, std::string& name
 	if(typeId == typeid(float).hash_code())
 	{
 		ImGui::DragFloat(name.c_str(), static_cast<float*>(valuePtr), DragValueSensitivity);
+		return;
+
 	}
 	if (typeId == typeid(std::string).hash_code())
 	{
 		ImGui::Text(static_cast<std::string*>(valuePtr)->c_str());
+		return;
+
 	}
-	if (typeId == typeid(gns::core::guid).hash_code())
+	if (typeId == typeid(gns::rendering::Mesh).hash_code())
 	{
-		gns::core::guid guid = *static_cast<gns::core::guid*>(valuePtr);
+		gns::rendering::Mesh** mesh = static_cast<gns::rendering::Mesh**>(valuePtr);
+		gns::rendering::Mesh* m = *mesh;
+		//std::string name = mesh->m_subMeshes[0]->name;
 		ImGui::PushItemWidth(-1.0f);
-		ImGui::Button(std::to_string(guid).c_str(),{ ImGui::GetContentRegionAvail().x,0});
+		ImGui::Button(m->m_name.c_str(), {ImGui::GetContentRegionAvail().x,0});
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_FILE"))
 			{
-				
 				LOG_INFO("Dropped into Field");
 			}
 			ImGui::EndDragDropTarget();
 		}
 		ImGui::PopItemWidth();
+		return;
+	}
+	if (typeId == typeid(gns::core::guid).hash_code())
+	{
+		gns::core::guid guid = *static_cast<gns::core::guid*>(valuePtr);
+		ImGui::PushItemWidth(-1.0f);
+		ImGui::Button(std::to_string(guid).c_str(), { ImGui::GetContentRegionAvail().x,0 });
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_FILE"))
+			{
+				LOG_INFO("Dropped into Field");
+			}
+			ImGui::EndDragDropTarget();
+		}
+		ImGui::PopItemWidth();
+		return;
+	}
+	if (typeId == typeid(std::vector<gns::rendering::Material*>).hash_code())
+	{
+		ImGui::PushItemWidth(-1.0f);
+		std::vector<gns::rendering::Material*> materials = *static_cast<std::vector<gns::rendering::Material*>*>(valuePtr);
+		for (size_t i = 0; i < materials.size(); i++ )
+		{
+			ImGui::Button(materials[i]->name.c_str(), {ImGui::GetContentRegionAvail().x,0});
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_FILE"))
+				{
+					LOG_INFO("Dropped into Field");
+				}
+				ImGui::EndDragDropTarget();
+			}
+		}
+		ImGui::PopItemWidth();
+		return;
 	}
 }

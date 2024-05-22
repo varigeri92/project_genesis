@@ -11,11 +11,11 @@ namespace gns::rendering
 	struct Material : public gns::Object
 	{
 
-		GNS_API Material(std::shared_ptr<gns::rendering::Shader> shader, std::string name);
+		GNS_API Material(gns::rendering::Shader* shader, std::string name);
 		GNS_API ~Material() override;
 		VkDescriptorSet descriptorSet;
 		std::string name;
-		std::shared_ptr<Shader> m_shader;
+		Shader* m_shader;
 		std::shared_ptr<Texture> m_texture{ nullptr };
 		std::vector<std::shared_ptr<Texture>> m_textures;
 

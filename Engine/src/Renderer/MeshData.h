@@ -71,19 +71,28 @@ namespace gns::rendering
 		}
 	};
 
-	struct Mesh : public gns::Object
+	struct MeshData : public IDisposable /*Drawing data*/
 	{
 		std::string name;
-		size_t materialIndex;
 		std::vector<Vertex> _vertices;
 		std::vector<uint32_t> _indices;
 		Buffer _vertexBuffer;
 		Buffer _indexBuffer;
-		Mesh()
+		MeshData()
 		{
-			LOG_INFO("Mesh Constructed:");
+			LOG_INFO("MeshData Constructed:");
 		}
+		~MeshData() override;
+		void Dispose() override;
+	};
+	struct Mesh :public gns::Object
+	{
 		~Mesh() override;
 		void Dispose() override;
+		bool loaded = false;
+		std::string m_name;
+		std::vector<MeshData*> m_subMeshes;
+	private:
+		void CleanUpMesh();
 	};
 }

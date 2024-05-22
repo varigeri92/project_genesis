@@ -7,6 +7,7 @@
 #include "../DragDropManager.h"
 #include "../../../Engine/src/AssetDatabase/AssetLoader.h"
 #include "../../../Engine/src/Gui/ImGui/IconsMaterialDesign.h"
+#include "../Utils/Utilities.h"
 
 namespace fs = std::filesystem;
 static float iconSize = 1;
@@ -19,8 +20,35 @@ static ImVec2 defaultButton_sz(105, 105);
 static ImGuiChildFlags child_flags = ImGuiChildFlags_Border | ImGuiChildFlags_AutoResizeY;
 
 static std::shared_ptr<gns::rendering::Texture> DirectoryIcon;
+static std::shared_ptr<gns::rendering::Texture> MaterialIcon;
 static std::shared_ptr<gns::rendering::Texture> FileIcon;
 
+bool create_file = false;
+constexpr int buffer_size = 128;
+char buffer[buffer_size] = "New File";
+
+void FileCreationModal(std::string fileType)
+{
+	const std::string title = "Create new " + fileType + " ...";
+	ImGui::OpenPopup(title.c_str());
+	if (ImGui::BeginPopupModal(title.c_str()))
+	{
+		ImGui::InputText("file name:", buffer, buffer_size);
+		if (ImGui::Button("Cancel"))
+		{
+			create_file = false;
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Create"))
+		{
+			LOG_INFO("File created: " << buffer);
+			create_file = false;
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+}
 
 namespace gns::editor
 {
@@ -51,11 +79,18 @@ namespace gns::editor
 
 		FileIcon->m_descriptorSet = ImGui_ImplVulkan_AddTexture(FileIcon->m_sampler, FileIcon->m_imageView,
 			VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+		MaterialIcon = std::make_shared<gns::rendering::Texture>(R"(Icons\icon_file.png)", true);
+		MaterialIcon->Apply();
+
+		MaterialIcon->m_descriptorSet = ImGui_ImplVulkan_AddTexture(MaterialIcon->m_sampler, MaterialIcon->m_imageView,
+			VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
  
 	}
 
 	ContentBrowserWindow::~ContentBrowserWindow()
 	{
+		MaterialIcon->Destroy();
 		DirectoryIcon->Destroy();
 		FileIcon->Destroy();
 	}
@@ -107,7 +142,28 @@ namespace gns::editor
 			}
 		}
 		ImGui::EndChild();
+		if (ImGui::BeginPopupContextItem("Content Browser context menu")) // <-- use last item id as popup id
+		{
+			if (ImGui::BeginMenu("Create ..."))
+			{
+				if (ImGui::MenuItem("Directory"))
+				{
+					LOG_INFO("Create new directory ...");
+				}
+				ImGui::Separator();
+				if(ImGui::MenuItem("Material"))
+				{
+					LOG_INFO("Create new material asset ...");
+					create_file = true;
+				}
+				ImGui::EndMenu();
+			}
+			ImGui::EndPopup();
+		}
 		ImGui::EndGroup();
+
+		if (!create_file) return;
+		FileCreationModal("material");
 	}
 
 	void ContentBrowserWindow::DrawDirectory(const std::filesystem::directory_entry& entry)
@@ -131,7 +187,12 @@ namespace gns::editor
 	{
 
 		ImGui::BeginChild((entry.path().string() + "_button").c_str(), buttonParent_sz, child_flags);
-		if (ImGui::ImageButton(base_name(entry.path().string()).c_str(), FileIcon->m_descriptorSet, button_sz))
+		ImTextureID icon = FileIcon->m_descriptorSet;
+		if(utils::hasExtension(entry.path().string(),".gnsmaterial"))
+		{
+			icon = MaterialIcon->m_descriptorSet;
+		}
+		if (ImGui::ImageButton(base_name(entry.path().string()).c_str(), icon, button_sz))
 		{
 			LOG_INFO("Opnening or inspecting file: '" << entry.path().string() <<"' feature not implemented...");
 		}

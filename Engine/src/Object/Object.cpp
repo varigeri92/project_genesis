@@ -14,7 +14,8 @@ namespace gns
 	void Object::DisposeAll()
 	{
 		for (auto it = s_objectMap.begin(); it != s_objectMap.end(); ++it) {
-			it->second->Dispose();
+			if(IsValid(it->second))
+				it->second->Dispose();
 		}
 	}
 

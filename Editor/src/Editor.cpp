@@ -31,8 +31,9 @@ gns::editor::Editor::Editor(Engine* engine) : engine(engine)
             cameraSystem->UpdateProjection(1920, 1080);
 
             // Entity tests:
-            const std::shared_ptr<rendering::Shader> defaultShader = std::make_shared<rendering::Shader>("blinphong.vert.spv", "blinphong.frag.spv");
-            RenderSystem* renderSystem = SystemsAPI::GetSystem<RenderSystem>();
+            //const std::shared_ptr<rendering::Shader> defaultShader = std::make_shared<rendering::Shader>("blinphong.vert.spv", "blinphong.frag.spv");
+            rendering::Shader* defaultShader = Object::Create<rendering::Shader>("blinphong.vert.spv", "blinphong.frag.spv");
+    		RenderSystem* renderSystem = SystemsAPI::GetSystem<RenderSystem>();
     		renderSystem->CreatePipeline(defaultShader);
 
             const std::shared_ptr<rendering::Texture> defaultTexture = std::make_shared<rendering::Texture>(R"(Textures\uv_color_Grid.png)");
@@ -49,7 +50,7 @@ gns::editor::Editor::Editor(Engine* engine) : engine(engine)
             AssetDatabase::AddAssetToDatabase(assetMeta, true);
             /*
             const auto meshInstance = AssetLoader::LoadMeshFile(1,R"(sketchfab\kda_akali_-_lol_-_3d_printable_fanart.glb)");
-            for (rendering::Mesh* mesh : meshInstance)
+            for (rendering::MeshData* mesh : meshInstance)
             {
                 renderSystem->UploadMesh(mesh);
                 Entity reiEntity = Entity::CreateEntity(mesh->name, core::SceneManager::ActiveScene);

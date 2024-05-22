@@ -9,7 +9,7 @@
 
 namespace gns::rendering
 {
-	Material::Material(std::shared_ptr<Shader> shader, std::string name) :
+	Material::Material(Shader* shader, std::string name) :
 		m_shader(shader), name(name)
 	{
 		m_textures.resize(5);

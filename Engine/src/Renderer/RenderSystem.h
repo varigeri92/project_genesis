@@ -5,6 +5,11 @@
 
 namespace gns
 {
+	namespace rendering
+	{
+		struct Mesh;
+	}
+
 	class Window;
 }
 
@@ -44,11 +49,11 @@ namespace gns
 		rendering::Renderer* GetRenderer() const;
 		void DisposeShader(rendering::Shader* shader);
 		void DisposeTexture(rendering::Texture* texture);
-		void DisposeMesh(rendering::Mesh* mesh);
+		void DisposeMesh(rendering::MeshData* mesh);
 		void DisposeMaterial(rendering::Material* material);
 		GNS_API rendering::OffscreenPass& GetOffscreenPass() const;
 		GNS_API void RecreateFrameBuffer(uint32_t width, uint32_t height);
-		GNS_API void CreatePipeline(const std::shared_ptr<rendering::Shader>& shader);
+		GNS_API void CreatePipeline(rendering::Shader* shader);
 		GNS_API void UploadMesh(rendering::Mesh* mesh);
 	};
 }

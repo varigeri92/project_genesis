@@ -18,6 +18,8 @@
 #include "../src/Gui/ImGui/imgui.h"
 #include "../src/Renderer/Rendering.h"
 #include "../src/Utils/Serialization/Serializer.h"
+#include "../src/Object/IDisposable.h"
+#include "../src/Object/Object.h"
 
 namespace gns
 {

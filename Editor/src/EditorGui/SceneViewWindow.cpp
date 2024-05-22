@@ -1,5 +1,4 @@
 ﻿#include "SceneViewWindow.h"
-
 #include "DockspaceWindow.h"
 #include "Engine.h"
 #include "../DragDropManager.h"
@@ -7,6 +6,7 @@
 #include "../../../Engine/src/Gui/ImGui/imgui_internal.h"
 #include "../../../Engine/src/Level/SceneManager.h"
 #include "../AssetManager/AssetImporter.h"
+#include "../Utils/Utilities.h"
 
 gns::editor::SceneViewWindow::SceneViewWindow(const std::string& name): GuiWindow(name), m_WindowInitialized(false)
 {
@@ -40,11 +40,10 @@ void gns::editor::SceneViewWindow::OnGUI()
 			if(importer.ImportAsset(DragDropManager::GetCurrentPayload()->path, assetMeta))
 			{
 				LOG_INFO("Asset imported sucessfully, or it was already imported... guid:" << assetMeta.guid);
-
 				AssetMetadata importedAsset = AssetDatabase::AddAssetToDatabase(assetMeta);
-				auto* mesh = AssetLoader::LoadAssetFromFile<gns::rendering::Mesh>(importedAsset.guid);
+				auto* mesh = AssetLoader::LoadAssetFromFile<rendering::Mesh>(importedAsset.guid);
 				SystemsAPI::GetSystem<RenderSystem>()->UploadMesh(mesh);
-				Entity entity = Entity::CreateEntity("Drag-drop entity", core::SceneManager::ActiveScene);
+				Entity entity = Entity::CreateEntity(utils::GetFileName(importedAsset.sourcePath), core::SceneManager::ActiveScene);
 				entity.AddComponet <RendererComponent>(importedAsset.guid, 0);
 			}
 			

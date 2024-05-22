@@ -15,6 +15,7 @@ namespace gns
 {
 	struct ComponentBase
 	{
+		virtual ~ComponentBase() = default;
 		virtual void Register() = 0;
 	};
 
@@ -30,7 +31,7 @@ namespace gns
 	namespace rendering
 	{
 		struct Material;
-		struct Mesh;
+		struct MeshData;
 	};
 
 	struct EntityComponent : public ComponentBase {
@@ -87,7 +88,6 @@ namespace gns
 		{
 			UpdateMatrix();
 		}
-
 	};
 	struct Children
 	{
@@ -100,54 +100,48 @@ namespace gns
 
 	struct RendererComponent : public ComponentBase
 	{
-		core::guid meshGuid;
-		core::guid materialGuid;
-		rendering::Mesh* mesh;
-		rendering::Material* material;
-
-		std::vector<rendering::Mesh*> m_subMeshes;
+		rendering::Mesh* m_mesh;
 		std::vector<rendering::Material*> m_materials;
 
 		RendererComponent() = default;
 
-		RendererComponent(gns::rendering::Mesh* mesh, rendering::Material* material)
-			: meshGuid(gns::core::Guid::GetNewGuid()), materialGuid(gns::core::Guid::GetNewGuid()), m_subMeshes(), m_materials()
+		RendererComponent(gns::rendering::Mesh* mesh, rendering::Material* material): m_mesh(mesh), m_materials()
 		{
-			m_subMeshes.push_back(mesh);
 			m_materials.push_back(material);
-			mesh = m_subMeshes[0];
-			material = m_materials[0];
+			m_materials.push_back(material);
 		}
 
-		RendererComponent(core::guid meshReferenceGuid, core::guid materialReferenceGuid)
-			: meshGuid(meshReferenceGuid), materialGuid(materialReferenceGuid),m_subMeshes{},m_materials{}
+		RendererComponent(core::guid meshReferenceGuid, core::guid materialReferenceGuid): m_materials{}
 		{
 			AssetMetadata meshMeta = AssetDatabase::GetAssetByGuid(meshReferenceGuid);
-			rendering::Mesh* mesh = Object::Get<rendering::Mesh>(meshMeta.guid);
-			m_subMeshes.push_back(mesh);
-			mesh = m_subMeshes[0];
+			m_mesh = Object::Get<rendering::Mesh>(meshMeta.guid);
 			rendering::Material* material = nullptr;
 			if(materialReferenceGuid == 0)
 			{
 				AssetMetadata default_materialMeta = AssetDatabase::GetAssetByName("__default_material");
 				material = Object::Get<rendering::Material>(default_materialMeta.guid);
-				m_materials.push_back(material);
-				material = m_materials[0];
+				for(const auto& subMesh : m_mesh->m_subMeshes)
+				{
+					m_materials.push_back(material);
+				}
 				return;
 			}
 			AssetMetadata materialMeta = AssetDatabase::GetAssetByGuid(materialReferenceGuid);
 			material = Object::Get<rendering::Material>(materialMeta.guid);
-			m_materials.push_back(material);
-			material = m_materials[0];
+			for (const auto& subMesh : m_mesh->m_subMeshes)
+			{
+				m_materials.push_back(material);
+			}
 		}
 
 
 		void Register() override
 		{
 			REGISTER_CMP(RendererComponent);
-			REGISTER_FIELD(gns::core::guid, meshGuid);
-			REGISTER_FIELD(gns::core::guid, materialGuid);
+			REGISTER_FIELD(rendering::Mesh, m_mesh);
+			REGISTER_FIELD(std::vector<rendering::Material*>, m_materials);
 		}
+
 	};
 
 	struct Camera : public ComponentBase

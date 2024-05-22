@@ -1,7 +1,7 @@
 ﻿#include "gnspch.h"
 #include "Renderer.h"
 
-#include "Mesh.h"
+#include "MeshData.h"
 #include "PipelineBuilder.h"
 #include "RenderSystem.h"
 #include "Utils/VkHelpers.h"
@@ -27,13 +27,13 @@ namespace gns::rendering
 		delete(m_device);
 	}
 
-	void Renderer::UploadMesh(Mesh* mesh)
+	void Renderer::UploadMesh(MeshData* mesh)
 	{
 		CreateVertexBuffers(mesh);
 		CreateIndexBuffers(mesh);
 		
 	}
-	void Renderer::CreatePipeline(const std::shared_ptr<Shader>& shader)
+	void Renderer::CreatePipeline(Shader* shader)
 	{
 		VkShaderModule vertShader = CreateShaderModule(AssetLoader::LoadShader(shader->m_vertexShaderPath));
 		VkShaderModule fragShader = CreateShaderModule(AssetLoader::LoadShader(shader->m_fragmentShaderPath));
@@ -219,7 +219,7 @@ namespace gns::rendering
 		vkCmdEndRenderPass(m_device->GetCurrentFrame()._mainCommandBuffer);
 	}
 
-	void Renderer::Draw(Mesh* mesh, Material* material, int index, size_t uniformSize)
+	void Renderer::Draw(MeshData* mesh, Material* material, int index, size_t uniformSize)
 	{
 		if (m_currentMaterial != material || m_pipelineBound == false)
 		{
@@ -330,7 +330,7 @@ namespace gns::rendering
 		return shaderModule;
 	}
 
-	void Renderer::CreateVertexBuffers(Mesh* mesh)
+	void Renderer::CreateVertexBuffers(MeshData* mesh)
 	{
 		const size_t bufferSize = mesh->_vertices.size() * sizeof(Vertex);
 		//allocate staging buffer
@@ -387,7 +387,7 @@ namespace gns::rendering
 		m_device->DisposeBuffer(stagingBuffer);
 	}
 
-	void Renderer::CreateIndexBuffers(Mesh* mesh)
+	void Renderer::CreateIndexBuffers(MeshData* mesh)
 	{
 		size_t size = sizeof(mesh->_indices[0]);
 		const size_t bufferSize = mesh->_indices.size() * size;
@@ -445,7 +445,7 @@ namespace gns::rendering
 		m_device->DisposeBuffer(stagingBuffer);
 	}
 
-	void Renderer::CreateSetLayoutBindings(std::shared_ptr<Shader> shader)
+	void Renderer::CreateSetLayoutBindings(Shader* shader)
 	{
 		std::vector<VkDescriptorSetLayoutBinding> textureBindings =
 		{

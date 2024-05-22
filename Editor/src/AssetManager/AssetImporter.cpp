@@ -1,11 +1,11 @@
 ﻿#include "AssetImporter.h"
 #include <filesystem>
 #include <fstream>
-
 #include "../../../Engine/src/AssetDatabase/AssetDatabase.h"
 #include "../Utils/Utilities.h"
-#define YAML_CPP_STATIC_DEFINE
 #include "../../../Engine/src/AssetDatabase/AssetLoader.h"
+
+#define YAML_CPP_STATIC_DEFINE
 #include "yaml-cpp/yaml.h"
 
 namespace gns::editor
@@ -47,8 +47,15 @@ namespace gns::editor
 
 		std::string relpath = utils::getRelativePath(AssetLoader::GetAssetsPath(), assetPath);
 		LOG_INFO(relpath);
-
-		std::string metaPath = utils::appendExtension(assetPath, metaFileExtension);
+		std::string metaPath = "";
+		if(utils::hasExtension(assetPath, metaFileExtension))
+		{
+			metaPath = assetPath;
+		}
+		else
+		{
+			metaPath = utils::appendExtension(assetPath, metaFileExtension);
+		}
 		if (IsImported(assetPath))
 		{
 			YAML::Node metaNode = YAML::LoadFile(metaPath);
@@ -67,9 +74,11 @@ namespace gns::editor
 
 	bool AssetImporter::IsImported(const std::string& path) const
 	{
+		if(utils::hasExtension(path, metaFileExtension))
+			return true;
+		
 		std::ifstream file(utils::appendExtension(path, metaFileExtension));
 		return file.good();
-
 	}
 
 	void AssetImporter::CreateMeta(const std::string& path, const std::string& assetSourcePath, 

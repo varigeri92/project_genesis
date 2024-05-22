@@ -1,9 +1,10 @@
 #pragma once
+#include "IDisposable.h"
 #include "../Utils/Guid.h"
 
 namespace gns
 {
-	class Object
+	class Object : public IDisposable
 	{
 		friend class Engine;
 		static Object* gns_NullObject;
@@ -52,6 +53,6 @@ namespace gns
 		}
 
 		GNS_API static bool IsValid(const Object* object);
-		virtual void Dispose();
+		virtual void Dispose() override;
 	};
 }

@@ -7,7 +7,7 @@ namespace gns::rendering
 	class Shader;
 	class Device;
 	class DrawData;
-	struct Mesh;
+	struct MeshData;
 	struct Material;
 	class Texture;
 
@@ -27,13 +27,13 @@ namespace gns::rendering
 		void BeginRenderPass(uint32_t& swapchainImageIndex, bool gui);
 		void BeginTextureRenderPass(uint32_t& swapchainImageIndex);
 		void BeginGuiRenderPass(uint32_t& swapchainImageIndex);
-		void Draw(Mesh* mesh, Material* material, int index, size_t uniformSize);
+		void Draw(MeshData* mesh, Material* material, int index, size_t uniformSize);
 		void EndRenderPass(uint32_t& swapchainImageIndex);
 		void EndFrame(uint32_t& swapchainImageIndex);
 
 
-		void UploadMesh(Mesh* mesh);
-		void CreatePipeline(const std::shared_ptr<Shader>& shader);
+		void UploadMesh(MeshData* mesh);
+		void CreatePipeline(Shader* shader);
 		void UpdatePushConstant(glm::mat4 modelMatrix, Material* material);
 		void UpdateGlobalUbo(void* src_bufferData, size_t size);
 		void UpdateSceneDataUbo(const void* data, size_t size);
@@ -44,9 +44,9 @@ namespace gns::rendering
 
 	private:
 		VkShaderModule CreateShaderModule(std::vector<uint32_t> buffer);
-		void CreateVertexBuffers(Mesh* mesh);
-		void CreateIndexBuffers(Mesh* mesh);
-		void CreateSetLayoutBindings(std::shared_ptr<Shader> shader);
+		void CreateVertexBuffers(MeshData* mesh);
+		void CreateIndexBuffers(MeshData* mesh);
+		void CreateSetLayoutBindings(Shader* shader);
 
 		uint32_t m_framesInFlight;
 		uint32_t m_frameNumber{ 0 };

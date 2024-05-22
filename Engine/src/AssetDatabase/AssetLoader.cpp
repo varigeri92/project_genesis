@@ -1,9 +1,11 @@
 #include <gnspch.h>
 #include "AssetLoader.h"
+#include <string>
+#include <filesystem>
 #include <fstream>
 #include "Log.h"
 #include <glm/glm.hpp>
-#include "../Renderer/Mesh.h"
+#include "../Renderer/MeshData.h"
 #include "../Renderer/Utils/Buffer.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "Loaders/stb_image.h"
@@ -15,6 +17,11 @@
 
 #include "AssetDatabase.h"
 
+inline std::string GetFileName(const std::string& filePath) {
+    std::filesystem::path path(filePath);
+    std::string fileName = path.stem().string();
+    return fileName;
+}
 
 using namespace gns::rendering;
 
@@ -24,10 +31,10 @@ namespace gns
     std::string AssetLoader::ShadersPath = R"(C:\)";
     std::string AssetLoader::ResourcesPath = R"(C:\)";
 
-    std::vector<Mesh*> AssetLoader::LoadMeshFile(gns::core::guid guid, std::string path, bool isFallbackPath)
+    Mesh* AssetLoader::LoadMeshFile(gns::core::guid guid, std::string path, bool isFallbackPath)
     {
-        std::vector<Mesh*> meshes = {};
-        
+        Mesh* mesh = Object::Create<Mesh>(guid);
+        mesh->m_name = GetFileName(path);
         Assimp::Importer importer;
         const unsigned flags = aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType;
         const unsigned flags2 = aiProcessPreset_TargetRealtime_Fast;
@@ -38,30 +45,30 @@ namespace gns
         // If the import failed, report it
         if (nullptr == scene) {
             LOG_ERROR(importer.GetErrorString());
-            LOG_WARNING("Cannot Load Mesh: " << path << " Falling back to Suzan!");
+            LOG_WARNING("Cannot Load MeshData: " << path << " Falling back to Suzan!");
             if (!isFallbackPath) {
-                meshes = LoadMeshFile(guid,"(Meshes\Suzan.obj)", true);
+                mesh = LoadMeshFile(guid,"(Meshes\Suzan.obj)", true);
             }
             else
             {
-                assert(meshes.size() == 0, "Failed To load the fallback Mesh!");
+                assert(mesh->m_subMeshes.size() == 0, "Failed To load the fallback MeshData!");
             }
-            return meshes;
+            return mesh;
         }
         if (scene->HasMeshes())
         {
             for (size_t i = 0; i < scene->mNumMeshes; i++)
             {
-                Mesh* mesh = Object::Create<Mesh>(guid);
-				ProcessImpoertedScene(scene->mMeshes[i], mesh);
-                meshes.push_back(mesh);
+                MeshData* meshData = new MeshData();
+				ProcessImpoertedScene(scene->mMeshes[i], meshData);
+                mesh->m_subMeshes.push_back(meshData);
             }
         }
-        return meshes;
+        return mesh;
     }
 
 
-    void AssetLoader::ProcessImpoertedScene(const void* _mesh, Mesh* outMesh)
+    void AssetLoader::ProcessImpoertedScene(const void* _mesh, MeshData* outMesh)
     {
         const aiMesh* mesh = static_cast<const aiMesh*>(_mesh);
         outMesh->name = mesh->mName.C_Str();
@@ -83,7 +90,6 @@ namespace gns
 				vertex.uv = { mesh->mTextureCoords[0][v].x, 1-mesh->mTextureCoords[0][v].y };
             }
             outMesh->_vertices.push_back(vertex);
-            outMesh->materialIndex = mesh->mMaterialIndex;
         }
 
         for (uint32_t i = 0; i < mesh->mNumFaces; i++) {
@@ -109,7 +115,7 @@ namespace gns
 	    {
 	    case AssetType::mesh:
             metaData.state = AssetState::loaded;
-            Mesh* mesh = LoadMeshFile(metaData.guid, metaData.sourcePath).data();
+            Mesh* mesh = LoadMeshFile(metaData.guid, metaData.sourcePath);
             return mesh;
 	    }
 	    return nullptr;
