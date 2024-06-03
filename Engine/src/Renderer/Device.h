@@ -14,28 +14,17 @@ namespace gns
 namespace gns::rendering
 {
 	struct FrameBufferAttachment {
-		VkImage image;
-		VkDeviceMemory mem;
+		VulkanImage image;
 		VkImageView view;
 	};
 
-	struct OffscreenPass {
-		int32_t width, height;
+	struct RenderPass {
+		uint32_t width, height;
 		std::vector<VkFramebuffer> frameBuffers;
 		FrameBufferAttachment color, depth;
 		VkSampler sampler;
 		VkDescriptorImageInfo descriptor;
 		VkRenderPass renderPass;
-	};
-
-	struct RenderPassData
-	{
-		uint32_t bufferWidth;
-		uint32_t bufferHeight;
-		VkFramebuffer framebuffer;
-		FrameBufferAttachment colorAttachment;
-		FrameBufferAttachment depthAttachment;
-		VkSampler sampler;
 	};
 	
 	typedef struct FrameData {
@@ -72,8 +61,6 @@ namespace gns::rendering
 
 		Window* m_window;
 
-		OffscreenPass m_offscreenPass;
-
 		VmaAllocator m_allocator;
 		uint32_t m_imageCount;
 		uint32_t m_imageIndex;
@@ -100,20 +87,18 @@ namespace gns::rendering
 		vkb::Swapchain m_vkb_swapchain;
 		VkSwapchainKHR m_swapchain;
 		VkFormat m_swapchainFormat;
-		std::vector<VkImageView> m_imageViews;
 
+		RenderPass m_offscreenPass;
+		RenderPass m_screenPass;
+
+		std::vector<VkImageView> m_imageViews;
 		VkImageView _depthImageView;
 		VulkanImage _depthImage;
+		VkFormat m_depthFormat;
 
 		std::vector<FrameData> m_frames;
+
 		UploadContext m_uploadContext;
-
-		VkRenderPass m_renderPass;
-		VkRenderPass m_guiPass;
-		std::vector<VkFramebuffer> m_frameBuffers;
-
-		//the format for the depth image
-		VkFormat m_depthFormat;
 
 		VkDescriptorSetLayout m_globalSetLayout;
 		VkDescriptorSetLayout m_objectSetLayout;
@@ -130,12 +115,12 @@ namespace gns::rendering
 		void RebuildSwapchain(int width, int height);
 		void CreateCommandPool();
 		void CreateRenderTarget(uint32_t width, uint32_t height);
-		void InitDefaultRenderPass();
+		void InitDefaultRenderPass(); /* dead CODE!*/
 		void InitTextureRenderPass();
 		void InitGUIRenderPass();
 		void InitFrameBuffers();
 		void InitOffscreenFrameBuffers();
-		void DestroyOffscreenFrameBuffer() const;
+		void DestroyOffscreenFrameBuffer(uint32_t width, uint32_t height);
 		void InitSyncStructures();
 		void CreateDescriptorSetLayout(VkDescriptorSetLayout* setLayout,
 			const VkDescriptorSetLayoutBinding* setLayoutBindings, 

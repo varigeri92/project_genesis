@@ -19,7 +19,9 @@ namespace gns::editor
 
 	{"png", AssetType::texture},
 	{"jpeg", AssetType::texture},
-	{"jpg", AssetType::texture}
+	{"jpg", AssetType::texture},
+	{"gnsmat", AssetType::material}
+
 	};
 
 	bool AssetImporter::ImportAsset(const std::string& assetPath)
@@ -44,6 +46,7 @@ namespace gns::editor
 	{
 		std::ifstream file(assetPath);
 		if (!file.good()) return false;
+		file.close();
 
 		std::string relpath = utils::getRelativePath(AssetLoader::GetAssetsPath(), assetPath);
 		LOG_INFO(relpath);
@@ -92,5 +95,40 @@ namespace gns::editor
 		<< "asset_type" << static_cast<int>(assetType)
 		<< YAML::EndMap;
 		utils::writeFile(out.c_str(), path);
+	}
+
+	std::string AssetImporter::GetExtensionByType(const AssetType type) const
+	{
+		switch (type)
+		{
+		case AssetType::material:
+			return ".gnsmat";
+		case AssetType::prefab:
+			return ".gnsprefab";
+		default: 
+			return ".UNDEFINED";
+		}
+	}
+
+	AssetMetadata AssetImporter::CreateAsset(const std::string& directory, const std::string& name, core::guid guid,
+	                                          AssetType assetType)
+	{
+		std::string absPath = directory + name + GetExtensionByType(assetType);
+		std::string relPath = utils::getRelativePath(AssetLoader::GetAssetsPath(), absPath);
+		YAML::Emitter out;
+		out << YAML::BeginMap
+			<< "asset_name" << name
+			<< "source_path" << relPath
+			<< "asset_guid" << guid
+			<< "asset_type" << static_cast<int>(assetType)
+			<< YAML::EndMap;
+		utils::writeFile(out.c_str(), absPath);
+
+		AssetMetadata assetMetadata;
+		if (ImportAsset(absPath, assetMetadata))
+		{
+			return assetMetadata;
+		}
+		return assetMetadata;
 	}
 }

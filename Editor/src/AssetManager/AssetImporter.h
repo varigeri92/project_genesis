@@ -18,6 +18,9 @@ namespace gns::editor
 
 		bool ImportAsset(const std::string& assetPath);
 		bool ImportAsset(const std::string& assetPath, AssetMetadata& out_assetMeta);
+		AssetMetadata CreateAsset(
+			const std::string& directory, 
+			const std::string& name, core::guid guid, AssetType assetType);
 	private:
 		void ScanProjectForAssets();
 		bool IsImported(core::guid);
@@ -25,5 +28,6 @@ namespace gns::editor
 
 		bool IsImported(const std::string& path) const;
 		void CreateMeta(const std::string& path, const std::string& assetSourcePath, core::guid guid, AssetType assetType);
+		std::string GetExtensionByType(const AssetType type) const;
 	};
 }

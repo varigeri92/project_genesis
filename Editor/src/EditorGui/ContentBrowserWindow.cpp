@@ -5,9 +5,12 @@
 #include <filesystem>
 
 #include "../DragDropManager.h"
+#include "../SelectionManager.h"
 #include "../../../Engine/src/AssetDatabase/AssetLoader.h"
 #include "../../../Engine/src/Gui/ImGui/IconsMaterialDesign.h"
+#include "../AssetManager/AssetImporter.h"
 #include "../Utils/Utilities.h"
+#include "yaml-cpp/yaml.h"
 
 namespace fs = std::filesystem;
 static float iconSize = 1;
@@ -27,7 +30,7 @@ bool create_file = false;
 constexpr int buffer_size = 128;
 char buffer[buffer_size] = "New File";
 
-void FileCreationModal(std::string fileType)
+void gns::editor::ContentBrowserWindow::FileCreationModal(std::string fileType)
 {
 	const std::string title = "Create new " + fileType + " ...";
 	ImGui::OpenPopup(title.c_str());
@@ -42,6 +45,8 @@ void FileCreationModal(std::string fileType)
 		ImGui::SameLine();
 		if (ImGui::Button("Create"))
 		{
+			gns::editor::AssetImporter importer;
+			importer.CreateAsset(m_currentDirPath, buffer, gns::core::Guid::GetNewGuid(), AssetType::material);
 			LOG_INFO("File created: " << buffer);
 			create_file = false;
 			ImGui::CloseCurrentPopup();
@@ -80,7 +85,7 @@ namespace gns::editor
 		FileIcon->m_descriptorSet = ImGui_ImplVulkan_AddTexture(FileIcon->m_sampler, FileIcon->m_imageView,
 			VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-		MaterialIcon = std::make_shared<gns::rendering::Texture>(R"(Icons\icon_file.png)", true);
+		MaterialIcon = std::make_shared<gns::rendering::Texture>(R"(Icons\Material_Icon.png)", true);
 		MaterialIcon->Apply();
 
 		MaterialIcon->m_descriptorSet = ImGui_ImplVulkan_AddTexture(MaterialIcon->m_sampler, MaterialIcon->m_imageView,
@@ -188,13 +193,14 @@ namespace gns::editor
 
 		ImGui::BeginChild((entry.path().string() + "_button").c_str(), buttonParent_sz, child_flags);
 		ImTextureID icon = FileIcon->m_descriptorSet;
-		if(utils::hasExtension(entry.path().string(),".gnsmaterial"))
+		if(utils::hasExtension(entry.path().string(),".gnsmat"))
 		{
 			icon = MaterialIcon->m_descriptorSet;
 		}
 		if (ImGui::ImageButton(base_name(entry.path().string()).c_str(), icon, button_sz))
 		{
 			LOG_INFO("Opnening or inspecting file: '" << entry.path().string() <<"' feature not implemented...");
+			SelectionManager::SetSelectedObject(utils::GetFileName(entry.path().string()));
 		}
 		if (ImGui::BeginDragDropSource())
 		{

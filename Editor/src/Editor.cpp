@@ -15,6 +15,11 @@ gns::editor::Editor::Editor(Engine* engine) : engine(engine)
 {
     engine->Init([&]()
         {
+            Entity cameraEntity = Entity::CreateEntity("Editor_Camera", core::SceneManager::ActiveScene);
+            Transform& cameraTransform = cameraEntity.GetComponent<Transform>();
+            Camera& cam = cameraEntity.AddComponet<Camera>(0.01, 1000, 60, 1920, 1080, cameraTransform);
+            CameraSystem* cameraSystem = SystemsAPI::RegisterSystem<CameraSystem>();
+
             gui::GuiSystem::RegisterWindow<DockspaceWindow>("DockSpace");
             gui::GuiSystem::RegisterWindow<SceneViewWindow>("Scene");
             gui::GuiSystem::RegisterWindow<DummyWindow>("Dummy");
@@ -22,12 +27,7 @@ gns::editor::Editor::Editor(Engine* engine) : engine(engine)
             gui::GuiSystem::RegisterWindow<ContentBrowserWindow>();
             gui::GuiSystem::RegisterWindow<SceneHierarchy>();
 
-            Entity cameraEntity = Entity::CreateEntity("Editor_Camera", core::SceneManager::ActiveScene);
-            Transform& cameraTransform = cameraEntity.GetComponent<Transform>();
-            Camera& cam = cameraEntity.AddComponet<Camera>(0.01, 1000, 60, 1920, 1080, cameraTransform);
-            CameraSystem* cameraSystem = SystemsAPI::RegisterSystem<CameraSystem>();
-
-            cameraTransform.position = { 0.f,-1.f,-5.f };
+            cameraTransform.position = { 0.f,1.f,5.f };
             cameraSystem->UpdateProjection(1920, 1080);
 
             // Entity tests:

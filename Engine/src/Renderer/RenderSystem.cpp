@@ -74,11 +74,6 @@ void gns::RenderSystem::OnUpdate(float deltaTime)
 		camData.view = camera.view;
 		camData.proj = camera.projection;
 		camData.viewproj = camera.camera_matrix;
-		/* 
-		printMat4(camera.view, "View");
-		printMat4(camera.projection, "Projection");
-		printMat4(camera.camera_matrix, "view projection");
-		*/
 	}
 	uint32_t swapchainImageIndex;
 	if (m_renderer->BeginFrame(swapchainImageIndex))
@@ -137,20 +132,18 @@ void gns::RenderSystem::DisposeShader(rendering::Shader* shader)
 
 void gns::RenderSystem::DisposeMaterial(rendering::Material* material)
 {
-	//m_device->DisposeBuffer(material->m_uniformBuffer);
+
 }
 
 
-gns::rendering::OffscreenPass& gns::RenderSystem::GetOffscreenPass() const
+gns::rendering::RenderPass& gns::RenderSystem::GetOffscreenPass() const
 {
 	return m_device->m_offscreenPass;
 }
 
 void gns::RenderSystem::RecreateFrameBuffer(uint32_t width, uint32_t height)
 {
-	m_device->DestroyOffscreenFrameBuffer();
-	m_device->CreateRenderTarget(width, height);
-	m_device->InitTextureRenderPass();
+	m_device->DestroyOffscreenFrameBuffer(width, height);
 	m_device->InitOffscreenFrameBuffers();
 }
 

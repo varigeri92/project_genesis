@@ -45,7 +45,8 @@ namespace gns
 	{
 	public:
 		static GNS_API AssetMetadata& GetAssetByGuid(const gns::core::guid guid);
-		static GNS_API const AssetMetadata& GetAssetByName(const std::string& assetName);
+		static GNS_API AssetMetadata& GetAssetByName(const std::string& assetName);
+		static GNS_API bool IsAssetImported(const std::string& assetName, gns::core::guid& guid);
 		static GNS_API void SetProjectRoot(const std::string& path);
 		static GNS_API void SetResourcesDir(const std::string& path);
 		static GNS_API AssetMetadata& AddAssetToDatabase(const AssetMetadata& assetMeta, bool loaded =false);

@@ -4,6 +4,8 @@
 
 #include "../AssetDatabase/AssetDatabase.h"
 #include "glm/glm.hpp"
+#include "glm/gtx/quaternion.hpp"
+#include "glm/gtc/quaternion.hpp"
 #include "../Renderer/Rendering.h"
 #include "../Utils/Guid.h"
 #include "../Utils/Serialization/Serializeable.h"
@@ -13,6 +15,11 @@ constexpr float PI = 3.14159265359f;
 
 namespace gns
 {
+	namespace editor
+	{
+		class SceneViewWindow;
+	}
+
 	struct ComponentBase
 	{
 		virtual ~ComponentBase() = default;
@@ -73,9 +80,8 @@ namespace gns
 			matrix = glm::mat4(1.f);
 			matrix = glm::translate(matrix, position);
 			matrix = glm::scale(matrix, scale);
-			matrix = glm::rotate(matrix, rotation.x * (PI / 180), glm::vec3(1.f, 0.f, 0.f));
-			matrix = glm::rotate(matrix, rotation.y * (PI / 180), glm::vec3(0.f, 1.f, 0.f));
-			matrix = glm::rotate(matrix, rotation.z * (PI / 180), glm::vec3(0.f, 0.f, 1.f));
+			glm::quat quaternion = glm::quat(rotation);
+			matrix *= glm::toMat4(quaternion);
 		}
 		Transform()
 			: position{ 0,0,0 }, rotation{ 0,0,0 }, scale{ 1,1,1 }
@@ -146,6 +152,7 @@ namespace gns
 
 	struct Camera : public ComponentBase
 	{
+		friend class gns::editor::SceneViewWindow;
 		friend class RenderSystem;
 		friend class CameraSystem;
 		float _near;

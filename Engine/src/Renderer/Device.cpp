@@ -8,7 +8,6 @@
 #include <vma/vk_mem_alloc.h>
 #include "Utils/VkHelpers.h"
 
-uint32_t renderTargetImageSize = 512;
 
 void gns::rendering::UploadContext::Destroy(VkDevice device)
 {
@@ -46,10 +45,8 @@ gns::rendering::Device::Device(Window* window) : m_window(window)
 	CreateRenderTarget(1920, 1080);
 	InitTextureRenderPass();
     InitOffscreenFrameBuffers();
-	
-	InitDefaultRenderPass();
-    InitGUIRenderPass();
 
+    InitGUIRenderPass();
 	InitFrameBuffers();
 
     CreateDescriptorPool();
@@ -64,12 +61,12 @@ gns::rendering::Device::~Device()
 
     vkDestroyDescriptorPool(m_device, m_descriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(m_device, m_globalSetLayout, nullptr);
-    vkDestroyRenderPass(m_device, m_renderPass, nullptr);
-    vkDestroyRenderPass(m_device, m_guiPass, nullptr);
+    //vkDestroyRenderPass(m_device, m_renderPass, nullptr);
+    vkDestroyRenderPass(m_device, m_screenPass.renderPass, nullptr);
 	vkDestroyRenderPass(m_device, m_offscreenPass.renderPass, nullptr);
 	
-    for (int i = 0; i < m_frameBuffers.size(); i++) {
-        vkDestroyFramebuffer(m_device, m_frameBuffers[i], nullptr);
+    for (int i = 0; i < m_offscreenPass.frameBuffers.size(); i++) {
+        vkDestroyFramebuffer(m_device, m_screenPass.frameBuffers[i], nullptr);
         vkDestroyImageView(m_device, m_imageViews[i], nullptr);
 		vkDestroyFramebuffer(m_device, m_offscreenPass.frameBuffers[i], nullptr);
     }
@@ -93,11 +90,10 @@ gns::rendering::Device::~Device()
 	
 	vkDestroyImageView(m_device, m_offscreenPass.color.view, nullptr);
 	vkDestroyImageView(m_device, m_offscreenPass.depth.view, nullptr);
-	vkDestroyImage(m_device, m_offscreenPass.color.image, nullptr);
-	vkDestroyImage(m_device, m_offscreenPass.depth.image, nullptr);
-	vkFreeMemory(m_device, m_offscreenPass.color.mem, nullptr);
-	vkFreeMemory(m_device, m_offscreenPass.depth.mem, nullptr);
 
+    vmaDestroyImage(m_allocator, m_offscreenPass.color.image._image, m_offscreenPass.color.image._allocation);
+	vmaDestroyImage(m_allocator, m_offscreenPass.depth.image._image, m_offscreenPass.depth.image._allocation);
+	
 	vmaDestroyAllocator(m_allocator);
     vkb::destroy_swapchain(m_vkb_swapchain);
     vkb::destroy_device(m_vkb_device);
@@ -271,8 +267,8 @@ void gns::rendering::Device::RebuildSwapchain(int width, int height)
     vkDestroyImageView(m_device, _depthImageView, nullptr);
     _VK_CHECK(vkCreateImageView(m_device, &dview_info, nullptr, &_depthImageView), "Failed to create ImageView!");
 
-    for (int i = 0; i < m_frameBuffers.size(); i++) {
-        vkDestroyFramebuffer(m_device, m_frameBuffers[i], nullptr);
+    for (int i = 0; i < m_screenPass.frameBuffers.size(); i++) {
+        vkDestroyFramebuffer(m_device, m_screenPass.frameBuffers[i], nullptr);
     }
     InitFrameBuffers();
 }
@@ -323,13 +319,13 @@ void gns::rendering::Device::CreateRenderTarget(uint32_t width, uint32_t height)
 	memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	VkMemoryRequirements memReqs;
 
-	_VK_CHECK(vkCreateImage(m_device, &image, nullptr, &m_offscreenPass.color.image), "Failed to Create Render target Image");
-	vkGetImageMemoryRequirements(m_device, m_offscreenPass.color.image, &memReqs);
-	memAlloc.allocationSize = memReqs.size;
-	memAlloc.memoryTypeIndex = GetMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	_VK_CHECK(vkAllocateMemory(m_device, &memAlloc, nullptr, &m_offscreenPass.color.mem),"Failed to Allocate Memory");
-	_VK_CHECK(vkBindImageMemory(m_device, m_offscreenPass.color.image, m_offscreenPass.color.mem, 0),
-		"Failed to Bind Image Memory");
+    VmaAllocationCreateInfo dimg_allocinfo = {};
+    dimg_allocinfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+    dimg_allocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    
+	_VK_CHECK(vmaCreateImage(m_allocator, &image, &dimg_allocinfo, &m_offscreenPass.color.image._image, &m_offscreenPass.color.image._allocation, nullptr),
+        "Failed to Create Render target Image");
 
 	VkImageViewCreateInfo colorImageView = {};
 	colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -341,7 +337,7 @@ void gns::rendering::Device::CreateRenderTarget(uint32_t width, uint32_t height)
 	colorImageView.subresourceRange.levelCount = 1;
 	colorImageView.subresourceRange.baseArrayLayer = 0;
 	colorImageView.subresourceRange.layerCount = 1;
-	colorImageView.image = m_offscreenPass.color.image;
+	colorImageView.image = m_offscreenPass.color.image._image;
 	_VK_CHECK(vkCreateImageView(m_device, &colorImageView, nullptr, &m_offscreenPass.color.view),
 		"Failed to create image View");
 
@@ -360,21 +356,14 @@ void gns::rendering::Device::CreateRenderTarget(uint32_t width, uint32_t height)
 	samplerInfo.maxLod = 1.0f;
 	samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 	_VK_CHECK(vkCreateSampler(m_device, &samplerInfo, nullptr, &m_offscreenPass.sampler),
-		"Failed to create image View");
+		"Failed to create render pass sampler");
 
 	// Depth stencil attachment
 	image.format = m_depthFormat;
 	image.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 
-	_VK_CHECK(vkCreateImage(m_device, &image, nullptr, &m_offscreenPass.depth.image),
-		"Failed to create Image!");
-	vkGetImageMemoryRequirements(m_device, m_offscreenPass.depth.image, &memReqs);
-	memAlloc.allocationSize = memReqs.size;
-	memAlloc.memoryTypeIndex = GetMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	_VK_CHECK(vkAllocateMemory(m_device, &memAlloc, nullptr, &m_offscreenPass.depth.mem),
-		"Failed to allocate depth memory!");
-	_VK_CHECK(vkBindImageMemory(m_device, m_offscreenPass.depth.image, m_offscreenPass.depth.mem, 0),
-		"Failed to Bind Depth image Memory!");
+    _VK_CHECK(vmaCreateImage(m_allocator, &image, &dimg_allocinfo, &m_offscreenPass.depth.image._image, &m_offscreenPass.depth.image._allocation, nullptr),
+        "Failed to Create Render target Image");
 
 	VkImageViewCreateInfo depthStencilView = {};
 	depthStencilView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -390,7 +379,7 @@ void gns::rendering::Device::CreateRenderTarget(uint32_t width, uint32_t height)
 	depthStencilView.subresourceRange.levelCount = 1;
 	depthStencilView.subresourceRange.baseArrayLayer = 0;
 	depthStencilView.subresourceRange.layerCount = 1;
-	depthStencilView.image = m_offscreenPass.depth.image;
+	depthStencilView.image = m_offscreenPass.depth.image._image;
 	_VK_CHECK(vkCreateImageView(m_device, &depthStencilView, nullptr, &m_offscreenPass.depth.view), "Failed to create Image!");
 }
 
@@ -536,7 +525,7 @@ void gns::rendering::Device::InitDefaultRenderPass()
     renderPassInfo.dependencyCount = 2;
     renderPassInfo.pDependencies = &dependencies[0];
 
-    _VK_CHECK(vkCreateRenderPass(m_device, &renderPassInfo, nullptr, &m_renderPass), "Failed to create RenderPass");
+    _VK_CHECK(vkCreateRenderPass(m_device, &renderPassInfo, nullptr, &m_screenPass.renderPass), "Failed to create RenderPass");
 }
 
 void gns::rendering::Device::InitGUIRenderPass()
@@ -612,7 +601,7 @@ void gns::rendering::Device::InitGUIRenderPass()
     renderPassInfo.dependencyCount = 2;
     renderPassInfo.pDependencies = &dependencies[0];
 
-    _VK_CHECK(vkCreateRenderPass(m_device, &renderPassInfo, nullptr, &m_guiPass), "Failed to create RenderPass");
+    _VK_CHECK(vkCreateRenderPass(m_device, &renderPassInfo, nullptr, &m_screenPass.renderPass), "Failed to create RenderPass");
 }
 
 void gns::rendering::Device::InitFrameBuffers()
@@ -623,7 +612,7 @@ void gns::rendering::Device::InitFrameBuffers()
     fb_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
     fb_info.pNext = nullptr;
 
-    fb_info.renderPass = m_guiPass;
+    fb_info.renderPass = m_screenPass.renderPass;
     fb_info.attachmentCount = 1;
     fb_info.width = m_vkb_swapchain.extent.width;
     fb_info.height = m_vkb_swapchain.extent.height;
@@ -631,7 +620,7 @@ void gns::rendering::Device::InitFrameBuffers()
 
     //grab how many images we have in the swapchain
     const uint32_t swapchain_imagecount = static_cast<uint32_t>(m_imageViews.size());
-    m_frameBuffers = std::vector<VkFramebuffer>(swapchain_imagecount);
+    m_screenPass.frameBuffers = std::vector<VkFramebuffer>(swapchain_imagecount);
 
     //create framebuffers for each of the swapchain image views
     for (uint32_t i = 0; i < swapchain_imagecount; i++) {
@@ -643,7 +632,7 @@ void gns::rendering::Device::InitFrameBuffers()
         fb_info.pAttachments = attachments;
         fb_info.attachmentCount = 2;
 
-        _VK_CHECK(vkCreateFramebuffer(m_device, &fb_info, nullptr, &m_frameBuffers[i]), "Failed to create Frame buffers");
+        _VK_CHECK(vkCreateFramebuffer(m_device, &fb_info, nullptr, &m_screenPass.frameBuffers[i]), "Failed to create Frame buffers");
     }
 }
 
@@ -681,21 +670,65 @@ void gns::rendering::Device::InitOffscreenFrameBuffers()
     m_offscreenPass.descriptor.sampler = m_offscreenPass.sampler;
 }
 
-void gns::rendering::Device::DestroyOffscreenFrameBuffer() const
+void gns::rendering::Device::DestroyOffscreenFrameBuffer(uint32_t width, uint32_t height)
 {
+    m_offscreenPass.width = width;
+    m_offscreenPass.height = height;
     vkDeviceWaitIdle(m_device);
+    // depth image:
+	VkExtent3D depthImageExtent = { m_offscreenPass.width ,m_offscreenPass.height,1 };
+    VkImageCreateInfo dimg_info = ImageCreateInfo(m_depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, depthImageExtent);
+    vmaDestroyImage(m_allocator, m_offscreenPass.depth.image._image, m_offscreenPass.depth.image._allocation);
+
+    VmaAllocationCreateInfo dimg_allocinfo = {};
+    dimg_allocinfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+    dimg_allocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    vmaCreateImage(m_allocator, &dimg_info, &dimg_allocinfo,
+        &m_offscreenPass.depth.image._image, &m_offscreenPass.depth.image._allocation, nullptr);
+
+    VkImageViewCreateInfo dview_info = ImageViewCreateInfo(m_depthFormat, m_offscreenPass.depth.image._image, VK_IMAGE_ASPECT_DEPTH_BIT);
+    vkDestroyImageView(m_device, m_offscreenPass.depth.view, nullptr);
+    _VK_CHECK(vkCreateImageView(m_device, &dview_info, nullptr, &m_offscreenPass.depth.view), "Failed to create ImageView!");
+
+    //Color Image
+    vmaDestroyImage(m_allocator, m_offscreenPass.color.image._image, m_offscreenPass.color.image._allocation);
+
+    VkImageCreateInfo cimg_info = {};
+    cimg_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    cimg_info.imageType = VK_IMAGE_TYPE_2D;
+    cimg_info.format = m_swapchainFormat;
+    cimg_info.extent.width = m_offscreenPass.width;
+    cimg_info.extent.height = m_offscreenPass.height;
+    cimg_info.extent.depth = 1;
+    cimg_info.mipLevels = 1;
+    cimg_info.arrayLayers = 1;
+    cimg_info.samples = VK_SAMPLE_COUNT_1_BIT;
+    cimg_info.tiling = VK_IMAGE_TILING_OPTIMAL;
+    cimg_info.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    VmaAllocationCreateInfo cimg_allocinfo = {};
+    cimg_allocinfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+    cimg_allocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    vmaCreateImage(m_allocator, &cimg_info, &cimg_allocinfo,
+        &m_offscreenPass.color.image._image, &m_offscreenPass.color.image._allocation, nullptr);
+
+    VkImageViewCreateInfo cview_info = {};
+    cview_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    cview_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    cview_info.format = m_swapchainFormat;
+    cview_info.subresourceRange = {};
+    cview_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    cview_info.subresourceRange.baseMipLevel = 0;
+    cview_info.subresourceRange.levelCount = 1;
+    cview_info.subresourceRange.baseArrayLayer = 0;
+    cview_info.subresourceRange.layerCount = 1;
+    cview_info.image = m_offscreenPass.color.image._image;
+    vkDestroyImageView(m_device, m_offscreenPass.color.view, nullptr);
+    _VK_CHECK(vkCreateImageView(m_device, &cview_info, nullptr, &m_offscreenPass.color.view), "Failed to create ImageView!");
+
+
     for (size_t i = 0; i < m_offscreenPass.frameBuffers.size(); i++) {
         vkDestroyFramebuffer(m_device, m_offscreenPass.frameBuffers[i], nullptr);
     }
-
-    vkDestroyImageView(m_device, m_offscreenPass.color.view, nullptr);
-    vkDestroySampler(m_device, m_offscreenPass.sampler, nullptr);
-
-    vkDestroyImageView(m_device, m_offscreenPass.depth.view, nullptr);
-    vkDestroyImage(m_device, m_offscreenPass.color.image, nullptr);
-    vkDestroyImage(m_device, m_offscreenPass.depth.image, nullptr);
-    vkFreeMemory(m_device, m_offscreenPass.color.mem, nullptr);
-    vkFreeMemory(m_device, m_offscreenPass.depth.mem, nullptr);
 }
 
 void gns::rendering::Device::InitSyncStructures()
@@ -804,7 +837,7 @@ void gns::rendering::Device::InitGlobalDescriptors(size_t size)
 
 void gns::rendering::Device::InitRenderTargetDescriptor()
 {
-    
+    PROFILE_FUNC
 }
 
 void gns::rendering::Device::InitMaterialSetLayouts()
@@ -868,31 +901,29 @@ void gns::rendering::Device::DisposeBuffer(const Buffer& buffer) const
 uint32_t gns::rendering::Device::GetMemoryType(uint32_t typeBits, VkMemoryPropertyFlags properties,
                                                VkBool32* memTypeFound) const
 {
+    for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++)
     {
-        for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++)
+        if ((typeBits & 1) == 1)
         {
-            if ((typeBits & 1) == 1)
+            if ((memoryProperties.memoryTypes[i].propertyFlags & properties) == properties)
             {
-                if ((memoryProperties.memoryTypes[i].propertyFlags & properties) == properties)
+                if (memTypeFound)
                 {
-                    if (memTypeFound)
-                    {
-                        *memTypeFound = true;
-                    }
-                    return i;
+                    *memTypeFound = true;
                 }
+                return i;
             }
-            typeBits >>= 1;
         }
+        typeBits >>= 1;
+    }
 
-        if (memTypeFound)
-        {
-            *memTypeFound = false;
-            return 0;
-        }
-        else
-        {
-            throw std::runtime_error("Could not find a matching memory type");
-        }
+    if (memTypeFound)
+    {
+        *memTypeFound = false;
+        return 0;
+    }
+    else
+    {
+        throw std::runtime_error("Could not find a matching memory type");
     }
 }

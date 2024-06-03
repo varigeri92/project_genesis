@@ -11,12 +11,24 @@ gns::AssetMetadata& gns::AssetDatabase::GetAssetByGuid(const gns::core::guid gui
 	return S_AssetDatabase[guid];
 }
 
-const gns::AssetMetadata& gns::AssetDatabase::GetAssetByName(const std::string& assetName)
+gns::AssetMetadata& gns::AssetDatabase::GetAssetByName(const std::string& assetName)
 {
 	for (auto it = S_AssetDatabase.begin(); it != S_AssetDatabase.end(); ++it) {
 		if (it->second.name == assetName)
 			return it->second;
 	}
+}
+
+bool gns::AssetDatabase::IsAssetImported(const std::string& assetName, gns::core::guid& guid)
+{
+	for (auto it = S_AssetDatabase.begin(); it != S_AssetDatabase.end(); ++it) {
+		if (it->second.name == assetName)
+		{
+			guid = it->first;
+			return true;
+		}
+	}
+	return false;
 }
 
 void gns::AssetDatabase::SetProjectRoot(const std::string& path)

@@ -40,7 +40,28 @@ namespace gns
 	public:
 
 		GNS_API static entt::registry& GetRegistry();
-		
+
+		template<typename T, typename... Args>
+		static T* FindEntityOfType_Component()
+		{
+			auto view = SystemsAPI::GetRegistry().view<T>();
+			for (auto [entt, component] : view.each())
+			{
+				return &component;
+			}
+			return nullptr;
+		}
+
+		template<typename T, typename... Args>
+		static entt::entity FindEntityOfType()
+		{
+			auto view = SystemsAPI::GetRegistry().view<T>();
+			for (auto [entt, component] : view.each())
+			{
+				return entt;
+			}
+			return entt::null;
+		}
 
 		template<typename T, typename... Args>
 		static T* RegisterSystem(Args&& ... args)

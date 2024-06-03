@@ -40,8 +40,6 @@ void operator delete(void* p, size_t size)
 	free(p);
 }
 //TESTING:
-
-
 gns::EventFunction<void, std::string> DoNotCallThis_EventFunction([](const std::string& message)
 	{
 		LOG_INFO("Do not Call this: " << message);

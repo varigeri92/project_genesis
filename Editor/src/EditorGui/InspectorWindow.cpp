@@ -30,7 +30,6 @@ namespace gns::editor
 		dockSpaceWindow->PushWindowMenu("Inspector Window", "", &m_isActive);
 		onEntitySelected = new gns::EventFunction<void, entt::entity>([&](entt::entity selectedEntity)
 			{
-				LOG_INFO(static_cast<uint64_t>(selectedEntity));
 				inspectedEntity = gns::Entity(selectedEntity);
 				DrawFullComponentData.clear();
 			});
@@ -63,7 +62,21 @@ namespace gns::editor
 	void InspectorWindow::OnGUI()
 	{
 		ChildSize.y = 0;
-		if (!inspectedEntity.IsValid()) return;
+		
+
+		if (!inspectedEntity.IsValid())
+		{
+			if(!SelectionManager::isSelectionImported)
+			{
+				ImGui::Text("Selected Asset is not imported!");
+				if(ImGui::Button("Import", { ImGui::GetContentRegionAvail().x,20 }))
+				{
+					LOG_INFO("Importing asset: xxx");
+				}
+			}
+			return;
+		}
+			
 
 		ImGui::PushFont(gns::gui::GuiSystem::boldFont);
 		ImGui::Text(inspectedEntity.GetComponent<gns::EntityComponent>().name.c_str());

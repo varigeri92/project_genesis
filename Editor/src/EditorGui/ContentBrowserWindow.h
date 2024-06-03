@@ -22,5 +22,7 @@ namespace gns::editor
 		void DrawDirectory(const std::filesystem::directory_entry& entry);
 		void DrawFile(const std::filesystem::directory_entry& entry);
 		void DrawDirectoryInHierarchy(const std::string& path);
+
+		void FileCreationModal(std::string fileType);
 	};
 }

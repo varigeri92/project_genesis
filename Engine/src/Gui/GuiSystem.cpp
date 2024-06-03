@@ -5,7 +5,7 @@
 #include "../Renderer/Utils/VkDebug.h"
 #include "../AssetDatabase/AssetLoader.h"
 #include "../Gui/ImGui/IconsMaterialDesign.h"
-
+#include "ImGui/ImGuizmo.h"
 
 std::vector<gns::gui::GuiWindow*> gns::gui::GuiSystem::guiWindows = {};
 bool gns::gui::GuiSystem::s_showDemo = false;
@@ -57,11 +57,12 @@ gns::gui::GuiSystem::GuiSystem(rendering::Device* device, Window* window) : m_de
 	init_info.Device = m_device->m_device;
 	init_info.Queue = m_device->m_graphicsQueue;
 	init_info.DescriptorPool = m_device->m_imGuiPool;
-	init_info.MinImageCount = 3;
-	init_info.ImageCount = 3;
+	init_info.Subpass = 0;
+	init_info.MinImageCount = 2;
+	init_info.ImageCount = m_device->m_imageCount;
 	init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-
-	ImGui_ImplVulkan_Init(&init_info, m_device->m_renderPass);
+	
+	ImGui_ImplVulkan_Init(&init_info, m_device->m_screenPass.renderPass);
 
 	//execute a gpu command to upload imgui font textures
 	ImGuiIO& io = ImGui::GetIO(); //(void)io;
@@ -111,7 +112,7 @@ void gns::gui::GuiSystem::BeginGUI() const
 	ImGui_ImplVulkan_NewFrame();
 	ImGui_ImplSDL2_NewFrame(m_window->sdlWindow);
 	ImGui::NewFrame();
-
+	ImGuizmo::BeginFrame();
 }
 
 void gns::gui::GuiSystem::UpdateGui()

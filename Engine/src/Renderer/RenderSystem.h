@@ -51,7 +51,7 @@ namespace gns
 		void DisposeTexture(rendering::Texture* texture);
 		void DisposeMesh(rendering::MeshData* mesh);
 		void DisposeMaterial(rendering::Material* material);
-		GNS_API rendering::OffscreenPass& GetOffscreenPass() const;
+		GNS_API rendering::RenderPass& GetOffscreenPass() const;
 		GNS_API void RecreateFrameBuffer(uint32_t width, uint32_t height);
 		GNS_API void CreatePipeline(rendering::Shader* shader);
 		GNS_API void UploadMesh(rendering::Mesh* mesh);

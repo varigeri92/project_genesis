@@ -17,9 +17,7 @@
 namespace gns::rendering
 {
 		
-	Renderer::Renderer(Device* device):m_device(device)
-	{
-	}
+	Renderer::Renderer(Device* device):m_device(device){}
 
 	Renderer::~Renderer()
 	{
@@ -49,16 +47,17 @@ namespace gns::rendering
 		CreateSetLayoutBindings(shader);
 		setLayouts.push_back(shader->shaderSetLayout);
 
+		VkExtent2D scissor = { m_device->m_offscreenPass.width, m_device->m_offscreenPass.height };
 		pipelineBuilder._vertexInputInfo = VertexInputStateCreateInfo();
 		pipelineBuilder._inputAssembly = InputAssemblyCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 		pipelineBuilder._viewport.x = 0.0f;
 		pipelineBuilder._viewport.y = 0.0f;
-		pipelineBuilder._viewport.width = static_cast<float>(m_device->m_vkb_swapchain.extent.width);
-		pipelineBuilder._viewport.height = static_cast<float>(m_device->m_vkb_swapchain.extent.height);
+		pipelineBuilder._viewport.width = static_cast<float>(m_device->m_offscreenPass.width);
+		pipelineBuilder._viewport.height = static_cast<float>(m_device->m_offscreenPass.width);
 		pipelineBuilder._viewport.minDepth = 0.0f;
 		pipelineBuilder._viewport.maxDepth = 1.0f;
 		pipelineBuilder._scissor.offset = { 0, 0 };
-		pipelineBuilder._scissor.extent = m_device->m_vkb_swapchain.extent;
+		pipelineBuilder._scissor.extent = scissor;
 		pipelineBuilder._rasterizer = RasterizationStateCreateInfo(VK_POLYGON_MODE_FILL);
 		pipelineBuilder._multisampling = MultisamplingStateCreateInfo();
 		pipelineBuilder._colorBlendAttachment = ColorBlendAttachmentState();
@@ -135,10 +134,10 @@ namespace gns::rendering
 		cmdBeginInfo.pInheritanceInfo = nullptr;
 		cmdBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-		const VkViewport viewport = { 0, 0, (float)m_device->m_vkb_swapchain.extent.width, (float)m_device->m_vkb_swapchain.extent.height, 0, 1 };
+		const VkViewport viewport = { 0, 0, (float)m_device->m_offscreenPass.width, (float)m_device->m_offscreenPass.height, 0, 1 };
 		VkRect2D scissor = {};
 		scissor.offset = { 0,0 };
-		scissor.extent = m_device->m_vkb_swapchain.extent;
+		scissor.extent = { m_device->m_offscreenPass.width , m_device->m_offscreenPass.height };
 
 		_VK_CHECK(vkBeginCommandBuffer(m_device->GetCurrentFrame()._mainCommandBuffer, &cmdBeginInfo), "Cannot begin cmdBuffer");
 		vkCmdSetViewport(m_device->GetCurrentFrame()._mainCommandBuffer, 0, 1, &viewport);
@@ -157,11 +156,11 @@ namespace gns::rendering
 		rpInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		rpInfo.pNext = nullptr;
 
-		rpInfo.renderPass = m_device->m_guiPass;
+		rpInfo.renderPass = m_device->m_screenPass.renderPass;
 		rpInfo.renderArea.offset.x = 0;
 		rpInfo.renderArea.offset.y = 0;
 		rpInfo.renderArea.extent = m_device->m_vkb_swapchain.extent;
-		rpInfo.framebuffer = m_device->m_frameBuffers[swapchainImageIndex];
+		rpInfo.framebuffer = m_device->m_screenPass.frameBuffers[swapchainImageIndex];
 		rpInfo.clearValueCount = 2;
 		VkClearValue clearValues[] = { clearValue, depthClear };
 		rpInfo.pClearValues = &clearValues[0];
@@ -203,11 +202,11 @@ namespace gns::rendering
 		rpInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		rpInfo.pNext = nullptr;
 
-		rpInfo.renderPass = m_device->m_guiPass;
+		rpInfo.renderPass = m_device->m_screenPass.renderPass;
 		rpInfo.renderArea.offset.x = 0;
 		rpInfo.renderArea.offset.y = 0;
 		rpInfo.renderArea.extent = m_device->m_vkb_swapchain.extent;
-		rpInfo.framebuffer = m_device->m_frameBuffers[swapchainImageIndex];
+		rpInfo.framebuffer = m_device->m_screenPass.frameBuffers[swapchainImageIndex];
 		rpInfo.clearValueCount = 2;
 		VkClearValue clearValues[] = { clearValue, depthClear };
 		rpInfo.pClearValues = &clearValues[0];

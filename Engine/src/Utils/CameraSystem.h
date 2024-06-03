@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "../SystemsApi/SystemBase.h"
+#include "glm/glm.hpp"
 
 namespace gns
 {
@@ -20,5 +21,6 @@ namespace gns
 		GNS_API void OnCreate() override;
 		GNS_API void OnUpdate(float deltaTime) override;
 		GNS_API void UpdateProjection(const int w, const int h);
+		GNS_API void setViewYXZ(glm::vec3 position, glm::vec3 rotation);
 };
 }
