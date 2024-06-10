@@ -5,6 +5,9 @@
 
 namespace gns
 {
+	struct Transform;
+	struct Camera;
+
 	namespace rendering
 	{
 		struct Mesh;
@@ -38,12 +41,18 @@ namespace gns
 		gns::rendering::Renderer* m_renderer;
 		void UpdateMatrix(glm::mat4& matrix, 
 			const glm::vec3 position, const glm::vec3 rotation, const glm::vec3 scale);
+
+		void BatchLights();
+		Camera* m_renderCamera;
+		Transform* m_transform;
+
 	public:
 		GNS_API RenderSystem(Window* window);
 		RenderSystem(RenderSystem& other) = delete;
 		GNS_API ~RenderSystem();
 		GNS_API void OnCreate() override;
 		GNS_API void OnUpdate(float deltaTime) override;
+		GNS_API void SetRenderCamera(Camera* renderCamera, Transform* transform);
 
 		rendering::Device* GetDevice() const;
 		rendering::Renderer* GetRenderer() const;

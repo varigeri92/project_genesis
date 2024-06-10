@@ -12,7 +12,6 @@ namespace gns
 	{
 	private:
 		friend class Engine;
-		static entt::registry m_registry;
 
 		static GNS_API std::vector<gns::SystemBase*> Systems;
 		static void UpdateSystems(float deltaTime);

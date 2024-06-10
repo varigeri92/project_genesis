@@ -1,6 +1,7 @@
 #include "Editor.h"
 #include "Engine.h"
 #include "api.h"
+#include "EditorCamera.h"
 #include "../../Engine/src/Level/SceneManager.h"
 #include "../../Engine/src/AssetDatabase/AssetLoader.h"
 #include "EditorGui/DockspaceWindow.h"
@@ -15,10 +16,10 @@ gns::editor::Editor::Editor(Engine* engine) : engine(engine)
 {
     engine->Init([&]()
         {
-            Entity cameraEntity = Entity::CreateEntity("Editor_Camera", core::SceneManager::ActiveScene);
-            Transform& cameraTransform = cameraEntity.GetComponent<Transform>();
-            Camera& cam = cameraEntity.AddComponet<Camera>(0.01, 1000, 60, 1920, 1080, cameraTransform);
-            CameraSystem* cameraSystem = SystemsAPI::RegisterSystem<CameraSystem>();
+
+            auto editor_camera = SystemsAPI::RegisterSystem<EditorCamera>();
+            SystemsAPI::GetSystem<RenderSystem>()->SetRenderCamera(
+                &editor_camera->m_camera, &editor_camera->m_transform);
 
             gui::GuiSystem::RegisterWindow<DockspaceWindow>("DockSpace");
             gui::GuiSystem::RegisterWindow<SceneViewWindow>("Scene");
@@ -27,8 +28,6 @@ gns::editor::Editor::Editor(Engine* engine) : engine(engine)
             gui::GuiSystem::RegisterWindow<ContentBrowserWindow>();
             gui::GuiSystem::RegisterWindow<SceneHierarchy>();
 
-            cameraTransform.position = { 0.f,1.f,5.f };
-            cameraSystem->UpdateProjection(1920, 1080);
 
             // Entity tests:
             //const std::shared_ptr<rendering::Shader> defaultShader = std::make_shared<rendering::Shader>("blinphong.vert.spv", "blinphong.frag.spv");

@@ -8,6 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+
 void gns::CameraSystem::OnCreate()
 {
 	LOG_INFO("Camera System Created!");
@@ -98,11 +99,11 @@ void gns::CameraSystem::UpdateCamera(float deltaTime)
 
 		//down:
 		if (InputBackend::GetKey(SDLK_q)) {
-			m_transform->position += camUp * speed;
+			m_transform->position -= camUp * speed;
 		}
 		//up:
 		if (InputBackend::GetKey(SDLK_e)) {
-			m_transform->position -= camUp * speed;
+			m_transform->position += camUp * speed;
 		}
 
 

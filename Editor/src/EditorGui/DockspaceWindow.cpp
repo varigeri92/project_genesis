@@ -23,12 +23,14 @@ void gns::editor::DockspaceWindow::OnGUI()
         {
             if(ImGui::MenuItem("Save Scene(s)", "Ctrl + S", &dummy))
             {
-                core::SceneManager::SerializeScene(core::SceneManager::ActiveScene);
+                Serializer serializer;
+                const std::string result = serializer.SerializeScene(core::SceneManager::ActiveScene);
+                LOG_INFO("\n" << result << "\n");
             }
             ImGui::Separator();
             if(ImGui::MenuItem("Open Default Scene", "Ctrl + O", &dummy))
             {
-                core::SceneManager::LoadScene("EmptyPath for now!");
+                
             }
             ImGui::MenuItem("dummy ...", "Ctrl + O", &dummy);
         	ImGui::Separator();

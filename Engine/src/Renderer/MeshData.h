@@ -2,6 +2,7 @@
 #include "RenderSystem.h"
 #include "../Object/Object.h"
 #include "Utils/Buffer.h"
+#include "Log.h"
 
 
 namespace gns::rendering

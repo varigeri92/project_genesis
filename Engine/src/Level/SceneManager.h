@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "../SystemsApi/ComponentLibrary.h"
-
+#include "Scene.h"
 namespace YAML
 {
 	class Node;
@@ -13,13 +13,6 @@ namespace gns::core
 	{
 		std::vector<ComponentBase*> componentDataArray;
 		std::vector<ComponentData> serializationInfos;
-	};
-
-	struct Scene
-	{
-		std::string name;
-		std::vector<entt::entity> entities;
-		void AddEntity(entt::entity entity);
 	};
 
 	class SceneManager

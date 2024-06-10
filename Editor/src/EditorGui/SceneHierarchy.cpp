@@ -23,7 +23,6 @@ namespace gns::editor
             {
                 node_flags |= ImGuiTreeNodeFlags_Selected;
             }
-
             /*
 			ImGui::Text(entityComponent.name.c_str());
             ImGuiTreeNodeFlags node_flags = base_flags;
@@ -55,14 +54,21 @@ namespace gns::editor
                 // The only reason we use TreeNode at all is to allow selection of the leaf. Otherwise we can
                 // use BulletText() or advance the cursor by GetTreeNodeToLabelSpacing() and call Text().
             }
-             */
+            */
+
             node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen; // ImGuiTreeNodeFlags_Bullet
             ImGui::TreeNodeEx((void*)&entt, node_flags, entityComponent.name.c_str());
             if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
             {
                 SelectionManager::SetSelectedEntity(entt);
                 LOG_INFO("Selected: " << entityComponent.name);
+            }ImGui::SameLine();
+            if(ImGui::Button("D"))
+            {
+                SelectionManager::SetSelectedEntity(entt::null);
+                SystemsAPI::GetRegistry().destroy(entt);
             }
+            
             if (ImGui::BeginDragDropSource())
             {
                 ImGui::SetDragDropPayload("_TREENODE", NULL, 0);

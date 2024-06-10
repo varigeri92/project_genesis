@@ -8,46 +8,21 @@
 #include "../AssetDatabase/AssetDatabase.h"
 #include "../AssetDatabase/AssetLoader.h"
 #include "../Renderer/Utils/Buffer.h"
-
+#include "Scene.h"
 
 namespace fs = std::filesystem;
 
 
 namespace gns::core
 {
-	bool writeFile(const std::string& source, const std::string& path) {
-		std::ofstream outputFile(path);
-
-		if (!outputFile.is_open()) {
-			// Failed to open file
-			LOG_ERROR("Error: Failed to open file " << path << " for writing");
-			return false;
-		}
-
-		outputFile << source;
-		outputFile.close();
-
-		if (!fs::exists(path)) {
-			fs::create_directories(fs::path(path).parent_path());
-			LOG_INFO("Created directory for file: " << path);
-		}
-
-		LOG_INFO("Data written to file: " << path);
-		return true;
-	}
-
-	void Scene::AddEntity(entt::entity entity)
-	{
-		entities.push_back(entity);
-	}
-
 	Scene* SceneManager::ActiveScene = nullptr;
 
 	Scene* SceneManager::LoadScene(std::string path)
 	{
+		/*
 		YAML::Node sceneNode = YAML::LoadFile(AssetLoader::GetAssetsPath() + "\\DefaultScene.gnsscene");
-		LOG_INFO(AQUA << "[Scene Seriualizer]:" << DEFAULT << "Serialized vith version: " << sceneNode["version"].as<std::string>());
-		LOG_INFO(AQUA << "[Scene Seriualizer]:" << DEFAULT << "Scene name: " << sceneNode["scene"].as<std::string>());
+		LOG_INFO(AQUA << "[Scene Serializer]:" << DEFAULT << "Serialized vith version: " << sceneNode["version"].as<std::string>());
+		LOG_INFO(AQUA << "[Scene Serializer]:" << DEFAULT << "Scene name: " << sceneNode["scene"].as<std::string>());
 		Scene* scene = CreateScene(sceneNode["scene"].as<std::string>());
 
 		const YAML::Node& entities = sceneNode["entities"];
@@ -56,48 +31,44 @@ namespace gns::core
 			for (std::size_t k = 0; k < entities[i].size(); k++)
 			{
 				const YAML::Node& component = entities[i][k];
-				LOG_INFO(AQUA << "\t[Scene Seriualizer]:" << DEFAULT << "entity-component name: " << component["component_name"].as<std::string>());
-				LOG_INFO(AQUA << "\t[Scene Seriualizer]:" << DEFAULT << "entity-component id: " << component["component_id"].as<uint32_t>());
-				LOG_INFO(AQUA << "\t[Scene Seriualizer]:" << DEFAULT << "entity-component fields: ");
+				LOG_INFO(AQUA << "\t[Scene Serializer]:" << DEFAULT << "entity-component name: " << component["component_name"].as<std::string>());
+				LOG_INFO(AQUA << "\t[Scene Serializer]:" << DEFAULT << "entity-component id: " << component["component_id"].as<uint32_t>());
+				LOG_INFO(AQUA << "\t[Scene Serializer]:" << DEFAULT << "entity-component fields: ");
 				void* component_ptr = AddComponentFromSavedData(entity, component["component_id"].as<uint32_t>());
 				const YAML::Node& fields = component["component_fields"];
 				for (std::size_t j = 0; j < fields.size(); j++)
 				{
-					LOG_INFO(AQUA << "\t\t[Scene Seriualizer]:" << DEFAULT << "field_type_id: " << fields[j]["field_type_id"].as<size_t>());
-					LOG_INFO(AQUA << "\t\t[Scene Seriualizer]:" << DEFAULT << "field_offset: " << fields[j]["field_offset"].as<size_t>());
-					LOG_INFO(AQUA << "\t\t[Scene Seriualizer]:" << DEFAULT << "field_size: " << fields[j]["field_size"].as<size_t>());
-					LOG_INFO(AQUA << "\t\t[Scene Seriualizer]:" << DEFAULT << "field_name: " << fields[j]["field_name"].as<std::string>());
+					LOG_INFO(AQUA << "\t\t[Scene Serializer]:" << DEFAULT << "field_type_id: " << fields[j]["field_type_id"].as<size_t>());
+					LOG_INFO(AQUA << "\t\t[Scene Serializer]:" << DEFAULT << "field_offset: " << fields[j]["field_offset"].as<size_t>());
+					LOG_INFO(AQUA << "\t\t[Scene Serializer]:" << DEFAULT << "field_size: " << fields[j]["field_size"].as<size_t>());
+					LOG_INFO(AQUA << "\t\t[Scene Serializer]:" << DEFAULT << "field_name: " << fields[j]["field_name"].as<std::string>());
 					void* field_ptr = ReadFieldValue(fields[j]["field_type_id"].as<size_t>(), fields[j]["field_value"]);
 					if (field_ptr != nullptr && component_ptr != nullptr)
 					{
 						LOG_INFO("Writing field data to: " << Serializer::ComponentData_Table[component["component_id"].as<uint32_t>()].fields[j].name);
-						;
 						WriteFieldToComponent(component_ptr, 
 							Serializer::ComponentData_Table[component["component_id"].as<uint32_t>()].fields[j],
 							field_ptr);
-
 					}
 				}
 				
 			}
-
 		}
-
+		*/
 		return nullptr;
 	}
 
 	Scene* SceneManager::CreateScene(std::string name)
 	{
-		Scene* newScene = new Scene(name, {});
+		Scene* newScene = new Scene(name);
 		if (ActiveScene == nullptr)
 			ActiveScene = newScene;
-
-		IntegrateScene(newScene);
 		return newScene;
 	}
 
 	Scene* SceneManager::SerializeScene(Scene* scene)
 	{
+		/*
 		YAML::Emitter out;
 		out << YAML::BeginMap << "version" << "0.0.1" <<"scene" << scene->name
 		<< "entities" << YAML::BeginSeq;
@@ -133,7 +104,8 @@ namespace gns::core
 		out << YAML::EndMap;
 		LOG_INFO("Yaml result:\n" << out.c_str()<<"\n");
 		writeFile(out.c_str(), AssetLoader::GetAssetsPath()+"\\"+scene->name+".gnsscene");
-		return scene;
+		*/
+		return nullptr;
 	}
 
 	void SceneManager::IntegrateScene(Scene* scene)
@@ -164,9 +136,11 @@ namespace gns::core
 				(static_cast<glm::vec3*>(GetPointerToField(data_ptr, offset)))->y <<
 				(static_cast<glm::vec3*>(GetPointerToField(data_ptr, offset)))->z << YAML::EndSeq;
 		}
-		if (typeId == typeid(gns::core::guid).hash_code())
+		if (typeId == typeid(gns::rendering::Mesh).hash_code())
 		{
-			guid guid = *static_cast<gns::core::guid*>(GetPointerToField(data_ptr, offset));
+			gns::rendering::Mesh** mesh = static_cast<gns::rendering::Mesh**>(GetPointerToField(data_ptr, offset));
+			gns::rendering::Mesh* m = *mesh;
+			guid guid = m->GetGuid();
 			return out << guid;
 		}
 		return out << "NaN";
@@ -199,6 +173,13 @@ namespace gns::core
 			LOG_INFO("field has the value of: " << node.as<std::string>());
 			return string;
 		}
+
+		if (field_typeId == typeid(gns::rendering::Mesh).hash_code())
+		{
+			gns::core::guid* guid = new gns::core::guid(node.as<uint64_t>());
+			LOG_INFO("field has the value of: " << node.as<std::string>());
+			return guid;
+		}
 		return nullptr;
 	}
 
@@ -215,14 +196,40 @@ namespace gns::core
 			gns::EntityComponent& component = entity.GetComponent<gns::EntityComponent>();
 			return &component;
 		}
+
+		if (Component_typeId == entt::type_hash<gns::RendererComponent, void>::value()) // EntityComponent
+		{
+			gns::RendererComponent& component = entity.AddComponet<gns::RendererComponent>();
+			return &component;
+		}
+
 		return nullptr;
 	}
 
 	void SceneManager::WriteFieldToComponent(void* component_ptr, const FieldData& fieldData,
 		const void* fieldValuer_ptr)
 	{
-		void* value_ptr = GetPointerToField(component_ptr, fieldData.offset);
-		memcpy(value_ptr, fieldValuer_ptr, fieldData.size);
+		LOG_INFO("Writing field "<< fieldData.name <<"Data to the Component");
+		if(fieldData.typeID == typeid(gns::rendering::Mesh).hash_code())
+		{
+			guid guid;
+			memcpy(&guid, fieldValuer_ptr, fieldData.size);
+			AssetMetadata meshMeta = AssetDatabase::GetAssetByGuid(guid);
+			gns::rendering::Mesh* mesh = Object::Get<rendering::Mesh>(meshMeta.guid);
+			rendering::Material* material = nullptr;
+			
+			AssetMetadata default_materialMeta = AssetDatabase::GetAssetByName("__default_material");
+			material = Object::Get<rendering::Material>(default_materialMeta.guid);
+			for (const auto& subMesh : mesh->m_subMeshes)
+			{
+				static_cast<RendererComponent*>(component_ptr)->m_materials.push_back(material);
+			}
+		}
+		else
+		{
+			void* value_ptr = GetPointerToField(component_ptr, fieldData.offset);
+			memcpy(value_ptr, fieldValuer_ptr, fieldData.size);
+		}
 	}
 
 	Scene* SceneManager::loadSceneFromFile(std::string path)

@@ -4,6 +4,7 @@
 #include "Shader.h"
 #include "../Gui/GuiSystem.h"
 #include "../SystemsApi/ComponentLibrary.h"
+#include "Lights/Lights.h"
 
 
 static  void printMat4(const glm::mat4& matrix, std::string label) {
@@ -41,6 +42,7 @@ static void printVec3(const glm::vec3& vec) {
 	std::cout << "+------------+------------+------------+" << std::endl;
 }
 
+
 gns::RenderSystem::RenderSystem(Window* window) : SystemBase(), sceneData()
 {
 	PROFILE_FUNC
@@ -67,14 +69,10 @@ void gns::RenderSystem::OnUpdate(float deltaTime)
 {
 	PROFILE_FUNC
 
-	
-	auto cameraView = SystemsAPI::GetRegistry().view<Transform, Camera>();
-	for (auto [entt, transform, camera] : cameraView.each())
-	{
-		camData.view = camera.view;
-		camData.proj = camera.projection;
-		camData.viewproj = camera.camera_matrix;
-	}
+	camData.view = m_renderCamera->view;
+	camData.proj = m_renderCamera->projection;
+	camData.viewproj = m_renderCamera->camera_matrix;
+
 	uint32_t swapchainImageIndex;
 	if (m_renderer->BeginFrame(swapchainImageIndex))
 	{
@@ -97,6 +95,12 @@ void gns::RenderSystem::OnUpdate(float deltaTime)
 		m_renderer->EndRenderPass(swapchainImageIndex);
 		m_renderer->EndFrame(swapchainImageIndex);
 	}
+}
+
+void gns::RenderSystem::SetRenderCamera(Camera* renderCamera, Transform* transform)
+{
+	m_renderCamera = renderCamera;
+	m_transform = transform;
 }
 
 

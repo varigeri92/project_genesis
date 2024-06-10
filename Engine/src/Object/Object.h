@@ -1,6 +1,7 @@
 #pragma once
 #include "IDisposable.h"
 #include "../Utils/Guid.h"
+#include "Log.h"
 
 namespace gns
 {
@@ -48,7 +49,6 @@ namespace gns
 			{
 				return static_cast<T*>(s_objectMap[guid]);
 			}
-			LOG_ERROR("The Object with guid: '" << guid << "' has beed already destoyed, or has never been created!");
 			return nullptr;
 		}
 

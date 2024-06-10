@@ -9,12 +9,18 @@
 #include "../AssetManager/AssetImporter.h"
 #include "../Utils/Utilities.h"
 #include "../../../Engine/src/Gui/ImGui/ImGuizmo.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/quaternion.hpp>
 
-gns::CameraSystem* editor_camera_System = nullptr;
+#include "../EditorCamera.h"
+#include "../Utils/FileSystem.h"
+
 gns::Transform* currentEntityTransform;
 entt::entity selected = entt::null;
-gns::Entity camera_entity = gns::Entity(selected);
-gns::editor::SceneViewWindow::SceneViewWindow(const std::string& name): GuiWindow(name), m_WindowInitialized(false)
+EditorCamera* camera = nullptr;
+gns::editor::SceneViewWindow::SceneViewWindow(const std::string& name): GuiWindow(name), m_WindowInitialized(false), m_isGizmoLocal(true)
 {
 	m_renderSystem = SystemsAPI::GetSystem<RenderSystem>();
 	m_offscreenPass = &m_renderSystem->GetOffscreenPass();
@@ -22,22 +28,28 @@ gns::editor::SceneViewWindow::SceneViewWindow(const std::string& name): GuiWindo
 		m_offscreenPass->descriptor.imageLayout);
 	DockspaceWindow* dockSpaceWindow = gui::GuiSystem::GetWindow<DockspaceWindow>();
 	dockSpaceWindow->PushWindowMenu("Scene View", "", &m_isActive);
-	//editor_camera_System = SystemsAPI::GetSystem<CameraSystem>();
-	camera_entity = SystemsAPI::FindEntityOfType<Camera>();
+	camera = SystemsAPI::GetSystem<EditorCamera>();
 	onEntitySelected = new gns::EventFunction<void, entt::entity>([&](entt::entity selectedEntity)
 		{
 			selected = selectedEntity;
-			currentEntityTransform = &gns::Entity(selectedEntity).GetComponent<Transform>();
+			if(selected!= entt::null)
+				currentEntityTransform = &gns::Entity(selectedEntity).GetComponent<Transform>();
 		});
 
 	SelectionManager::onSelectionChanged.Subscribe<void, entt::entity>(onEntitySelected);
+	m_gizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
+	m_gizmoMode = ImGuizmo::MODE::WORLD;
 }
 
 gns::editor::SceneViewWindow::~SceneViewWindow()
 {
 	
 }
-
+void decomposeMatrix(const glm::mat4& matrix, glm::vec3& scale, glm::quat& rotation, glm::vec3& translation) {
+	glm::vec3 skew;
+	glm::vec4 perspective;
+	glm::decompose(matrix, scale, rotation, translation, skew, perspective);
+}
 ImVec2 viewportPanelSize = {0,0};
 void gns::editor::SceneViewWindow::OnGUI()
 {
@@ -45,9 +57,33 @@ void gns::editor::SceneViewWindow::OnGUI()
 	ImGui::PopStyleVar(1);
 	viewportPanelSize = ImGui::GetContentRegionAvail();
 	viewportPanelSize.y -= ImGui::GetTextLineHeightWithSpacing() + 5;
-	if(ImGui::Button("Recreate Framebuffer"))
+	if (ImGui::Button("L/W"))
 	{
-		OnWindowResized(viewportPanelSize.x, viewportPanelSize.y);
+		if(m_gizmoMode == ImGuizmo::MODE::LOCAL)
+		{
+			m_gizmoMode = ImGuizmo::MODE::WORLD;
+		}
+		else
+		{
+			m_gizmoMode = ImGuizmo::MODE::LOCAL;
+		}
+
+	}ImGui::SameLine();
+	if (ImGui::Button("T"))
+	{
+		m_gizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
+	}ImGui::SameLine();
+	if (ImGui::Button("R"))
+	{
+		m_gizmoOperation = ImGuizmo::OPERATION::ROTATE;
+	}ImGui::SameLine();
+	if (ImGui::Button("S"))
+	{
+		m_gizmoOperation = ImGuizmo::OPERATION::SCALE;
+	}ImGui::SameLine();
+	if (ImGui::Button("B"))
+	{
+		m_gizmoOperation = ImGuizmo::OPERATION::BOUNDS;
 	}
 	if(IsWindowResized(viewportPanelSize) && m_WindowInitialized)
 	{
@@ -67,14 +103,14 @@ void gns::editor::SceneViewWindow::OnGUI()
 				AssetMetadata importedAsset = AssetDatabase::AddAssetToDatabase(assetMeta);
 				auto* mesh = AssetLoader::LoadAssetFromFile<rendering::Mesh>(importedAsset.guid);
 				SystemsAPI::GetSystem<RenderSystem>()->UploadMesh(mesh);
-				Entity entity = Entity::CreateEntity(utils::GetFileName(importedAsset.sourcePath), core::SceneManager::ActiveScene);
+				Entity entity = core::SceneManager::ActiveScene->CreateEntity(fs::FileSystem::GetFileName(importedAsset.sourcePath));
 				entity.AddComponet <RendererComponent>(importedAsset.guid, 0);
 			}
 		}
 		ImGui::EndDragDropTarget();
 	}
 	m_WindowInitialized = true;
-	if (currentEntityTransform == nullptr) return;
+	if(selected == entt::null) return;
 
 	glm::mat4 gridMatrix = glm::mat4(1);
 	ImGuizmo::SetOrthographic(false);
@@ -82,25 +118,19 @@ void gns::editor::SceneViewWindow::OnGUI()
 	ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y + ImGui::GetTextLineHeightWithSpacing(),
 		(float)viewportPanelSize.x, (float)viewportPanelSize.y);
 	glm::mat4 t_matrix = currentEntityTransform->matrix;
-	Camera& camera = camera_entity.GetComponent<Camera>();
-	glm::mat4 view = camera.view;//camera_entity.GetComponent<Transform>().matrix;
-	//view = glm::inverse(view);
-	glm::mat4 projection = camera.projection;
+	glm::mat4 view = camera->m_camera.view;
+	glm::mat4 projection = camera->m_camera.projection;
 	projection[1][1] *= -1;
 
-	/*
-	ImGuizmo::DrawGrid(reinterpret_cast<float*>(&view), reinterpret_cast<float*>(&projection),
-		reinterpret_cast<float*>(&gridMatrix), 25);
-	 */
-	if(selected == camera_entity.entity)
-		return;
 	ImGuizmo::Manipulate(reinterpret_cast<float*>(&view), reinterpret_cast<float*>(&projection),
-		ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, 
+		m_gizmoOperation, m_gizmoMode,
 		reinterpret_cast<float*>(&t_matrix));
 
 	if(ImGuizmo::IsUsing())
 	{
-		currentEntityTransform->position = { t_matrix[3] };
+		glm::quat rotation = {};
+		decomposeMatrix(t_matrix, currentEntityTransform->scale, rotation, currentEntityTransform->position);
+		currentEntityTransform->rotation = glm::eulerAngles(rotation);
 	}
 }
 
@@ -140,7 +170,5 @@ void gns::editor::SceneViewWindow::OnWindowResized(uint32_t width, uint32_t heig
 		m_offscreenPass->descriptor.imageLayout);
 
 	Screen::SetResolution(viewportPanelSize.x, viewportPanelSize.y);
-
-	CameraSystem* cameraSystem = SystemsAPI::GetSystem<CameraSystem>();
-	cameraSystem->UpdateProjection(viewportPanelSize.x, viewportPanelSize.y);
+	camera->UpdateProjection(viewportPanelSize.x, viewportPanelSize.y);
 }

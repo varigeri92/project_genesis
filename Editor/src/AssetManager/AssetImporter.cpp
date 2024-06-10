@@ -6,6 +6,7 @@
 #include "../../../Engine/src/AssetDatabase/AssetLoader.h"
 
 #define YAML_CPP_STATIC_DEFINE
+#include "../Utils/FileSystem.h"
 #include "yaml-cpp/yaml.h"
 
 namespace gns::editor
@@ -26,16 +27,16 @@ namespace gns::editor
 
 	bool AssetImporter::ImportAsset(const std::string& assetPath)
 	{
-		std::string relpath = utils::getRelativePath(AssetLoader::GetAssetsPath(), assetPath);
+		std::string relpath = fs::FileSystem::GetRelativePath(assetPath);
 		LOG_INFO(relpath);
 		std::ifstream file(assetPath);
 		if (!file.good()) return false;
 
 		if(IsImported(assetPath)) return true;
 		
-		std::string metaPath = utils::appendExtension(assetPath, metaFileExtension);
+		std::string metaPath = fs::FileSystem::AppendExtension(assetPath, metaFileExtension);
 		core::guid assetGuid = core::Guid::GetNewGuid();
-		AssetType assetType = AssetTypeMap.at(utils::getFileExtension(assetPath));
+		AssetType assetType = AssetTypeMap.at(fs::FileSystem::GetFileExtension(assetPath));
 
 		CreateMeta(metaPath, relpath, assetGuid, assetType);
 
@@ -48,16 +49,16 @@ namespace gns::editor
 		if (!file.good()) return false;
 		file.close();
 
-		std::string relpath = utils::getRelativePath(AssetLoader::GetAssetsPath(), assetPath);
+		std::string relpath = fs::FileSystem::GetRelativePath(assetPath);
 		LOG_INFO(relpath);
 		std::string metaPath = "";
-		if(utils::hasExtension(assetPath, metaFileExtension))
+		if(fs::FileSystem::HasExtension(assetPath, metaFileExtension))
 		{
 			metaPath = assetPath;
 		}
 		else
 		{
-			metaPath = utils::appendExtension(assetPath, metaFileExtension);
+			metaPath = fs::FileSystem::AppendExtension(assetPath, metaFileExtension);
 		}
 		if (IsImported(assetPath))
 		{
@@ -70,17 +71,17 @@ namespace gns::editor
 			return true;
 		}
 		out_assetMeta.guid = core::Guid::GetNewGuid();
-		out_assetMeta.assetType = AssetTypeMap.at(utils::getFileExtension(assetPath));
+		out_assetMeta.assetType = AssetTypeMap.at(fs::FileSystem::GetFileExtension(assetPath));
 		CreateMeta(metaPath, relpath, out_assetMeta.guid, out_assetMeta.assetType);
 		return true;
 	}
 
 	bool AssetImporter::IsImported(const std::string& path) const
 	{
-		if(utils::hasExtension(path, metaFileExtension))
+		if(fs::FileSystem::HasExtension(path, metaFileExtension))
 			return true;
 		
-		std::ifstream file(utils::appendExtension(path, metaFileExtension));
+		std::ifstream file(fs::FileSystem::AppendExtension(path, metaFileExtension));
 		return file.good();
 	}
 
@@ -94,7 +95,7 @@ namespace gns::editor
 		<< "asset_guid" << guid
 		<< "asset_type" << static_cast<int>(assetType)
 		<< YAML::EndMap;
-		utils::writeFile(out.c_str(), path);
+		fs::FileSystem::WriteFile(out.c_str(), path);
 	}
 
 	std::string AssetImporter::GetExtensionByType(const AssetType type) const
@@ -114,7 +115,7 @@ namespace gns::editor
 	                                          AssetType assetType)
 	{
 		std::string absPath = directory + name + GetExtensionByType(assetType);
-		std::string relPath = utils::getRelativePath(AssetLoader::GetAssetsPath(), absPath);
+		std::string relPath = fs::FileSystem::GetRelativePath(absPath);
 		YAML::Emitter out;
 		out << YAML::BeginMap
 			<< "asset_name" << name
@@ -122,7 +123,7 @@ namespace gns::editor
 			<< "asset_guid" << guid
 			<< "asset_type" << static_cast<int>(assetType)
 			<< YAML::EndMap;
-		utils::writeFile(out.c_str(), absPath);
+		fs::FileSystem::WriteFile(out.c_str(), absPath);
 
 		AssetMetadata assetMetadata;
 		if (ImportAsset(absPath, assetMetadata))

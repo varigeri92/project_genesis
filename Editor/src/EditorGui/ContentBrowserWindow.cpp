@@ -11,8 +11,9 @@
 #include "../AssetManager/AssetImporter.h"
 #include "../Utils/Utilities.h"
 #include "yaml-cpp/yaml.h"
+#include "../Utils/FileSystem.h"
 
-namespace fs = std::filesystem;
+namespace stdfs = std::filesystem;
 static float iconSize = 1;
 static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_SizingFixedFit;
 static float dummyfloat[3] = { 0,0,0 };
@@ -113,7 +114,7 @@ namespace gns::editor
 
 		ImGui::BeginChild("Left-pane", ImVec2(250, 0), ImGuiChildFlags_Border | ImGuiChildFlags_ResizeX);
 		{
-			ImGui::TreePush("SceneHierarchy");
+			ImGui::TreePush("directory Hierarchy");
 
 			//DrawDirectoryInHierarchy(m_currentDirPath);
 			ImGui::TreePop();
@@ -128,7 +129,7 @@ namespace gns::editor
 			float window_visible_x2 = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
 
 			int buttonsInRow = 0;
-			for (const auto& entry : fs::directory_iterator(m_currentDirPath))
+			for (const auto& entry : stdfs::directory_iterator(m_currentDirPath))
 			{
 				ImGui::PushID(entry.path().string().c_str());
 				if (entry.is_directory())
@@ -193,14 +194,14 @@ namespace gns::editor
 
 		ImGui::BeginChild((entry.path().string() + "_button").c_str(), buttonParent_sz, child_flags);
 		ImTextureID icon = FileIcon->m_descriptorSet;
-		if(utils::hasExtension(entry.path().string(),".gnsmat"))
+		if(fs::FileSystem::HasExtension(entry.path().string(),".gnsmat"))
 		{
 			icon = MaterialIcon->m_descriptorSet;
 		}
 		if (ImGui::ImageButton(base_name(entry.path().string()).c_str(), icon, button_sz))
 		{
 			LOG_INFO("Opnening or inspecting file: '" << entry.path().string() <<"' feature not implemented...");
-			SelectionManager::SetSelectedObject(utils::GetFileName(entry.path().string()));
+			SelectionManager::SetSelectedObject(fs::FileSystem::GetFileName(entry.path().string()));
 		}
 		if (ImGui::BeginDragDropSource())
 		{
@@ -218,7 +219,7 @@ namespace gns::editor
 
 	void ContentBrowserWindow::DrawDirectoryInHierarchy(const std::string& path)
 	{
-		for (const auto& entry : fs::directory_iterator(path))
+		for (const auto& entry : stdfs::directory_iterator(path))
 		{
 			if (entry.is_directory())
 			{

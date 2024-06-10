@@ -179,6 +179,7 @@ namespace gns::editor
 			gns::rendering::Mesh* m = *mesh;
 			//std::string name = mesh->m_subMeshes[0]->name;
 			ImGui::PushItemWidth(-1.0f);
+			ImGui::Text(std::to_string(m->GetGuid()).c_str());
 			ImGui::Button(m->m_name.c_str(), { ImGui::GetContentRegionAvail().x,0 });
 			if (ImGui::BeginDragDropTarget())
 			{

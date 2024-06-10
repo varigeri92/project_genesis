@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Engine.h"
-
+#include "../../../Engine/src/Gui/ImGui/ImGuizmo.h"
 namespace gns::rendering
 {
 	class Texture;
@@ -11,6 +11,10 @@ namespace gns::editor
 class SceneViewWindow : public gns::gui::GuiWindow
 {
 private:
+	ImGuizmo::OPERATION m_gizmoOperation;
+	ImGuizmo::MODE m_gizmoMode;
+	bool m_isGizmoLocal;
+
 	bool varPopped = false;
 	ImVec2 m_view;
 	std::shared_ptr<rendering::Texture> fbTexture;

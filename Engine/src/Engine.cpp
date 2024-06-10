@@ -73,7 +73,7 @@ gns::Engine::~Engine()
 
 void gns::Engine::Init(std::function<void()> startupCallback)
 {
-	core::Scene* scene =  core::SceneManager::CreateScene("DefaultScene");
+	Scene* scene =  core::SceneManager::CreateScene("DefaultScene");
 	RenderSystem* renderSystem = SystemsAPI::RegisterSystem<RenderSystem>(m_window);
 	m_guiSystemInstance = new gns::gui::GuiSystem(renderSystem->GetDevice(), m_window);
 	startupCallback();

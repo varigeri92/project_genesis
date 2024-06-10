@@ -4,10 +4,7 @@
 #include "SystemsAPI.h"
 namespace gns
 {
-	namespace core
-	{
-		struct Scene;
-	}
+	class Scene;
 
 	struct ComponentMetadata
 	{
@@ -19,7 +16,7 @@ namespace gns
 
 	struct Entity
 	{
-		GNS_API static Entity CreateEntity(std::string entityName, core::Scene* scene);
+		friend class Scene;
 
 		entt::entity entity;
 		Entity(entt::entity entity) :
@@ -29,6 +26,9 @@ namespace gns
 		Entity() = delete;
 
 		inline bool IsValid() { return entity != entt::null; }
+
+		operator bool() { return IsValid(); }
+
 		template<typename T, typename... Args>
 		T& AddComponet(Args&& ... args)
 		{
@@ -60,5 +60,6 @@ namespace gns
 		 */
 		private:
 			std::vector<gns::ComponentMetadata> componentsVector;
+			static Entity CreateEntity(std::string entityName, Scene* scene);
 	};
 }
