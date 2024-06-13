@@ -4,5 +4,9 @@
 class NativeFileBrowser
 {
 public:
-	GNS_API static std::string OpenBrowser(std::string filter);
+	enum class FileBrowserMode
+	{
+		OpenFile, SaveFile,
+	};
+	GNS_API static std::string OpenBrowser(std::string filter, FileBrowserMode mode);
 };

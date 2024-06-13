@@ -13,6 +13,8 @@ namespace gns::editor
 
 	void SceneHierarchy::OnGUI()
 	{
+        ImGui::BeginChild("h");
+
 		ImGui::Text("SceneHierarchy");
 		auto entityView = SystemsAPI::GetRegistry().view<EntityComponent>();
         ImGui::TreePush("SceneHierarchy");
@@ -77,5 +79,18 @@ namespace gns::editor
             }
 		}
         ImGui::TreePop();
+        ImGui::EndChild();
+        if (ImGui::BeginPopupContextItem("hierarchy_ctx_menu")) // <-- use last item id as popup id
+        {
+            if (ImGui::BeginMenu("< Create >"))
+            {
+                if (ImGui::MenuItem("Entity"))
+                {
+                    core::SceneManager::ActiveScene->CreateEntity("new entity");
+                }
+                ImGui::EndMenu();
+            }
+            ImGui::EndPopup();
+        }
 	}
 }

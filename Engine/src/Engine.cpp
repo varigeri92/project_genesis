@@ -48,23 +48,32 @@ gns::EventFunction<void, std::string> DoNotCallThis_EventFunction([](const std::
 
 using namespace  gns::rendering;
 
-gns::Engine::Engine() :close(false), m_window(new Window(1920, 1080))
+gns::Engine::Engine() :close(false)
 {
 	START_PROFILER("Engine")
 	PROFILE_FUNC
+
+	Window::getInstance()->InitWindow(1920, 1080);
 	Screen::InitDefaultScreen(1920, 1080, Screen::ScreenMode::sm_none);
 	Serializer::RegisterSerializableComponents([](){
 		gns::RegisterComponent<gns::EntityComponent>();
 		gns::RegisterComponent<gns::Transform>();
 		gns::RegisterComponent<gns::Camera>();
 		gns::RegisterComponent<gns::RendererComponent>();
+
+		gns::RegisterComponent<gns::Light>();
+		gns::RegisterComponent<gns::Ambient>();
+		gns::RegisterComponent<gns::LightDirection>();
+		gns::RegisterComponent<gns::SpotLight>();
+		gns::RegisterComponent<gns::PointLight>();
+		gns::RegisterComponent<gns::ShadowCaster>();
+
 	});
 }
 
 gns::Engine::~Engine()
 {
 	PROFILE_FUNC
-	delete m_window;
 #ifdef TRACE_ALLOCATION
 	LOG_TRACE("Current memory usage = " << trace.GetAllocations());
 #endif
@@ -73,9 +82,10 @@ gns::Engine::~Engine()
 
 void gns::Engine::Init(std::function<void()> startupCallback)
 {
+	AssetDatabase::LoadAssetDatabase();
 	Scene* scene =  core::SceneManager::CreateScene("DefaultScene");
-	RenderSystem* renderSystem = SystemsAPI::RegisterSystem<RenderSystem>(m_window);
-	m_guiSystemInstance = new gns::gui::GuiSystem(renderSystem->GetDevice(), m_window);
+	RenderSystem* renderSystem = SystemsAPI::RegisterSystem<RenderSystem>();
+	m_guiSystemInstance = new gns::gui::GuiSystem(renderSystem->GetDevice());
 	startupCallback();
 	// Event system subsribe tests:
 	CallThis_EventFunction_InClass = new gns::EventFunction<void, std::string>([](const std::string& message)
@@ -95,8 +105,8 @@ void gns::Engine::Run()
 	{
 		PROFILE_FUNC
 		Time::StartFrameTime();
-		close = m_window->PollEvents();
-		if(!m_window->isMinimized)
+		close = Window::getInstance()->PollEvents();
+		if(!Window::getInstance()->isMinimized)
 		{
 			m_guiSystemInstance->BeginGUI();
 			m_guiSystemInstance->UpdateGui();

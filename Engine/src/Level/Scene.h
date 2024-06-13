@@ -1,17 +1,21 @@
 ﻿#pragma once
 #include "../Utils/Guid.h"
+
 namespace gns
 {
+	class Serializer;
+
 	class Scene
 	{
 		friend struct Entity;
+		friend class Serializer;
 	public:
 		Scene(std::string name);
 		std::string name;
 		std::vector<Scene> m_subScenes;
 	private:
 		entt::registry m_registry;
-
+		Entity SoftCreateEntity();
 	public:
 		GNS_API Entity CreateEntity(std::string name);
 		GNS_API Entity FindEntity(std::string name);

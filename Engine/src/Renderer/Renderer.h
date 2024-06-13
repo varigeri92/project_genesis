@@ -36,6 +36,7 @@ namespace gns::rendering
 		void CreatePipeline(Shader* shader);
 		void UpdatePushConstant(glm::mat4 modelMatrix, Material* material);
 		void UpdateGlobalUbo(void* src_bufferData, size_t size);
+		void UpdateMaterialUbo(Material* material);
 		void UpdateSceneDataUbo(const void* data, size_t size);
 		void UpdateObjectData(void* src_data, size_t size);
 		void UpdateMaterialUniformBuffer(void* src_data, size_t size, const std::shared_ptr<Material>& material);

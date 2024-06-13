@@ -15,7 +15,7 @@ ImFont* gns::gui::GuiSystem::defaultFont = nullptr;
 ImFont* gns::gui::GuiSystem::boldFont = nullptr;
 
 
-gns::gui::GuiSystem::GuiSystem(rendering::Device* device, Window* window) : m_device(device), m_window(window)
+gns::gui::GuiSystem::GuiSystem(rendering::Device* device) : m_device(device)
 {
 	//1: create descriptor pool for IMGUI
 	VkDescriptorPoolSize pool_sizes[] =
@@ -48,7 +48,7 @@ gns::gui::GuiSystem::GuiSystem(rendering::Device* device, Window* window) : m_de
 	ImGui::CreateContext();
 
 	//this initializes imgui for SDL
-	ImGui_ImplSDL2_InitForVulkan(m_window->sdlWindow);
+	ImGui_ImplSDL2_InitForVulkan(Window::getInstance()->sdlWindow);
 
 	//this initializes imgui for Vulkan
 	ImGui_ImplVulkan_InitInfo init_info = {};
@@ -110,7 +110,7 @@ gns::gui::GuiSystem::GuiSystem(rendering::Device* device, Window* window) : m_de
 void gns::gui::GuiSystem::BeginGUI() const
 {
 	ImGui_ImplVulkan_NewFrame();
-	ImGui_ImplSDL2_NewFrame(m_window->sdlWindow);
+	ImGui_ImplSDL2_NewFrame(Window::getInstance()->sdlWindow);
 	ImGui::NewFrame();
 	ImGuizmo::BeginFrame();
 }

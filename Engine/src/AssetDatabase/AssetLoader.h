@@ -21,6 +21,7 @@ namespace gns
 	{
 		friend class AssetDatabase;
 		static std::string AssetsPath;
+		static std::string ProjectPath;
 		static std::string ShadersPath;
 		static std::string ResourcesPath;
 
@@ -35,6 +36,7 @@ namespace gns
 		///<summary> Returns the path to the Assets directory with '\' at the end </summary>
 		static GNS_API std::string& GetAssetsPath() { return AssetsPath; }
 		static GNS_API std::string& GetEngineResourcesPath() { return ResourcesPath; }
+		static GNS_API std::string& GetProjectPath() { return ProjectPath; }
 
 		template<typename T>
 		static T* LoadAssetFromFile(core::guid guid)

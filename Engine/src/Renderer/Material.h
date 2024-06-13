@@ -15,6 +15,7 @@ namespace gns::rendering
 		GNS_API Material(gns::rendering::Shader* shader, std::string name);
 		GNS_API ~Material() override;
 		VkDescriptorSet descriptorSet;
+		Buffer attributeBuffer;
 		std::string name;
 		Shader* m_shader;
 		std::shared_ptr<Texture> m_texture{ nullptr };

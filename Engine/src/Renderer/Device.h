@@ -54,12 +54,10 @@ namespace gns::rendering
 	class Device
 	{
 	public:
-		Device(Window* window);
+		Device();
 		~Device();
 		Device(Device& other) = delete;
 		Device operator=(Device& other) = delete;
-
-		Window* m_window;
 
 		VmaAllocator m_allocator;
 		uint32_t m_imageCount;

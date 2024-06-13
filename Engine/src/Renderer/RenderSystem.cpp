@@ -43,16 +43,16 @@ static void printVec3(const glm::vec3& vec) {
 }
 
 
-gns::RenderSystem::RenderSystem(Window* window) : SystemBase(), sceneData()
+void* rawSceneData;
+gns::RenderSystem::RenderSystem() : SystemBase(), lightSubsystem()
 {
 	PROFILE_FUNC
-	m_device = new rendering::Device(window);
+	m_device = new rendering::Device();
+	const size_t buffersizze = sizeof(glm::vec4) * (4 + (2 * 10) + (2 * 40) + (3 * 40));
+	rawSceneData = malloc(buffersizze);
 	m_device->InitGlobalDescriptors(sizeof(SceneData));
 	m_renderer = new gns::rendering::Renderer(m_device);
 
-	sceneData.ambientColor = { 1.f,1.f,1.f,0.050f };
-	sceneData.sunlightColor = { 1.f, 1.f, 1.f, 1.f };
-	sceneData.sunlightDirection = { 1.f, 1.f, 0.f , 0.f };
 }
 gns::RenderSystem::~RenderSystem()
 {
@@ -69,23 +69,31 @@ void gns::RenderSystem::OnUpdate(float deltaTime)
 {
 	PROFILE_FUNC
 
+	
 	camData.view = m_renderCamera->view;
 	camData.proj = m_renderCamera->projection;
 	camData.viewproj = m_renderCamera->camera_matrix;
+
+	auto transformView = SystemsAPI::GetRegistry().view<Transform>();
+	for (auto [entt, transform] : transformView.each())
+		transform.UpdateMatrix();
+	size_t buffer_size;
+	lightSubsystem.CalculateLightData(rawSceneData, buffer_size);
 
 	uint32_t swapchainImageIndex;
 	if (m_renderer->BeginFrame(swapchainImageIndex))
 	{
 		m_renderer->BeginTextureRenderPass(swapchainImageIndex);
 		m_renderer->UpdateGlobalUbo(&camData, sizeof(CameraData));
-		m_renderer->UpdateSceneDataUbo(&sceneData, sizeof(SceneData));
+		m_renderer->UpdateSceneDataUbo(rawSceneData, sizeof(SceneData));
 		auto entityView = SystemsAPI::GetRegistry().view<Transform, RendererComponent, EntityComponent>();
 		for (auto [entt, transform, rendererComponent, entity] : entityView.each())
 		{
-			transform.UpdateMatrix();
 			m_renderer->UpdatePushConstant(transform.matrix, rendererComponent.m_materials[0]);
 			for (size_t i = 0; i < rendererComponent.m_mesh->m_subMeshes.size(); i++)
 			{
+				m_renderer->UpdateMaterialUbo(rendererComponent.m_materials[0]);
+
 				m_renderer->Draw(rendererComponent.m_mesh->m_subMeshes[i], rendererComponent.m_materials[0], swapchainImageIndex, sizeof(SceneData));
 			}
 		}

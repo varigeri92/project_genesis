@@ -3,19 +3,12 @@
 #include "Engine.h"
 #include "../DragDropManager.h"
 #include "../SelectionManager.h"
-#include "../../../Engine/src/AssetDatabase/AssetLoader.h"
-#include "../../../Engine/src/Gui/ImGui/imgui_internal.h"
-#include "../../../Engine/src/Level/SceneManager.h"
 #include "../AssetManager/AssetImporter.h"
-#include "../Utils/Utilities.h"
-#include "../../../Engine/src/Gui/ImGui/ImGuizmo.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/quaternion.hpp>
-
 #include "../EditorCamera.h"
-#include "../Utils/FileSystem.h"
 
 gns::Transform* currentEntityTransform;
 entt::entity selected = entt::null;
@@ -100,10 +93,10 @@ void gns::editor::SceneViewWindow::OnGUI()
 			if(importer.ImportAsset(DragDropManager::GetCurrentPayload()->path, assetMeta))
 			{
 				LOG_INFO("Asset imported sucessfully, or it was already imported... guid:" << assetMeta.guid);
-				AssetMetadata importedAsset = AssetDatabase::AddAssetToDatabase(assetMeta);
+				AssetMetadata importedAsset = AssetDatabase::AddImportedAssetToDatabase(assetMeta);
 				auto* mesh = AssetLoader::LoadAssetFromFile<rendering::Mesh>(importedAsset.guid);
 				SystemsAPI::GetSystem<RenderSystem>()->UploadMesh(mesh);
-				Entity entity = core::SceneManager::ActiveScene->CreateEntity(fs::FileSystem::GetFileName(importedAsset.sourcePath));
+				Entity entity = core::SceneManager::ActiveScene->CreateEntity(gns::fileSystem::FileSystem::GetFileName(importedAsset.sourcePath));
 				entity.AddComponet <RendererComponent>(importedAsset.guid, 0);
 			}
 		}

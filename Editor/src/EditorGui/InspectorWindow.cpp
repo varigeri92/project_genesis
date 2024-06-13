@@ -3,7 +3,7 @@
 #include "../SelectionManager.h"
 #include "DockspaceWindow.h"
 #include "../DragDropManager.h"
-
+#include "../../../Engine/src/Gui/ImGui/imgui_stdlib.h"
 using namespace gns::gui;
 namespace gns::editor
 {
@@ -22,7 +22,7 @@ namespace gns::editor
 		else
 			return iconLookup[0];
 	}
-
+	bool showAddComponentMenu = false;
 	InspectorWindow::InspectorWindow() : GuiWindow("Inspector"), inspectedEntity(nullentity)
 	{
 		drawMaterial = true;
@@ -32,6 +32,7 @@ namespace gns::editor
 			{
 				inspectedEntity = gns::Entity(selectedEntity);
 				DrawFullComponentData.clear();
+				showAddComponentMenu = false;
 			});
 		SelectionManager::onSelectionChanged.Subscribe<void, entt::entity>(onEntitySelected);
 		iconLookup[0] = ICON_MD_CODE;
@@ -89,7 +90,29 @@ namespace gns::editor
 		}
 
 		ImGui::Spacing();
-		ImGui::Button("Add Component...", { ImGui::GetContentRegionAvail().x, 35 });
+		if(ImGui::Button("Add Component...", { ImGui::GetContentRegionAvail().x, 35 }))
+		{
+			showAddComponentMenu = !showAddComponentMenu;
+		}
+		if(showAddComponentMenu)
+		{
+			ImGui::BeginChild("add_cmp_menu");
+			for (auto it = Serializer::ComponentData_Table.begin(); it != Serializer::ComponentData_Table.end(); ++it) {
+				if(ImGui::Button(it->second.name.c_str()))
+				{
+					LOG_INFO("AddComponent:" << it->second.name);
+					Serializer serilizer;
+					serilizer.AddComponentByID(it->second.typeID, inspectedEntity);
+					showAddComponentMenu = false;
+				}
+			}
+
+			if (ImGui::Button("Cancel"))
+			{
+				showAddComponentMenu = false;
+			}
+			ImGui::EndChild();
+		}
 		ImGui::Spacing();
 		ImGui::Spacing();
 		ImGui::Spacing();
@@ -153,7 +176,7 @@ namespace gns::editor
 	{
 		DrawField(fieldData.typeID, (void*)(componentPtr + fieldData.offset), fieldData.name);
 	}
-
+	char buffer[255];
 	void InspectorWindow::DrawValue(size_t typeId, void* valuePtr, std::string& name)
 	{
 		if (typeId == typeid(glm::vec3).hash_code())
@@ -169,10 +192,18 @@ namespace gns::editor
 		}
 		if (typeId == typeid(std::string).hash_code())
 		{
-			ImGui::Text(static_cast<std::string*>(valuePtr)->c_str());
+			ImGui::InputText(name.c_str(), static_cast<std::string*>(valuePtr));
 			return;
 
 		}
+
+		if (typeId == typeid(Color).hash_code())
+		{
+			ImGui::ColorEdit4(name.c_str(), static_cast<float*>(valuePtr));
+			return;
+
+		}
+
 		if (typeId == typeid(gns::rendering::Mesh).hash_code())
 		{
 			gns::rendering::Mesh** mesh = static_cast<gns::rendering::Mesh**>(valuePtr);
@@ -288,6 +319,10 @@ namespace gns::editor
 			}
 			ImGui::EndDragDropTarget();
 		}
+		if(ImGui::Button("Rebuild Pipeline"))
+		{
+			SystemsAPI::GetSystem<RenderSystem>()->CreatePipeline(material->m_shader);
+		}
 
 		ImGui::SeparatorText("Material Properties:");
 		std::string tableID = "Table_" + std::to_string(index);
@@ -299,7 +334,6 @@ namespace gns::editor
 			}
 			ImGui::EndTable();
 		}
-
 		ImGui::EndChild();
 	}
 

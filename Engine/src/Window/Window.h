@@ -22,8 +22,21 @@ namespace gns
 		SDL_Window* sdlWindow;
 		SDL_Event sdl_event;
 	public:
-		Window(uint32_t width, uint32_t height);
+		GNS_API static Window* getInstance()
+		{
+			if (instance == nullptr)
+				instance = new Window();
+
+			return instance;
+		}
 		~Window();
+		Window(Window const&) = delete;
+		void operator=(Window const&) = delete;
+	private:
+		Window();
+		GNS_API static Window* instance;
+
+	public:
 		HWND hwndHandle;
 		HINSTANCE hinstance;
 		bool isMinimized;
@@ -32,5 +45,6 @@ namespace gns
 		void GetExtentions(uint32_t& count, const char** names);
 		void GetExtent(int& width, int& height);
 		void WindowEvent(const SDL_Event* event);
+		void InitWindow(uint32_t width, uint32_t height);
 	};
 }

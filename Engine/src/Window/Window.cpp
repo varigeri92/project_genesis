@@ -3,34 +3,8 @@
 #include "Log.h"
 #include "InputBackend.h"
 
-gns::Window::Window(uint32_t width, uint32_t height) : isMinimized{ false }
-{
-	PROFILE_FUNC
-	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
-	}
-
-	sdlWindow = SDL_CreateWindow(
-		"",
-		SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED,
-		static_cast<int>(width), static_cast<int>(height),
-		SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
-
-	if (!sdlWindow) {
-		SDL_Log("Failed to create window: %s", SDL_GetError());
-	}
-
-	SDL_SysWMinfo wmInfo;
-	SDL_VERSION(&wmInfo.version);
-	SDL_GetWindowWMInfo(sdlWindow, &wmInfo);
-	hwndHandle = wmInfo.info.win.window;
-	hinstance = wmInfo.info.win.hinstance;
-
-	int w = 0;
-	int h = 0;
-	SDL_Vulkan_GetDrawableSize(sdlWindow, &w, &h);
-}
+gns::Window* gns::Window::instance = nullptr;
+gns::Window::Window() : isMinimized{ false } {}
 
 
 gns::Window::~Window()
@@ -116,5 +90,34 @@ void gns::Window::WindowEvent(const SDL_Event* event)
 			break;
 		}
 	}
+}
+
+void gns::Window::InitWindow(uint32_t width, uint32_t height)
+{
+	PROFILE_FUNC
+		if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+			SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
+		}
+
+	sdlWindow = SDL_CreateWindow(
+		"",
+		SDL_WINDOWPOS_CENTERED,
+		SDL_WINDOWPOS_CENTERED,
+		static_cast<int>(width), static_cast<int>(height),
+		SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
+
+	if (!sdlWindow) {
+		SDL_Log("Failed to create window: %s", SDL_GetError());
+	}
+
+	SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
+	SDL_GetWindowWMInfo(sdlWindow, &wmInfo);
+	hwndHandle = wmInfo.info.win.window;
+	hinstance = wmInfo.info.win.hinstance;
+
+	int w = 0;
+	int h = 0;
+	SDL_Vulkan_GetDrawableSize(sdlWindow, &w, &h);
 }
 

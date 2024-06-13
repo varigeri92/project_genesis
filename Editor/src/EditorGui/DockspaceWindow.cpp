@@ -1,7 +1,7 @@
 ﻿#include "DockspaceWindow.h"
 #include "Engine.h"
 #include "EditorStyles.h"
-#include "../../../Engine/src/Level/SceneManager.h"
+
 
 gns::editor::DockspaceWindow::DockspaceWindow(const std::string& name) : GuiWindow(name)
 {
@@ -21,16 +21,16 @@ void gns::editor::DockspaceWindow::OnGUI()
     {
         if (ImGui::BeginMenu("File"))
         {
-            if(ImGui::MenuItem("Save Scene(s)", "Ctrl + S", &dummy))
+            if(ImGui::MenuItem("Save Scene ...", "Ctrl + S", &dummy))
             {
-                Serializer serializer;
-                const std::string result = serializer.SerializeScene(core::SceneManager::ActiveScene);
-                LOG_INFO("\n" << result << "\n");
+                std::string path = NativeFileBrowser::OpenBrowser(".gnsscene", NativeFileBrowser::FileBrowserMode::SaveFile);
+				core::SceneManager::SaveSceneToFile(path);
             }
             ImGui::Separator();
-            if(ImGui::MenuItem("Open Default Scene", "Ctrl + O", &dummy))
+            if(ImGui::MenuItem("Open Scene ...", "Ctrl + O", &dummy))
             {
-                
+                std::string path = NativeFileBrowser::OpenBrowser(".gnsscene", NativeFileBrowser::FileBrowserMode::SaveFile);
+                core::SceneManager::loadSceneFromFile(path);
             }
             ImGui::MenuItem("dummy ...", "Ctrl + O", &dummy);
         	ImGui::Separator();

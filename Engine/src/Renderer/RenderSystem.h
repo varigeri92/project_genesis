@@ -2,6 +2,7 @@
 #include "Device.h"
 #include "Renderer.h"
 #include "../SystemsApi/SystemBase.h"
+#include "Lights/LightSubsystem.h"
 
 namespace gns
 {
@@ -24,18 +25,44 @@ namespace gns
 		glm::mat4 viewproj;
 	};
 
-	struct alignas(64) SceneData {
-		glm::vec4 fogColor; // w is for exponent
-		glm::vec4 fogDistances; //x for min, y for max, zw unused.
+	struct GPU_DirectionalLight
+	{
+		glm::vec4 direction; //w for Intensity
+		glm::vec4 color; //w for padding
+	};
+
+	struct GPU_PointLight
+	{
+		glm::vec4 position; //w for range 
+		glm::vec4 color; //w for Intensity
+	};
+
+	struct GPU_SpotLight
+	{
+		glm::vec4 position; //w for range
+		glm::vec4 direction; //w for Intensity
+		glm::vec4 color; //w for angle
+	};
+
+	struct alignas(64) SceneLights
+	{
+		std::vector<GPU_DirectionalLight> directionalLights;
+		std::vector<GPU_PointLight> pointLights;
+		std::vector<GPU_SpotLight> spotLights;
+	};
+
+	struct alignas(64) SceneData
+	{
 		glm::vec4 ambientColor;
 		glm::vec4 sunlightDirection; //w for sun power
 		glm::vec4 sunlightColor;
+		glm::vec4 viewPos;
 	};
 
 	class RenderSystem : public gns::SystemBase
 	{
 	private:
-		SceneData sceneData;
+		LightSubsystem lightSubsystem;
 		CameraData camData;
 		gns::rendering::Device* m_device;
 		gns::rendering::Renderer* m_renderer;
@@ -47,7 +74,7 @@ namespace gns
 		Transform* m_transform;
 
 	public:
-		GNS_API RenderSystem(Window* window);
+		GNS_API RenderSystem();
 		RenderSystem(RenderSystem& other) = delete;
 		GNS_API ~RenderSystem();
 		GNS_API void OnCreate() override;

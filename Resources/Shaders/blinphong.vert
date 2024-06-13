@@ -7,6 +7,7 @@ layout (location = 3) in vec2 vTexCoord;
 layout (location = 0) out vec3 outColor;
 layout (location = 1) out vec2 texCoord;
 layout (location = 2) out vec3 normal;
+layout (location = 3) out vec3 pos;
 
 layout(set = 0, binding = 0) uniform  CameraBuffer{
 	mat4 view;
@@ -27,6 +28,6 @@ void main()
 	gl_Position = transformMatrix * vec4(vPosition, 1.0f);
 	outColor = vColor;
 	texCoord = vTexCoord;
-	//normal = vNormal;
-	normal = mat3(transpose(inverse(PushConstants.model_matrix))) * vNormal; 
+	normal = normalize(mat3(transpose(inverse(PushConstants.model_matrix))) * vNormal);
+	pos =  vec3(PushConstants.model_matrix * vec4(vPosition, 1.0));
 }

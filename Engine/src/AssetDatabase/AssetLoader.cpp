@@ -28,6 +28,7 @@ using namespace gns::rendering;
 namespace gns
 {
     std::string AssetLoader::AssetsPath = R"(C:\)";
+    std::string AssetLoader::ProjectPath = R"(C:\)";
     std::string AssetLoader::ShadersPath = R"(C:\)";
     std::string AssetLoader::ResourcesPath = R"(C:\)";
 
@@ -39,7 +40,7 @@ namespace gns
         const unsigned flags = aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType;
         const unsigned flags2 = aiProcessPreset_TargetRealtime_Fast;
         const unsigned flags3 = 0;
-
+        LOG_INFO("Load Mesh from: " << AssetsPath + path);
         const aiScene* scene = importer.ReadFile((AssetsPath + path), flags);
 
         // If the import failed, report it
@@ -47,7 +48,7 @@ namespace gns
             LOG_ERROR(importer.GetErrorString());
             LOG_WARNING("Cannot Load MeshData: " << path << " Falling back to Suzan!");
             if (!isFallbackPath) {
-                mesh = LoadMeshFile(guid,"(Meshes\Suzan.obj)", true);
+                mesh = LoadMeshFile(guid,R"(Meshes\Suzan.obj)", true);
             }
             else
             {

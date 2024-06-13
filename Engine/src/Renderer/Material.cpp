@@ -14,13 +14,16 @@ namespace gns::rendering
 	{
 		m_textures.resize(5);
 		Device* device = SystemsAPI::GetSystem<RenderSystem>()->GetDevice();
-		VkDescriptorSetAllocateInfo allocInfo = {};
-		allocInfo.pNext = nullptr;
-		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		allocInfo.descriptorPool = device->m_descriptorPool;
-		allocInfo.descriptorSetCount = 1;
-		allocInfo.pSetLayouts = &shader->shaderSetLayout;
-		_VK_CHECK(vkAllocateDescriptorSets(device->m_device, &allocInfo, &descriptorSet), "Descriptor set Allocation Failed!");
+		//Texture set
+		VkDescriptorSetAllocateInfo textureSetAllocInfo = {};
+		textureSetAllocInfo.pNext = nullptr;
+		textureSetAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		textureSetAllocInfo.descriptorPool = device->m_descriptorPool;
+		textureSetAllocInfo.descriptorSetCount = 1;
+		textureSetAllocInfo.pSetLayouts = &shader->shaderSetLayout;
+		_VK_CHECK(vkAllocateDescriptorSets(device->m_device, &textureSetAllocInfo, &descriptorSet), "Descriptor set Allocation Failed!");
+
+
 		LOG_INFO("Material Created! " << name);
 		
 		if(shader->fragmentShaderDataSize > 0)
@@ -34,15 +37,22 @@ namespace gns::rendering
 		else
 			vertexShaderData_memory = nullptr;
 
-		SetFragmentShaderAttribute<glm::vec4>("color_albedo", { 1.f,2.f,3.f,4.f });
-		SetFragmentShaderAttribute<glm::vec4>("color_specular", { 5.f,6.f,7.f,8.f });
-		SetFragmentShaderAttribute<float>("roughness", 0.654f);
+		SetFragmentShaderAttribute<glm::vec4>("color_albedo", { 1.f,1.f,1.f,1.f });
+		SetFragmentShaderAttribute<float>("specular", 0.5f);
+
+		attributeBuffer = CreateBuffer(device->m_allocator, sizeof(glm::vec4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+		constexpr uint32_t bufferRange = sizeof(glm::vec4);
+		VkDescriptorBufferInfo bufferInfo = CreateBufferInfo(attributeBuffer._buffer, bufferRange, 0);
+		VkWriteDescriptorSet data = WriteDescriptorBuffer(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, descriptorSet, &bufferInfo, 0);
+		vkUpdateDescriptorSets(device->m_device, 1, &data, 0, nullptr);
 	}
 
 	Material::~Material()
 	{
 		RenderSystem* renderSystem = SystemsAPI::GetSystem<RenderSystem>();
 		renderSystem->DisposeMaterial(this);
+		vmaDestroyBuffer(renderSystem->GetDevice()->m_allocator, attributeBuffer._buffer, attributeBuffer._allocation);
 		LOG_INFO("Material Destroyed: " << name);
 
 		free(vertexShaderData_memory);
@@ -51,6 +61,7 @@ namespace gns::rendering
 
 	void Material::SetTexture(std::shared_ptr<Texture> texture, uint32_t binding)
 	{
+		binding++;
 		m_textures[binding] = texture;
 
 		if (binding == 1)

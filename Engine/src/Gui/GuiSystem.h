@@ -25,7 +25,6 @@ namespace gns::gui
 	private:
 		static GNS_API bool s_showDemo;
 		rendering::Device* m_device;
-		Window* m_window;
 		void InitializeGUI();
 
 		static int32_t GetIndexOfType(size_t typeHash)
@@ -54,7 +53,7 @@ namespace gns::gui
 		static GNS_API ImFont* boldFont;
 
 		static GNS_API std::vector<gns::gui::GuiWindow*> guiWindows;
-		GuiSystem(rendering::Device* device, Window* window);
+		GuiSystem(rendering::Device* device);
 
 		template<typename T, typename... Args>
 		static T* RegisterWindow(Args&& ... args)

@@ -1,4 +1,5 @@
-﻿#include "FileSystem.h"
+﻿#include "gnspch.h"
+#include "FileSystem.h"
 #include <string>
 #include <filesystem>
 #include <fstream>
@@ -9,19 +10,19 @@
 #include "Utilities.h"
 
 
-namespace stdfs = std::filesystem;
+namespace fs = std::filesystem;
 
-bool gns::editor::fs::FileSystem::ScanDirectoryFor(const std::string& extension, const std::string& RootPath)
+bool gns::fileSystem::FileSystem::ScanDirectoryFor(const std::string& extension, const std::string& RootPath)
 {
 	return true;
 }
 
-std::string gns::editor::fs::FileSystem::GetAbsolutePath(const std::string relativePath)
+std::string gns::fileSystem::FileSystem::GetAbsolutePath(const std::string relativePath)
 {
 	return { AssetLoader::GetAssetsPath() + relativePath};
 }
 
-std::string gns::editor::fs::FileSystem::GetRelativePath(const std::string absolutePath)
+std::string gns::fileSystem::FileSystem::GetRelativePath(const std::string absolutePath)
 {
 	// Split the paths by the directory separator
 	std::vector<std::string> baseParts = utils::split(AssetLoader::GetAssetsPath(), '\\');
@@ -55,7 +56,7 @@ std::string gns::editor::fs::FileSystem::GetRelativePath(const std::string absol
 	return relativePath.empty() ? "." : relativePath; // If no relative path needed, return "."
 }
 
-bool gns::editor::fs::FileSystem::WriteFile(const std::string& source, const std::string& path)
+bool gns::fileSystem::FileSystem::WriteFile(const std::string& source, const std::string& path)
 {
 	
 	std::ofstream outputFile(path);
@@ -69,14 +70,26 @@ bool gns::editor::fs::FileSystem::WriteFile(const std::string& source, const std
 	outputFile << source;
 	outputFile.close();
 
-	if (!stdfs::exists(path)) {
-		stdfs::create_directories(stdfs::path(path).parent_path());
+	if (!fs::exists(path)) {
+		fs::create_directories(fs::path(path).parent_path());
 		LOG_INFO("Created directory for file: " << path);
 	}
 	return true;
 }
 
-std::string gns::editor::fs::FileSystem::GetFileExtension(const std::string& path)
+std::string gns::fileSystem::FileSystem::ReadFile(const std::string& path)
+{
+	std::ifstream f(path);
+	std::string str = "";
+	if (f) {
+		std::ostringstream ss;
+		ss << f.rdbuf();
+		str = ss.str();
+	}
+	return str;
+}
+
+std::string gns::fileSystem::FileSystem::GetFileExtension(const std::string& path)
 {
 	size_t lastDotPos = path.find_last_of(".");
 	if (lastDotPos != std::string::npos && lastDotPos != path.length() - 1) {
@@ -85,12 +98,12 @@ std::string gns::editor::fs::FileSystem::GetFileExtension(const std::string& pat
 	return "";
 }
 
-std::string gns::editor::fs::FileSystem::AppendExtension(const std::string& filePath, const std::string& extension)
+std::string gns::fileSystem::FileSystem::AppendExtension(const std::string& filePath, const std::string& extension)
 {
 	return filePath + extension;
 }
 
-std::string gns::editor::fs::FileSystem::ReplaceOrRemoveExtension(const std::string& filePath,
+std::string gns::fileSystem::FileSystem::ReplaceOrRemoveExtension(const std::string& filePath,
 	const std::string& newExtension)
 {
 	size_t lastDotPos = filePath.find_last_of(".");
@@ -105,14 +118,14 @@ std::string gns::editor::fs::FileSystem::ReplaceOrRemoveExtension(const std::str
 	return filePath;
 }
 
-std::string gns::editor::fs::FileSystem::GetFileName(const std::string& filePath)
+std::string gns::fileSystem::FileSystem::GetFileName(const std::string& filePath)
 {
 	std::filesystem::path path(filePath);
 	std::string fileName = path.stem().string();
 	return fileName;
 }
 
-bool gns::editor::fs::FileSystem::HasExtension(const std::string& filePath, const std::string& extension)
+bool gns::fileSystem::FileSystem::HasExtension(const std::string& filePath, const std::string& extension)
 {
 	std::filesystem::path path(filePath);
 
@@ -121,4 +134,18 @@ bool gns::editor::fs::FileSystem::HasExtension(const std::string& filePath, cons
 
 	// Compare with the given extension
 	return fileExtension == extension;
+}
+
+std::vector<std::string> gns::fileSystem::FileSystem::GetAllFileInDirectory(const std::string& path)
+{
+	std::vector<std::string> files = {};
+	for (const auto& entry : fs::directory_iterator(path))
+		files.push_back(entry.path().string());
+	return files;
+}
+
+bool gns::fileSystem::FileSystem::Exists(const std::string& file)
+{
+	std::ifstream f(file);
+	return f.good();
 }

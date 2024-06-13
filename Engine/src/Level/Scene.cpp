@@ -5,6 +5,14 @@ namespace gns
 {
 	Scene::Scene(std::string name) : name(name) {}
 
+	Entity Scene::SoftCreateEntity()
+	{
+		entt::entity ent = m_registry.create();
+		Entity entity(ent);
+		entity.componentsVector = {};
+		return entity;
+	}
+
 	Entity Scene::CreateEntity(std::string name)
 	{
 		return Entity::CreateEntity(name, this);

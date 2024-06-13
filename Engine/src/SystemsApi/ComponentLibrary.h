@@ -119,8 +119,17 @@ namespace gns
 
 		RendererComponent(core::guid meshReferenceGuid, core::guid materialReferenceGuid): m_materials{}
 		{
+			AssignMesh(meshReferenceGuid);
+			AssignMaterial(materialReferenceGuid);
+		}
+
+		void AssignMesh(core::guid meshReferenceGuid)
+		{
 			AssetMetadata meshMeta = AssetDatabase::GetAssetByGuid(meshReferenceGuid);
 			m_mesh = Object::Get<rendering::Mesh>(meshMeta.guid);
+		}
+		void AssignMaterial(core::guid materialReferenceGuid)
+		{
 			rendering::Material* material = nullptr;
 			if(materialReferenceGuid == 0)
 			{
@@ -138,8 +147,8 @@ namespace gns
 			{
 				m_materials.push_back(material);
 			}
+			
 		}
-
 
 		void Register() override
 		{
@@ -189,4 +198,5 @@ namespace gns
 			camera_matrix = projection * view;
 		}
 	};
+
 };

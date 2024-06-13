@@ -110,7 +110,7 @@ namespace gns::rendering
 		{
 			LOG_VK_WARNING("NEED TO RECREATE SWAPCHAIN!");
 			int w = 0, h = 0;
-			m_device->m_window->GetExtent(w, h);
+			Window::getInstance()->GetExtent(w, h);
 			m_device->RebuildSwapchain(w,h);
 			m_frameBufferResized = true;
 			return false;
@@ -225,7 +225,7 @@ namespace gns::rendering
 			m_currentMaterial = material;
 			vkCmdBindPipeline(m_device->GetCurrentFrame()._mainCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_shader->pipeline);
 
-			uint32_t uniform_offset = m_device->PadUniformBufferSize(uniformSize) * m_device->m_imageIndex;
+			const uint32_t uniform_offset = m_device->PadUniformBufferSize(uniformSize) * m_device->m_imageIndex;
 
 			vkCmdBindDescriptorSets(m_device->GetCurrentFrame()._mainCommandBuffer,
 				VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_shader->pipelineLayout, 0, 1,
@@ -303,7 +303,7 @@ namespace gns::rendering
 			LOG_WARNING("NEED TO RECREATE SWAPCHAIN!");
 			m_frameBufferResized = false;
 			int w = 0, h = 0;
-			m_device->m_window->GetExtent(w, h);
+			Window::getInstance()->GetExtent(w, h);
 			m_device->RebuildSwapchain(w, h);
 		}
 		else
@@ -448,11 +448,12 @@ namespace gns::rendering
 	{
 		std::vector<VkDescriptorSetLayoutBinding> textureBindings =
 		{
-			DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 0),
+			DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 0),
 			DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1),
 			DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 2),
 			DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 3),
-			DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 4)
+			DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 4),
+			DescriptorsetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 5)
 		};
 		m_device->CreateDescriptorSetLayout(&shader->shaderSetLayout, textureBindings.data(), textureBindings.size());
 	}
@@ -473,6 +474,14 @@ namespace gns::rendering
 		vmaMapMemory(m_device->m_allocator, m_device->GetCurrentFrame()._cameraBuffer._allocation, &data);
 		memcpy(data, src_bufferData, size);
 		vmaUnmapMemory(m_device->m_allocator, m_device->GetCurrentFrame()._cameraBuffer._allocation);
+	}
+
+	void Renderer::UpdateMaterialUbo(Material* material)
+	{
+		void* data;
+		vmaMapMemory(m_device->m_allocator, material->attributeBuffer._allocation, &data);
+		memcpy(data, material->fragmentShaderData_memory, material->m_shader->fragmentShaderDataSize);
+		vmaUnmapMemory(m_device->m_allocator, material->attributeBuffer._allocation);
 	}
 
 	void Renderer::UpdateSceneDataUbo(const void* data, size_t size)

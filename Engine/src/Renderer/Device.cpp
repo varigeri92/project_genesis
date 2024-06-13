@@ -16,7 +16,7 @@ void gns::rendering::UploadContext::Destroy(VkDevice device)
     vkDestroyCommandPool(device, _commandPool, nullptr);
 }
 
-gns::rendering::Device::Device(Window* window) : m_window(window)
+gns::rendering::Device::Device()
 {
     PROFILE_FUNC
 	m_imageIndex = 0;
@@ -198,8 +198,8 @@ void gns::rendering::Device::CreateSurface()
     PROFILE_FUNC
     VkWin32SurfaceCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-    createInfo.hwnd = m_window->hwndHandle;
-    createInfo.hinstance = m_window->hinstance;
+    createInfo.hwnd = Window::getInstance()->hwndHandle;
+    createInfo.hinstance = Window::getInstance()->hinstance;
     _VK_CHECK(vkCreateWin32SurfaceKHR(m_instance, &createInfo, nullptr, &m_surface), "Failed to create Surface");
 }
 
@@ -218,7 +218,7 @@ void gns::rendering::Device::CreateSwapchain()
     m_imageViews = m_vkb_swapchain.get_image_views().value();
 
     int w = 0, h = 0;
-    m_window->GetExtent(w, h);
+    Window::getInstance()->GetExtent(w, h);
     VkExtent3D depthImageExtent = { static_cast<uint32_t>(w),static_cast<uint32_t>(h),1 };
     m_depthFormat = VK_FORMAT_D32_SFLOAT;
     VkImageCreateInfo dimg_info = ImageCreateInfo(m_depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, depthImageExtent);

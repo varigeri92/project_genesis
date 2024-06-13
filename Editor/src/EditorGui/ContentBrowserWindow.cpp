@@ -9,11 +9,9 @@
 #include "../../../Engine/src/AssetDatabase/AssetLoader.h"
 #include "../../../Engine/src/Gui/ImGui/IconsMaterialDesign.h"
 #include "../AssetManager/AssetImporter.h"
-#include "../Utils/Utilities.h"
 #include "yaml-cpp/yaml.h"
-#include "../Utils/FileSystem.h"
 
-namespace stdfs = std::filesystem;
+namespace fs = std::filesystem;
 static float iconSize = 1;
 static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_SizingFixedFit;
 static float dummyfloat[3] = { 0,0,0 };
@@ -129,7 +127,7 @@ namespace gns::editor
 			float window_visible_x2 = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
 
 			int buttonsInRow = 0;
-			for (const auto& entry : stdfs::directory_iterator(m_currentDirPath))
+			for (const auto& entry : fs::directory_iterator(m_currentDirPath))
 			{
 				ImGui::PushID(entry.path().string().c_str());
 				if (entry.is_directory())
@@ -194,14 +192,14 @@ namespace gns::editor
 
 		ImGui::BeginChild((entry.path().string() + "_button").c_str(), buttonParent_sz, child_flags);
 		ImTextureID icon = FileIcon->m_descriptorSet;
-		if(fs::FileSystem::HasExtension(entry.path().string(),".gnsmat"))
+		if(gns::fileSystem::FileSystem::HasExtension(entry.path().string(),".gnsmat"))
 		{
 			icon = MaterialIcon->m_descriptorSet;
 		}
 		if (ImGui::ImageButton(base_name(entry.path().string()).c_str(), icon, button_sz))
 		{
 			LOG_INFO("Opnening or inspecting file: '" << entry.path().string() <<"' feature not implemented...");
-			SelectionManager::SetSelectedObject(fs::FileSystem::GetFileName(entry.path().string()));
+			SelectionManager::SetSelectedObject(gns::fileSystem::FileSystem::GetFileName(entry.path().string()));
 		}
 		if (ImGui::BeginDragDropSource())
 		{
@@ -219,7 +217,7 @@ namespace gns::editor
 
 	void ContentBrowserWindow::DrawDirectoryInHierarchy(const std::string& path)
 	{
-		for (const auto& entry : stdfs::directory_iterator(path))
+		for (const auto& entry : fs::directory_iterator(path))
 		{
 			if (entry.is_directory())
 			{

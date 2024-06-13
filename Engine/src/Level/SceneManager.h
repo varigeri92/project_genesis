@@ -22,6 +22,8 @@ namespace gns::core
 		GNS_API static Scene* LoadScene(std::string path);
 		GNS_API static Scene* CreateScene(std::string name);
 		GNS_API static Scene* SerializeScene(Scene* scene);
+		GNS_API static void SaveSceneToFile(std::string path);
+		GNS_API static Scene* loadSceneFromFile(std::string path);
 
 	private:
 		static void IntegrateScene(Scene* scene);
@@ -30,7 +32,5 @@ namespace gns::core
 		static void* ReadFieldValue(size_t field_typeId, const YAML::Node& node);
 		static void* AddComponentFromSavedData(Entity& entity, uint32_t Component_typeId);
 		static void WriteFieldToComponent(void* component_ptr, const FieldData& fieldData, const void* fieldValuer_ptr);
-		static Scene* loadSceneFromFile(std::string path);
-		static void SaveSceneToFile(std::string path);
 	};
 }

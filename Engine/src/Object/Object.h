@@ -43,7 +43,7 @@ namespace gns
 		{
 			if(!s_objectMap.contains(guid))
 			{
-				LOG_ERROR("Object Map does not contain Guid: " << guid);
+				LOG_ERROR("Object: "<< guid <<" does not created yet!");//return Create<T>(guid);
 			}
 			if(IsValid(s_objectMap[guid]))
 			{

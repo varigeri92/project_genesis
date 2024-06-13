@@ -32,9 +32,6 @@ gns::editor::Editor::Editor(Engine* engine) : engine(engine)
             // Entity tests:
             //const std::shared_ptr<rendering::Shader> defaultShader = std::make_shared<rendering::Shader>("blinphong.vert.spv", "blinphong.frag.spv");
             rendering::Shader* defaultShader = Object::Create<rendering::Shader>("blinphong.vert.spv", "blinphong.frag.spv");
-    		RenderSystem* renderSystem = SystemsAPI::GetSystem<RenderSystem>();
-    		renderSystem->CreatePipeline(defaultShader);
-
             const std::shared_ptr<rendering::Texture> defaultTexture = std::make_shared<rendering::Texture>(R"(Textures\uv_color_Grid.png)");
 
             rendering::Material* defaultMaterial = Object::Create<rendering::Material>(defaultShader, "default Material");
@@ -46,19 +43,7 @@ gns::editor::Editor::Editor(Engine* engine) : engine(engine)
                 AssetType::material,
                 AssetState::loaded
             };
-            AssetDatabase::AddAssetToDatabase(assetMeta, true);
-            /*
-            const auto meshInstance = AssetLoader::LoadMeshFile(1,R"(sketchfab\kda_akali_-_lol_-_3d_printable_fanart.glb)");
-            for (rendering::MeshData* mesh : meshInstance)
-            {
-                renderSystem->UploadMesh(mesh);
-                Entity reiEntity = Entity::CreateEntity(mesh->name, core::SceneManager::ActiveScene);
-                RendererComponent& rc = reiEntity.AddComponet<RendererComponent>(mesh, defaultMaterial);
-                Transform& transform = reiEntity.GetComponent<Transform>();
-                transform.position = { 0,0,0 };
-                //transform.scale = { 0.25f,0.25f,0.25f };
-            }
-            */
+            AssetDatabase::AddImportedAssetToDatabase(assetMeta, true, true);
         });
     engine->Run();
     engine->ShutDown();

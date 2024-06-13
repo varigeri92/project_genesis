@@ -9,6 +9,8 @@
 #include "../AssetDatabase/AssetLoader.h"
 #include "../Renderer/Utils/Buffer.h"
 #include "Scene.h"
+#include "../Utils/NativeFileBrowser.h"
+#include "../Utils/FileSystem/FileSystem.h"
 
 namespace fs = std::filesystem;
 
@@ -19,11 +21,11 @@ namespace gns::core
 
 	Scene* SceneManager::LoadScene(std::string path)
 	{
-		/*
 		YAML::Node sceneNode = YAML::LoadFile(AssetLoader::GetAssetsPath() + "\\DefaultScene.gnsscene");
 		LOG_INFO(AQUA << "[Scene Serializer]:" << DEFAULT << "Serialized vith version: " << sceneNode["version"].as<std::string>());
 		LOG_INFO(AQUA << "[Scene Serializer]:" << DEFAULT << "Scene name: " << sceneNode["scene"].as<std::string>());
 		Scene* scene = CreateScene(sceneNode["scene"].as<std::string>());
+		/*
 
 		const YAML::Node& entities = sceneNode["entities"];
 		for (std::size_t i = 0; i < entities.size(); i++) {
@@ -197,7 +199,7 @@ namespace gns::core
 			return &component;
 		}
 
-		if (Component_typeId == entt::type_hash<gns::RendererComponent, void>::value()) // EntityComponent
+		if (Component_typeId == entt::type_hash<gns::RendererComponent, void>::value()) // RendererComponent
 		{
 			gns::RendererComponent& component = entity.AddComponet<gns::RendererComponent>();
 			return &component;
@@ -234,11 +236,21 @@ namespace gns::core
 
 	Scene* SceneManager::loadSceneFromFile(std::string path)
 	{
+		if (path == "") return nullptr;
+		LOG_INFO(path);
+		Serializer serializer;
+		serializer.DeserializeScene(path);
 		return nullptr;
 	}
 
 	void SceneManager::SaveSceneToFile(std::string path)
 	{
-
+		if (path == "") return;
+		Serializer serializer;
+		std::string SerializedSceneData = serializer.SerializeScene(ActiveScene);
+		if(!gns::fileSystem::FileSystem::WriteFile(SerializedSceneData, path))
+		{
+			LOG_ERROR("Saving Scene Failed: " << path);
+		};
 	}
 }
