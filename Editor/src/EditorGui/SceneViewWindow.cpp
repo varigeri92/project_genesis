@@ -88,16 +88,24 @@ void gns::editor::SceneViewWindow::OnGUI()
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_FILE"))
 		{
 			LOG_INFO("Dropped into scene!");
-			AssetImporter importer;
-			AssetMetadata assetMeta = {};
-			if(importer.ImportAsset(DragDropManager::GetCurrentPayload()->path, assetMeta))
+			std::string path = DragDropManager::GetCurrentPayload()->path;
+			std::string extension = fileSystem::FileSystem::GetFileExtension(path);
+			if (extension == "gnsscene") {
+				core::SceneManager::loadSceneFromFile(path);
+			}
+			else 
 			{
-				LOG_INFO("Asset imported sucessfully, or it was already imported... guid:" << assetMeta.guid);
-				AssetMetadata importedAsset = AssetDatabase::AddImportedAssetToDatabase(assetMeta);
-				auto* mesh = AssetLoader::LoadAssetFromFile<rendering::Mesh>(importedAsset.guid);
-				SystemsAPI::GetSystem<RenderSystem>()->UploadMesh(mesh);
-				Entity entity = core::SceneManager::ActiveScene->CreateEntity(gns::fileSystem::FileSystem::GetFileName(importedAsset.sourcePath));
-				entity.AddComponet <RendererComponent>(importedAsset.guid, 0);
+				AssetImporter importer;
+				AssetMetadata assetMeta = {};
+				if(importer.ImportAsset(path, assetMeta))
+				{
+					LOG_INFO("Asset imported sucessfully, or it was already imported... guid:" << assetMeta.guid);
+					AssetMetadata importedAsset = AssetDatabase::AddImportedAssetToDatabase(assetMeta);
+					auto* mesh = AssetLoader::LoadAssetFromFile<rendering::Mesh>(importedAsset.guid);
+					SystemsAPI::GetSystem<RenderSystem>()->UploadMesh(mesh);
+					Entity entity = core::SceneManager::ActiveScene->CreateEntity(gns::fileSystem::FileSystem::GetFileName(importedAsset.sourcePath));
+					entity.AddComponet <RendererComponent>(importedAsset.guid, 0);
+				}
 			}
 		}
 		ImGui::EndDragDropTarget();

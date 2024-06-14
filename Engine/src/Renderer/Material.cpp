@@ -50,13 +50,15 @@ namespace gns::rendering
 
 	Material::~Material()
 	{
+		free(vertexShaderData_memory);
+		vertexShaderData_memory = nullptr;
+		free(fragmentShaderData_memory);
+		fragmentShaderData_memory = nullptr;
 		RenderSystem* renderSystem = SystemsAPI::GetSystem<RenderSystem>();
 		renderSystem->DisposeMaterial(this);
 		vmaDestroyBuffer(renderSystem->GetDevice()->m_allocator, attributeBuffer._buffer, attributeBuffer._allocation);
 		LOG_INFO("Material Destroyed: " << name);
 
-		free(vertexShaderData_memory);
-		free(fragmentShaderData_memory);
 	}
 
 	void Material::SetTexture(std::shared_ptr<Texture> texture, uint32_t binding)

@@ -12,6 +12,12 @@ namespace gns::rendering
 
 	struct Material : public gns::Object
 	{
+		Material() = delete;
+		Material(const Material& other) = delete;
+		Material(Material&& other) = delete;
+		Material& operator =(Material&& other) = delete;
+		Material& operator =(const Material& other) = delete;
+
 		GNS_API Material(gns::rendering::Shader* shader, std::string name);
 		GNS_API ~Material() override;
 		VkDescriptorSet descriptorSet;

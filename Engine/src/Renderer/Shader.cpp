@@ -33,6 +33,8 @@ void gns::rendering::Shader::ReadAttributes()
 	fragmentShaderDataSize += (sizeof(float) * 4);
 	m_fragmentShaderAttributes.emplace_back("specular", 
 		ShaderAttributeType::Float, fragmentShaderDataSize, 2, 0);
+	fragmentShaderDataSize += (sizeof(float));
+
 	/*
 	 
 	//set 1 is for textures
