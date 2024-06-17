@@ -15,7 +15,11 @@ std::unordered_map<uint32_t, std::function<void* (Entity&)>> Serializer::AddComp
 	{entt::type_hash<EntityComponent>().value(),[](Entity& entity)
 		{ return &entity.AddComponet<EntityComponent>(); }},
 	{entt::type_hash<Transform>().value(),[](Entity& entity)
-		{ return &entity.AddComponet<Transform>(); }},
+	{ 
+		Transform& transform = entity.AddComponet<Transform>();
+		entity.SetParent(core::SceneManager::ActiveScene->GetSceneRoot().entity);
+		return &transform;
+	}},
 	{entt::type_hash<RendererComponent>().value(),[](Entity& entity)
 		{ return &entity.AddComponet<RendererComponent>(); }},
 	{entt::type_hash<Camera>().value(),[](Entity& entity)

@@ -1,9 +1,18 @@
 ﻿#include "gnspch.h"
 #include "Scene.h"
 #include "../SystemsApi/ComponentLibrary.h"
+#include "entt/entt.hpp"
+#include "../../Engine/src/SystemsApi/Entity.h"
+
 namespace gns
 {
-	Scene::Scene(std::string name) : name(name) {}
+	Scene::Scene(std::string name) : name(name)
+	{
+		entt::entity ent = m_registry.create();
+		m_registry.emplace<EntityComponent>(ent, "SceneRoot");
+		m_registry.emplace<Transform>(ent);
+		m_sceneRoot = { ent };
+	}
 
 	Entity Scene::SoftCreateEntity()
 	{
@@ -52,5 +61,9 @@ namespace gns
 	entt::registry& Scene::Registry()
 	{
 		return m_registry;
+	}
+	Entity& Scene::GetSceneRoot()
+	{
+		return m_sceneRoot;
 	}
 }

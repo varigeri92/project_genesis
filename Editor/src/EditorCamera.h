@@ -16,6 +16,7 @@ class EditorCamera : public gns::SystemBase
 	gns::Camera m_camera;
 	float m_cameraMoveSpeed;
 public:
+	EditorCamera();
 	void OnCreate() override;
 	void OnUpdate(float deltaTime) override;
 	void SetViewYXZ(glm::vec3 position, glm::vec3 rotation);

@@ -5,6 +5,8 @@
 #include "../Gui/GuiSystem.h"
 #include "../SystemsApi/ComponentLibrary.h"
 #include "Lights/Lights.h"
+#include "../Level/SceneManager.h"
+#include "../Level/Scene.h"
 
 
 static  void printMat4(const glm::mat4& matrix, std::string label) {
@@ -65,6 +67,16 @@ void gns::RenderSystem::OnCreate()
 	PROFILE_FUNC
 }
 
+void UpdateTransformRecursive(gns::Transform& transform) 
+{
+	for (entt::entity entity : transform.children) {
+		gns::Transform& child_transform = gns::Entity(entity).GetComponent<gns::Transform>();
+		child_transform.UpdateMatrix();
+		child_transform.matrix = transform.matrix * child_transform.matrix;
+		UpdateTransformRecursive(child_transform);
+	}
+}
+
 void gns::RenderSystem::OnUpdate(float deltaTime)
 {
 	PROFILE_FUNC
@@ -74,9 +86,10 @@ void gns::RenderSystem::OnUpdate(float deltaTime)
 	camData.proj = m_renderCamera->projection;
 	camData.viewproj = m_renderCamera->camera_matrix;
 
-	auto transformView = SystemsAPI::GetRegistry().view<Transform>();
-	for (auto [entt, transform] : transformView.each())
-		transform.UpdateMatrix();
+	Entity SceneRootEntity = core::SceneManager::ActiveScene->GetSceneRoot();
+	Transform& t = SceneRootEntity.GetComponent<Transform>();
+	t.UpdateMatrix();
+	UpdateTransformRecursive(t);
 	size_t buffer_size;
 	lightSubsystem.CalculateLightData(rawSceneData, buffer_size);
 

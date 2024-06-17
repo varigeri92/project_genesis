@@ -22,9 +22,9 @@ namespace gns
 		Entity(entt::entity entity) :
 			entity{ entity }, children{}
 		{};
-		Entity() = delete;
+		Entity() : entity{ entt::null } {};
 
-		inline bool IsValid() { return entity != entt::null; }
+		GNS_API bool IsValid();
 		operator bool() { return IsValid(); }
 
 		GNS_API Entity GetParent();

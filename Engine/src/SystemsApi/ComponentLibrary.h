@@ -67,7 +67,7 @@ namespace gns
 
 		glm::mat4 matrix;
 
-		entt::entity parent;
+		entt::entity parent = entt::null;
 		core::guid parent_guid;
 
 		std::vector<entt::entity> children;
@@ -92,16 +92,20 @@ namespace gns
 		Transform()
 			: position{ 0,0,0 }, rotation{ 0,0,0 }, scale{ 1,1,1 }
 		{
-			parent = entt::null;
 			UpdateMatrix();
+			LOG_INFO("Created Transform, Default Constructor!");
 		}
 
 		Transform(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 			: position{ position }, rotation{ rotation }, scale{ scale }
 		{
-			parent = entt::null;
 			UpdateMatrix();
+			LOG_INFO("Created Transform, with arguments!");
 		}
+		Transform(const Transform& other) = delete;
+		Transform(Transform&& other) = delete;
+		Transform& operator =(Transform&& other) = delete;
+		Transform& operator =(const Transform& other) = delete;
 	};
 
 	struct RendererComponent : public ComponentBase

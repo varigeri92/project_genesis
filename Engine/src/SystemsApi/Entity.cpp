@@ -11,15 +11,28 @@ gns::Entity gns::Entity::CreateEntity(std::string entityName, Scene* scene)
     scene->m_registry.emplace<Transform>(ent);
     Entity entity(ent);
 	entity.componentsVector = {};
+    entity.SetParent(core::SceneManager::ActiveScene->GetSceneRoot());
 	return entity;
 }
 
 void gns::Entity::RemoveChild(entt::entity ent)
 {
+    LOG_INFO("Remove Children of: " << (uint32_t)entity << " child was:" <<(uint32_t)ent);
     if (!IsValid())
         return;
 
-    Entity(ent).SetParent(entt::null);
+    gns::core::guid guid = Entity(ent).GetComponent<EntityComponent>().guid;
+    size_t index = 0;
+    Transform& t = GetComponent<Transform>();
+    for (size_t i = 0; i < t.children.size(); i++)
+    {
+        if (t.children[i] == ent) {
+            index = i;
+            t.children.erase(t.children.begin()+ index);
+            t.children_guid.erase(t.children_guid.begin() + index);
+            break;
+        }
+    }
 }
 void gns::Entity::SetParent(entt::entity parent)
 {
@@ -33,9 +46,16 @@ void gns::Entity::SetParent(entt::entity parent)
     SetParent(e);
 }
 
+bool gns::Entity::IsValid()
+{
+    return entity != entt::null;
+}
+
 gns::Entity gns::Entity::GetParent()
 {
-    return { GetComponent<Transform>().parent };
+    entt::entity parent = GetComponent<Transform>().parent;
+    LOG_INFO("The parent of " << (uint32_t)entity << "is: " << (uint32_t)parent);
+    return { parent };
 }
 
 std::vector<gns::Entity>& gns::Entity::GetChildren()
@@ -51,12 +71,18 @@ std::vector<gns::Entity>& gns::Entity::GetChildren()
 
 void gns::Entity::SetParent(Entity& parent)
 {
-    GetParent().RemoveChild(entity);
     if(!parent.IsValid())
         return;
-
+    Entity oldParent = GetParent();
+    if (oldParent.entity == parent.entity) {
+        return;
+    }
+    oldParent.RemoveChild(entity);
+    GetComponent<Transform>().parent = parent.entity;
     parent.GetComponent<Transform>().children.emplace_back(entity);
     parent.GetComponent<Transform>().children_guid.emplace_back(GetComponent<EntityComponent>().guid);
+    LOG_INFO("Set Parent of: " << (uint32_t)entity << " to " << (uint32_t)parent.entity << ", old parent was: " << (uint32_t)oldParent.entity);
+
 }
 
 

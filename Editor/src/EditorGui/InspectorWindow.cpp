@@ -80,7 +80,7 @@ namespace gns::editor
 			
 
 		ImGui::PushFont(gns::gui::GuiSystem::boldFont);
-		ImGui::Text(inspectedEntity.GetComponent<gns::EntityComponent>().name.c_str());
+		ImGui::Text("%i; %s",inspectedEntity.entity, inspectedEntity.GetComponent<gns::EntityComponent>().name.c_str());
 		ImGui::PopFont();
 
 		const std::vector<gns::ComponentMetadata>& components = inspectedEntity.GetAllComponent();

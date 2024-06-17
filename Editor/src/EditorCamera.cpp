@@ -2,11 +2,14 @@
 #include "Engine.h"
 #include "Log.h"
 
+EditorCamera::EditorCamera() : m_transform{ { 0.f,1.f,5.f }, {0,0,0}, {1,1,1} }
+{
+}
+
 void EditorCamera::OnCreate()
 {
 	LOG_INFO("Editor Camera System Created!");
 	m_cameraMoveSpeed = 3.f;
-	m_transform = gns::Transform({ 0.f,1.f,5.f }, {0,0,0}, {1,1,1});
 	m_camera = gns::Camera(0.01f, 1000.f, 60.f, 1920.f, 1080.f, m_transform);
 }
 

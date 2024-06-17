@@ -205,7 +205,7 @@ namespace gns::editor
 		{
 			if(ImGui::SetDragDropPayload("CONTENT_BROWSER_FILE", nullptr, 0))
 			{
-				DragDropManager::SetCurrentPayload(nullptr, entry.path().string());
+				DragDropManager::SetCurrentPayload_Asset(entry.path().string());
 			}
 			
 			ImGui::Text(base_name(entry.path().string()).c_str());

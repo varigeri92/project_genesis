@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "../Utils/Guid.h"
+#include "../../Engine/src/SystemsApi/Entity.h"
 
 namespace gns
 {
@@ -9,12 +10,6 @@ namespace gns
 	{
 		friend struct Entity;
 		friend class Serializer;
-
-		struct SceneNode
-		{
-			core::guid entity_guid;
-			std::vector<SceneNode> children;
-		};
 
 	public:
 		Scene(std::string name);
@@ -32,10 +27,10 @@ namespace gns
 		}
 
 		entt::registry& Registry();
-
+		GNS_API Entity& GetSceneRoot();
 	private:
 		entt::registry m_registry;
-		SceneNode m_root;
+		Entity m_sceneRoot;
 		Entity SoftCreateEntity();
 	};
 }
