@@ -9,13 +9,16 @@ namespace gns
 	{
 		friend struct Entity;
 		friend class Serializer;
+
+		struct SceneNode
+		{
+			core::guid entity_guid;
+			std::vector<SceneNode> children;
+		};
+
 	public:
 		Scene(std::string name);
 		std::string name;
-		std::vector<Scene> m_subScenes;
-	private:
-		entt::registry m_registry;
-		Entity SoftCreateEntity();
 	public:
 		GNS_API Entity CreateEntity(std::string name);
 		GNS_API Entity FindEntity(std::string name);
@@ -29,5 +32,10 @@ namespace gns
 		}
 
 		entt::registry& Registry();
+
+	private:
+		entt::registry m_registry;
+		SceneNode m_root;
+		Entity SoftCreateEntity();
 	};
 }

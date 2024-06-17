@@ -67,6 +67,12 @@ namespace gns
 
 		glm::mat4 matrix;
 
+		entt::entity parent;
+		core::guid parent_guid;
+
+		std::vector<entt::entity> children;
+		std::vector<core::guid> children_guid;
+
 		void Register() override
 		{
 			REGISTER_CMP(Transform);
@@ -86,22 +92,16 @@ namespace gns
 		Transform()
 			: position{ 0,0,0 }, rotation{ 0,0,0 }, scale{ 1,1,1 }
 		{
+			parent = entt::null;
 			UpdateMatrix();
 		}
 
 		Transform(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 			: position{ position }, rotation{ rotation }, scale{ scale }
 		{
+			parent = entt::null;
 			UpdateMatrix();
 		}
-	};
-	struct Children
-	{
-		std::vector<std::shared_ptr<Transform>> children;
-	};
-	struct Parent
-	{
-		std::shared_ptr<Transform> parent;
 	};
 
 	struct RendererComponent : public ComponentBase

@@ -58,7 +58,6 @@ namespace gns::rendering
 		renderSystem->DisposeMaterial(this);
 		vmaDestroyBuffer(renderSystem->GetDevice()->m_allocator, attributeBuffer._buffer, attributeBuffer._allocation);
 		LOG_INFO("Material Destroyed: " << name);
-
 	}
 
 	void Material::SetTexture(std::shared_ptr<Texture> texture, uint32_t binding)
