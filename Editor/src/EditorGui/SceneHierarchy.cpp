@@ -6,6 +6,7 @@
 
 namespace gns::editor
 {
+    std::string treenodeID = "##";
 	SceneHierarchy::SceneHierarchy() : GuiWindow("SceneHierarchy")
 	{
 		gns::editor::DockspaceWindow* dockSpaceWindow = gns::gui::GuiSystem::GetWindow<gns::editor::DockspaceWindow>();
@@ -28,7 +29,15 @@ namespace gns::editor
             node_flags |= ImGuiTreeNodeFlags_Selected;
         }
         if (DrawEntity) {
-            bool node_open = ImGui::TreeNodeEx(entitycomponent.name.c_str(), node_flags);
+            if(entitycomponent.name == "")
+            {
+                treenodeID = "##";
+            }
+            else
+            {
+                treenodeID = entitycomponent.name;
+            }
+            bool node_open = ImGui::TreeNodeEx(treenodeID.c_str(), node_flags);
             if (ImGui::BeginDragDropTarget())
             {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY"))

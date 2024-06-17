@@ -149,7 +149,8 @@ namespace gns::editor
 		ImGui::PopFont();
 		if (DrawFullComponentData[typeHash])
 		{
-			if (ImGui::BeginTable(name.c_str(), 2, table_flags))
+			std::string tableID = name + "__";
+			if (ImGui::BeginTable(tableID.c_str(), 2, table_flags))
 			{
 				for (size_t i = 0; i < Serializer::ComponentData_Table[typeHash].fields.size(); i++)
 				{
