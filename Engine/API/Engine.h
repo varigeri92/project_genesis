@@ -10,6 +10,7 @@
 #include "../src/Utils/FileSystem/Utilities.h"
 #include "../src/Utils/Serialization/Serializer.h"
 #include "../src/Utils/NativeFileBrowser.h"
+#include "../src/Utils/Stats.h"
 #include "../src/Level/SceneManager.h"
 #include "../src/Window/InputBackend.h"
 #include "../src/SystemsApi/SystemsAPI.h"
@@ -28,6 +29,7 @@
 #include "../src/AssetDatabase/AssetLoader.h"
 #include "../src/AssetDatabase/AssetDatabase.h"
 #include "../src/Renderer/Lights/Lights.h"
+
 
 
 namespace gns

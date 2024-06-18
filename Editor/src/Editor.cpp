@@ -10,6 +10,7 @@
 #include "EditorGui/SceneViewWindow.h"
 #include "EditorGui/ContentBrowserWindow.h"
 #include "EditorGui/SceneHierarchy.h"
+#include "EditorGui/StatsWindow.h"
 
 
 gns::editor::Editor::Editor(Engine* engine) : engine(engine)
@@ -27,6 +28,7 @@ gns::editor::Editor::Editor(Engine* engine) : engine(engine)
             gui::GuiSystem::RegisterWindow<InspectorWindow>();
             gui::GuiSystem::RegisterWindow<ContentBrowserWindow>();
             gui::GuiSystem::RegisterWindow<SceneHierarchy>();
+            gui::GuiSystem::RegisterWindow<StatsWindow>();
 
 
             // Entity tests:

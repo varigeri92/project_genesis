@@ -3,6 +3,8 @@
 #include "RenderSystem.h"
 #include "Renderer.h"
 
+
+
 gns::rendering::Shader::Shader(const std::string vertexShaderPath, const std::string fragmentShaderPath) :
 	m_vertexShaderPath(vertexShaderPath),
 	m_fragmentShaderPath(fragmentShaderPath)
@@ -34,21 +36,4 @@ void gns::rendering::Shader::ReadAttributes()
 	m_fragmentShaderAttributes.emplace_back("specular", 
 		ShaderAttributeType::Float, fragmentShaderDataSize, 2, 0);
 	fragmentShaderDataSize += (sizeof(float));
-
-	/*
-	 
-	//set 1 is for textures
-	m_fragmentShaderAttributes.emplace_back("tex_albedo", ShaderAttributeType::Texture, 0, 1, 0);
-	m_fragmentShaderAttributes.emplace_back("tex_normal", ShaderAttributeType::Texture, 0, 1, 0);
-
-	m_fragmentShaderAttributes.emplace_back("tex_metallic", ShaderAttributeType::Texture, 0, 1, 0);
-	m_fragmentShaderAttributes.emplace_back("color_specular", ShaderAttributeType::Color4, fragmentShaderDataSize, 2, 0);
-	fragmentShaderDataSize += (sizeof(float) * 4);
-
-	m_fragmentShaderAttributes.emplace_back("tex_roughness", ShaderAttributeType::Texture, 0, 1, 0);
-	m_fragmentShaderAttributes.emplace_back("roughness", ShaderAttributeType::Float, fragmentShaderDataSize, 2, 0);
-	fragmentShaderDataSize += sizeof(float);
-
-	m_fragmentShaderAttributes.emplace_back("tex_ao",ShaderAttributeType::Texture, 0, 1, 0 );
-	*/
 }

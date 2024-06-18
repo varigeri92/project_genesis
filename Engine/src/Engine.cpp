@@ -53,8 +53,8 @@ gns::Engine::Engine() :close(false)
 	START_PROFILER("Engine")
 	PROFILE_FUNC
 
-	Window::getInstance()->InitWindow(1920, 1080);
-	Screen::InitDefaultScreen(1920, 1080, Screen::ScreenMode::sm_none);
+	Window::getInstance()->InitWindow(1024, 720);
+	Screen::InitDefaultScreen(1024, 720, Screen::ScreenMode::sm_none);
 	Serializer::RegisterSerializableComponents([](){
 		gns::RegisterComponent<gns::EntityComponent>();
 		gns::RegisterComponent<gns::Transform>();
@@ -87,6 +87,8 @@ void gns::Engine::Init(std::function<void()> startupCallback)
 	RenderSystem* renderSystem = SystemsAPI::RegisterSystem<RenderSystem>();
 	m_guiSystemInstance = new gns::gui::GuiSystem(renderSystem->GetDevice());
 	startupCallback();
+
+
 	// Event system subsribe tests:
 	CallThis_EventFunction_InClass = new gns::EventFunction<void, std::string>([](const std::string& message)
 	{
@@ -97,6 +99,7 @@ void gns::Engine::Init(std::function<void()> startupCallback)
 	TestEvent.Subscribe<void, std::string>(&DoNotCallThis_EventFunction);
 	TestEvent.Subscribe<void, std::string>(CallThis_EventFunction_InClass);
 	TestEvent.RemoveListener<void, std::string>(&DoNotCallThis_EventFunction);
+
 }
 
 void gns::Engine::Run()
