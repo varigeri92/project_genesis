@@ -22,9 +22,9 @@ gns::editor::Editor::Editor(Engine* engine) : engine(engine)
             SystemsAPI::GetSystem<RenderSystem>()->SetRenderCamera(
                 &editor_camera->m_camera, &editor_camera->m_transform);
 
-            gui::GuiSystem::RegisterWindow<DockspaceWindow>("DockSpace");
-            gui::GuiSystem::RegisterWindow<SceneViewWindow>("Scene");
-            gui::GuiSystem::RegisterWindow<DummyWindow>("Dummy");
+            gui::GuiSystem::RegisterWindow<DockspaceWindow>();
+            gui::GuiSystem::RegisterWindow<SceneViewWindow>();
+            gui::GuiSystem::RegisterWindow<DummyWindow>();
             gui::GuiSystem::RegisterWindow<InspectorWindow>();
             gui::GuiSystem::RegisterWindow<ContentBrowserWindow>();
             gui::GuiSystem::RegisterWindow<SceneHierarchy>();

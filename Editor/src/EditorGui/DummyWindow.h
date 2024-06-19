@@ -11,7 +11,7 @@ class DummyWindow final : public gns::gui::GuiWindow
 	};
 	std::vector<IconDefine> icons;
 public:
-	DummyWindow(const std::string& name);
+	DummyWindow();
 
 protected:
 	void OnGUI() override;

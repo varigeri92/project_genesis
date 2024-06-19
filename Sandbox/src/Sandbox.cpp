@@ -32,13 +32,11 @@ int main(int argc, char* argv[])
         SetProjectArguments("-p", R"(D:\GenesisProjects\GenesisTestProject)");
     }
 
-    gns::Engine* engine = new gns::Engine();
+    gns::Engine engine = gns::Engine();
     gns::EventFunction<void, std::string>* sandboxEvent = new gns::EventFunction<void, std::string>([](const std::string& message)
         {
             LOG_INFO("External subscription: " << message);
 		});
-    engine->TestEvent.Subscribe<void, std::string>(sandboxEvent);
-    gns::editor::Editor* editor = new gns::editor::Editor(engine);
-    delete engine;
-    delete editor;
+    engine.TestEvent.Subscribe<void, std::string>(sandboxEvent);
+    gns::editor::Editor editor = gns::editor::Editor(&engine);
 }

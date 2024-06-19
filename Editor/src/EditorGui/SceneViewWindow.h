@@ -25,7 +25,7 @@ private:
 	bool m_WindowInitialized;
 	gns::EventFunction<void, entt::entity>* onEntitySelected;
 public:
-	explicit SceneViewWindow(const std::string& name);
+	explicit SceneViewWindow();
 	~SceneViewWindow();
 
 protected:

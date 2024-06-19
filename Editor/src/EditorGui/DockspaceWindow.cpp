@@ -3,7 +3,7 @@
 #include "EditorStyles.h"
 
 
-gns::editor::DockspaceWindow::DockspaceWindow(const std::string& name) : GuiWindow(name)
+gns::editor::DockspaceWindow::DockspaceWindow() : GuiWindow("Dockspace")
 {
     m_flags = ImGuiWindowFlags_MenuBar| ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking
         | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove

@@ -7,7 +7,6 @@ namespace gns
 	class SystemBase
 	{
 		friend class SystemsAPI;
-
 		size_t typeHash;
 	public:
 		GNS_API SystemBase() = default;

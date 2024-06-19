@@ -12,13 +12,9 @@ namespace gns::editor
 	class DockspaceWindow final : public gns::gui::GuiWindow
 	{
 	public:
-		DockspaceWindow(const std::string& name);
+		DockspaceWindow();
 		~DockspaceWindow() = default;
-
-
-
 		void PushWindowMenu(std::string label, std::string shortCut, bool* windowOpen);
-		
 	protected:
 		void OnGUI() override;
 		void OnBeforeWindowDraw() override;

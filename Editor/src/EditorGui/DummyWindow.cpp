@@ -2,7 +2,7 @@
 #include "DockspaceWindow.h"
 #include "../../Engine/src/Gui/ImGui/IconsMaterialDesign.h"
 
-DummyWindow::DummyWindow(const std::string& name) : GuiWindow(name)
+DummyWindow::DummyWindow() : GuiWindow("DummyWindow")
 {
 	gns::editor::DockspaceWindow* dockSpaceWindow = gns::gui::GuiSystem::GetWindow<gns::editor::DockspaceWindow>();
 	dockSpaceWindow->PushWindowMenu("Dummy window", "", &m_isActive);

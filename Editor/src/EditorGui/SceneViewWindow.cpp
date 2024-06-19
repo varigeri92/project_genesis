@@ -13,7 +13,7 @@
 gns::Transform* currentEntityTransform;
 entt::entity selected = entt::null;
 EditorCamera* camera = nullptr;
-gns::editor::SceneViewWindow::SceneViewWindow(const std::string& name): GuiWindow(name), m_WindowInitialized(false), m_isGizmoLocal(true)
+gns::editor::SceneViewWindow::SceneViewWindow() : GuiWindow("Scene View"), m_WindowInitialized(false), m_isGizmoLocal(true)
 {
 	m_renderSystem = SystemsAPI::GetSystem<RenderSystem>();
 	m_offscreenPass = &m_renderSystem->GetOffscreenPass();
