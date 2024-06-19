@@ -11,6 +11,8 @@ namespace gns::editor
 	static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_SizingFixedFit;
 	static ImVec2 ChildSize = { 0,0 };
 	static ImGuiChildFlags child_flags = ImGuiChildFlags_Border | ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_FrameStyle;
+	static ImGuiTreeNodeFlags tree_flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed;
+
 	static entt::entity nullentity = entt::null;
 	bool drawMaterial;
 	static std::unordered_map<size_t, bool> DrawFullComponentData = {};
@@ -130,25 +132,14 @@ namespace gns::editor
 
 	void InspectorWindow::DrawComponent(void* component, size_t typeHash)
 	{
-		if (!DrawFullComponentData.contains(typeHash))
-		{
-			DrawFullComponentData[typeHash] = true;
-		}
 		ImGui::BeginChild(typeHash, ChildSize, child_flags);
 		ImGui::PushFont(gns::gui::GuiSystem::boldFont);
-		ImGui::Text("%s %s", GetIcon(typeHash), Serializer::ComponentData_Table[typeHash].name.c_str());
-
-		ImGui::SameLine(ImGui::GetWindowWidth() - 80);
-		if (ImGui::Button(ICON_MD_ARROW_DROP_DOWN))
-			DrawFullComponentData[typeHash] = !DrawFullComponentData[typeHash];
-
-		ImGui::SameLine(ImGui::GetWindowWidth() - 40);
-		ImGui::Button(ICON_MD_DELETE_FOREVER);
-
-		ImGui::Separator();
-		ImGui::PopFont();
-		if (DrawFullComponentData[typeHash])
+		const char* label = ("%s %s", GetIcon(typeHash), Serializer::ComponentData_Table[typeHash].name.c_str());
+		ImGui::Text("%s", GetIcon(typeHash));
+		ImGui::SameLine();
+		if (ImGui::CollapsingHeader(label, tree_flags))
 		{
+			ImGui::PopFont();
 			std::string tableID = name + "__";
 			if (ImGui::BeginTable(tableID.c_str(), 2, table_flags))
 			{
@@ -158,6 +149,9 @@ namespace gns::editor
 				}
 				ImGui::EndTable();
 			}
+		}
+		else {
+			ImGui::PopFont();
 		}
 		ImGui::EndChild();
 	}

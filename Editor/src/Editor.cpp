@@ -32,7 +32,6 @@ gns::editor::Editor::Editor(Engine* engine) : engine(engine)
 
 
             // Entity tests:
-            //const std::shared_ptr<rendering::Shader> defaultShader = std::make_shared<rendering::Shader>("blinphong.vert.spv", "blinphong.frag.spv");
             rendering::Shader* defaultShader = Object::Create<rendering::Shader>("blinphong.vert.spv", "blinphong.frag.spv");
             const std::shared_ptr<rendering::Texture> defaultTexture = std::make_shared<rendering::Texture>(R"(Textures\uv_color_Grid.png)");
 
