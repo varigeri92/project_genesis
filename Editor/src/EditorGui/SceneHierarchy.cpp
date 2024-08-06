@@ -6,6 +6,7 @@
 
 namespace gns::editor
 {
+    static bool clicked_on_Entity;
     std::string treenodeID = "##";
 	SceneHierarchy::SceneHierarchy() : GuiWindow("SceneHierarchy")
 	{
@@ -38,6 +39,28 @@ namespace gns::editor
                 treenodeID = entitycomponent.name;
             }
             bool node_open = ImGui::TreeNodeEx(treenodeID.c_str(), node_flags);
+            if (ImGui::BeginPopupContextItem()) // <-- use last item id as popup id
+            {
+                clicked_on_Entity = true;
+                if (ImGui::MenuItem(entitycomponent.name.c_str()))
+                {
+                    LOG_INFO(entitycomponent.name.c_str());
+                }
+                if (ImGui::BeginMenu("Create"))
+                {
+                    if (ImGui::MenuItem("Entity as Child"))
+                    {
+
+                    }
+                    ImGui::EndMenu();
+                }
+                ImGui::Separator();
+                if (ImGui::MenuItem("Delete"))
+                {
+                    
+                }
+                ImGui::EndPopup();
+            }
             if (ImGui::BeginDragDropTarget())
             {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY"))
@@ -45,8 +68,7 @@ namespace gns::editor
                     Payload* pl = DragDropManager::GetCurrentPayload();
                     if (pl->type == PayloadType::Entity) {
                         Entity drag_entity = ((entt::entity)pl->entity_id);
-                        LOG_INFO("Dropped: "  << drag_entity.GetComponent<EntityComponent>().name << " onto " << entitycomponent.name);
-                        drag_entity.SetParent(entity);
+                    	drag_entity.SetParent(entity);
                     }
                 }
                 ImGui::EndDragDropTarget();
@@ -80,19 +102,22 @@ namespace gns::editor
         
 	}
 
+
 	void SceneHierarchy::OnGUI()
 	{
+        clicked_on_Entity = false;
         ImGui::BeginChild("h");
-
 		ImGui::Text("SceneHierarchy");
         Entity& root = core::SceneManager::ActiveScene->GetSceneRoot();
         EntityComponent ec = root.GetComponent<EntityComponent>();
         ImGui::Separator();
         DrawHierarchyRecursive(root.entity, ec);
         ImGui::EndChild();
+        if (clicked_on_Entity)
+            return;
         if (ImGui::BeginPopupContextItem("hierarchy_ctx_menu")) // <-- use last item id as popup id
         {
-            if (ImGui::BeginMenu("< Create >"))
+            if (ImGui::BeginMenu("Create"))
             {
                 if (ImGui::MenuItem("Entity"))
                 {
@@ -102,7 +127,6 @@ namespace gns::editor
                 ImGui::EndMenu();
             }
             ImGui::EndPopup();
-        }
-
+        } 
 	}
 }

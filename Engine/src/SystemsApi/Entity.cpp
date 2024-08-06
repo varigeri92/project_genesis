@@ -79,6 +79,7 @@ void gns::Entity::SetParent(Entity& parent)
     }
     oldParent.RemoveChild(entity);
     GetComponent<Transform>().parent = parent.entity;
+    GetComponent<Transform>().parent_guid = parent.GetComponent<EntityComponent>().guid;
     parent.GetComponent<Transform>().children.emplace_back(entity);
     parent.GetComponent<Transform>().children_guid.emplace_back(GetComponent<EntityComponent>().guid);
     LOG_INFO("Set Parent of: " << (uint32_t)entity << " to " << (uint32_t)parent.entity << ", old parent was: " << (uint32_t)oldParent.entity);

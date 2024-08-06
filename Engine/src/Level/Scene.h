@@ -28,6 +28,7 @@ namespace gns
 
 		entt::registry& Registry();
 		GNS_API Entity& GetSceneRoot();
+		GNS_API Entity GetEntityByGuid(const gns::core::guid guid);
 	private:
 		entt::registry m_registry;
 		Entity m_sceneRoot;

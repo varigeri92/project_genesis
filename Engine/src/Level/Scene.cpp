@@ -66,4 +66,15 @@ namespace gns
 	{
 		return m_sceneRoot;
 	}
+
+	Entity Scene::GetEntityByGuid(const gns::core::guid guid)
+	{
+		auto entityView = m_registry.view<EntityComponent>();
+		for (auto [entity_id, entityComponent] : entityView.each())
+		{
+			if(entityComponent.guid == guid)
+				return { entity_id };
+		}
+		return gns::Entity(static_cast<entt::entity>(entt::null));
+	}
 }

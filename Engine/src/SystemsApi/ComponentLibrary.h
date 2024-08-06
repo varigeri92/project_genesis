@@ -64,14 +64,14 @@ namespace gns
 		glm::vec3 position;
 		glm::vec3 rotation;
 		glm::vec3 scale;
-
-		glm::mat4 matrix;
+		core::guid parent_guid;
+		std::vector<core::guid> children_guid = {};
 
 		entt::entity parent = entt::null;
-		core::guid parent_guid;
+		std::vector<entt::entity> children = {};
 
-		std::vector<entt::entity> children;
-		std::vector<core::guid> children_guid;
+
+		glm::mat4 matrix;
 
 		void Register() override
 		{
@@ -79,6 +79,8 @@ namespace gns
 			REGISTER_FIELD(glm::vec3, position);
 			REGISTER_FIELD(glm::vec3, rotation);
 			REGISTER_FIELD(glm::vec3, scale);
+			REGISTER_FIELD(core::guid, parent_guid);
+			REGISTER_FIELD(std::vector<core::guid>, children_guid);
 		}
 
 		void UpdateMatrix()

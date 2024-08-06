@@ -7,9 +7,9 @@
 #include "yaml-cpp/yaml.h"
 #include "../../src/Renderer/Lights/Lights.h"
 
+static std::string currentVersion = "0.4.0";
 namespace gns
 {
-	
 std::unordered_map<uint32_t, ComponentData> Serializer::ComponentData_Table = {};
 std::unordered_map<uint32_t, std::function<void* (Entity&)>> Serializer::AddComponentMap = {
 	{entt::type_hash<EntityComponent>().value(),[](Entity& entity)
@@ -53,6 +53,7 @@ std::unordered_map<size_t, std::function<void(YAML::Emitter&, FieldData, char*)>
 	[](YAML::Emitter& out, FieldData data, char* ptr)
 	{
 		const auto value = *reinterpret_cast<std::string*>(ptr += data.offset);
+		LOG_INFO("Entity name? " << value);
 		out << value;
 	}},
 	{typeid(glm::vec3).hash_code(),
@@ -91,17 +92,20 @@ void* Serializer::AddComponentByID(uint32_t cmp_id, Entity& entity)
 std::string Serializer::SerializeScene(gns::Scene* scene)
 {
 	YAML::Emitter out;
-	out << YAML::BeginMap << "version" << "0.3.0"
+	out << YAML::BeginMap << "version" << currentVersion
 	<< "scene" << scene->name
 	<< "entities" << YAML::BeginSeq;
 	auto view = scene->Registry().view<gns::EntityComponent>();
 	for (auto [entt, entity] : view.each())
 	{
+		if (entity.name == "SceneRoot") continue;
+
 		gns::Entity e = gns::Entity(entt);
 		out << YAML::BeginSeq;
 		auto comps = e.GetAllComponent();
 		for (auto componentData : comps)
 		{
+			LOG_INFO("Serilize component name: " << ComponentData_Table[componentData.typehash].name);
 			out << YAML::BeginMap
 				<< "component_name" << ComponentData_Table[componentData.typehash].name
 				<< "component_id" << ComponentData_Table[componentData.typehash].typeID
@@ -129,13 +133,20 @@ std::string Serializer::SerializeScene(gns::Scene* scene)
 std::string Serializer::DeserializeScene(const std::string& src)
 {
 	YAML::Node root = YAML::LoadFile(src);
+	if(root["version"].as<std::string>() != currentVersion)
+	{
+		LOG_WARNING("Serializer Version mismatch! your Scene will may load incorrectly");
+	}
 	LOG_INFO(AQUA << "[Scene Serializer]:" << DEFAULT << "Serialized vith version: " << root["version"].as<std::string>());
 	LOG_INFO(AQUA << "[Scene Serializer]:" << DEFAULT << "Scene name: " << root["scene"].as<std::string>());
+
+
+	Scene* scene = gns::core::SceneManager::ActiveScene;
 
 	const YAML::Node& entities = root["entities"];
 	for (std::size_t i = 0; i < entities.size(); i++)
 	{
-		gns::Entity deserializedEntity = gns::core::SceneManager::ActiveScene->SoftCreateEntity();
+		gns::Entity deserializedEntity = scene->SoftCreateEntity();
 		for (std::size_t j = 0; j < entities[i].size(); j++)
 		{
 			const YAML::Node& component = entities[i][j];
@@ -159,8 +170,13 @@ std::string Serializer::DeserializeScene(const std::string& src)
 				}
 			}
 		}
-		
 	}
+	auto view = scene->Registry().view<gns::EntityComponent, Transform>();
+	for (auto [entt, entity, transform] : view.each())
+	{
+		Entity(entt).SetParent(scene->GetEntityByGuid(transform.parent_guid).entity);
+	}
+
 	return "";
 }
 

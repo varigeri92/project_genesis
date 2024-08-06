@@ -43,7 +43,7 @@ void main()
 	vec3 specular = materialData.specular * spec * sceneData.sunlightColor.xyz;
 	
 	vec3 result = (ambient + diffuse + specular) * materialData.albedo.xyz;
-	outFragColor = vec4(result, 1.0);
+	outFragColor = vec4(0.61, 0.3, 0.3, 1.0);
 	
 	/*
 	float diff = max((dot(inNormal, sceneData.sunlightDirection.xyz) + 1) * 0.5, 0.0);

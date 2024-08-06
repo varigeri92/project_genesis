@@ -199,6 +199,19 @@ namespace gns::editor
 
 		}
 
+		if (typeId == typeid(std::vector<gns::core::guid>).hash_code())
+		{
+			std::vector<gns::core::guid>* vector = static_cast<std::vector<gns::core::guid>*>(valuePtr);
+			if(ImGui::CollapsingHeader(std::to_string(vector->size()).c_str(), tree_flags |!ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				for (gns::core::guid guid :  *vector)
+				{
+					ImGui::Text("%llu", (size_t)guid);
+				}
+			}
+			return;
+		}
+
 		if (typeId == typeid(gns::rendering::Mesh).hash_code())
 		{
 			gns::rendering::Mesh** mesh = static_cast<gns::rendering::Mesh**>(valuePtr);
