@@ -4,6 +4,7 @@
 #include "Renderer.h"
 #include "../AssetDatabase/AssetLoader.h"
 #include "spirv_reflect/spirv_reflect.h"
+#include "spirv_cross/spirv_cross.hpp"
 
 
 gns::rendering::Shader::Shader(const std::string vertexShaderPath, const std::string fragmentShaderPath) :
@@ -65,18 +66,36 @@ void gns::rendering::Shader::ReadAttributes()
 {
 	//placeholder
 	//TODO: Get the Attributes from the shader code, Save it, and also package the data with the game.
-	std::vector<uint32_t> shader_code = gns::AssetLoader::LoadShader(m_fragmentShaderPath);
-	 
-	bool reflection_sucess = SpirvReflectExample(shader_code.data(), shader_code.size());
-	if(reflection_sucess)
+	std::vector<uint32_t> spirv = gns::AssetLoader::LoadShader(m_fragmentShaderPath);
+	spirv_cross::Compiler comp(std::move(spirv));
+	spirv_cross::ShaderResources res = comp.get_shader_resources();
+	LOG_INFO("Shader Data of: " << m_fragmentShaderPath);
+	LOG_INFO("\t Uniforms:");
+	for (size_t i = 0; i < res.uniform_buffers.size(); i++)
 	{
-		LOG_INFO("Shader ReflectionSucessfull!");
+		auto& type = comp.get_type(res.uniform_buffers[i].type_id);
+		LOG_INFO("\t\t" << res.uniform_buffers[i].name << " " << res.uniform_buffers[i].type_id << " " << res.uniform_buffers[i].id << " " << res.uniform_buffers[i].base_type_id);
+		auto member_types = type.member_types;
+		auto member_names = comp.get_type(res.uniform_buffers[i].type_id).member_name_cache;
+		for (size_t j = 0; j < member_types.size(); j++) {
+			auto& name = comp.get_member_name(type.self, j);
+			LOG_INFO("\t\t\t" << member_types[j] << " " << name);
+			auto& member_type = comp.get_type(member_types[i]);
+		}
 	}
-	else
+
+	LOG_INFO("\t Sampled Images:");
+	for (size_t i = 0; i < res.sampled_images.size(); i++)
 	{
-		LOG_WARNING("Shader Reflection Failed!");
+		LOG_INFO("\t\t" << res.sampled_images[i].name << " " << res.sampled_images[i].type_id << " " << res.sampled_images[i].id << " " << res.sampled_images[i].base_type_id);
 	}
-	//set 0 is the global data
+
+	LOG_INFO("\t Storage buffers:");
+	for (size_t i = 0; i < res.gl_plain_uniforms.size(); i++)
+	{
+		LOG_INFO("\t\t" << res.gl_plain_uniforms[i].name << " " << res.gl_plain_uniforms[i].type_id << " " << res.gl_plain_uniforms[i].id << " " << res.gl_plain_uniforms[i].base_type_id);
+	}
+
 
 	fragmentShaderDataSize = 0;
 	//set 2 is other per material data like color and other attributes

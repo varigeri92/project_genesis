@@ -53,8 +53,8 @@ gns::Engine::Engine() :close(false)
 	START_PROFILER("Engine")
 	PROFILE_FUNC
 
-	Window::getInstance()->InitWindow(1920, 1080);
-	Screen::InitDefaultScreen(1920, 1080, Screen::ScreenMode::sm_none);
+	Window::getInstance()->InitWindow(1024, 720);
+	Screen::InitDefaultScreen(1024, 720, Screen::ScreenMode::sm_none);
 	Serializer::RegisterSerializableComponents([](){
 		gns::RegisterComponent<gns::EntityComponent>();
 		gns::RegisterComponent<gns::Transform>();
