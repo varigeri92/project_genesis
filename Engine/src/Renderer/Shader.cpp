@@ -79,8 +79,9 @@ void gns::rendering::Shader::ReadAttributes()
 		auto member_names = comp.get_type(res.uniform_buffers[i].type_id).member_name_cache;
 		for (size_t j = 0; j < member_types.size(); j++) {
 			auto& name = comp.get_member_name(type.self, j);
-			LOG_INFO("\t\t\t" << member_types[j] << " " << name);
 			auto& member_type = comp.get_type(member_types[i]);
+			size_t offset = comp.type_struct_member_offset(type, j);
+			LOG_INFO("\t\t\t" << member_types[j] << " " << name << ", offset: " << offset);
 		}
 	}
 
