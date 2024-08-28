@@ -23,11 +23,16 @@ namespace gns::rendering
 			uint32_t set;
 			uint32_t binding;
 		};
+		const std::unordered_map<uint32_t, ShaderAttributeType> typeMap{ 
+			std::pair<uint32_t, ShaderAttributeType>{9, ShaderAttributeType::Color4},
+			std::pair<uint32_t, ShaderAttributeType>{10, ShaderAttributeType::Float3},
+		};
 	private:
 		friend class Renderer;
 		std::string m_vertexShaderPath;
 		std::string m_fragmentShaderPath;
 		void ReadAttributes();
+		void AddAttribute(std::string& name, size_t offset, uint32_t type_ID, uint32_t set, uint32_t binding);
 	public:
 		Shader() = delete;
 		GNS_API Shader(const std::string vertexShaderPath, const std::string fragmentShaderPath);
