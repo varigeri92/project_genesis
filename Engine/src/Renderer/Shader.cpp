@@ -82,6 +82,9 @@ void gns::rendering::Shader::ReadAttributes()
 		LOG_INFO("\t\t" << res.uniform_buffers[i].name << "(set = "<< set << ", binding = " << binding <<")");
 		auto member_types = type.member_types;
 		auto member_names = comp.get_type(res.uniform_buffers[i].type_id).member_name_cache;
+		if (res.uniform_buffers[i].name == "SceneData")
+			continue;
+		fragmentShaderDataSize = 0;
 		for (size_t j = 0; j < member_types.size(); j++) {
 			auto name = comp.get_member_name(type.self, j);
 			auto member_type = comp.get_type(member_types[i]);
@@ -89,6 +92,7 @@ void gns::rendering::Shader::ReadAttributes()
 			size_t offset = comp.type_struct_member_offset(type, j);
 			LOG_INFO("\t\t\t" << member_types[j] << " " << name << ", offset: " << offset << " size: " << member_size );
 			AddAttribute(name, offset, member_types[j], set, binding);
+			fragmentShaderDataSize += member_size;
 		}
 	}
 
@@ -103,16 +107,6 @@ void gns::rendering::Shader::ReadAttributes()
 	{
 		LOG_INFO("\t\t" << res.gl_plain_uniforms[i].name << " " << res.gl_plain_uniforms[i].type_id << " " << res.gl_plain_uniforms[i].id << " " << res.gl_plain_uniforms[i].base_type_id);
 	}
-
-
-	fragmentShaderDataSize = 0;
-	//set 2 is other per material data like color and other attributes
-	m_fragmentShaderAttributes.emplace_back("color_albedo", ShaderAttributeType::Color4, 0, 2, 0);
-	
-	fragmentShaderDataSize += (sizeof(float) * 4);
-	m_fragmentShaderAttributes.emplace_back("specular", 
-		ShaderAttributeType::Float, fragmentShaderDataSize, 2, 0);
-	fragmentShaderDataSize += (sizeof(float));
 }
 
 void gns::rendering::Shader::AddAttribute(std::string& name, size_t offset, uint32_t type_ID, uint32_t set, uint32_t binding)

@@ -37,7 +37,7 @@ namespace gns::rendering
 		else
 			vertexShaderData_memory = nullptr;
 
-		SetFragmentShaderAttribute<glm::vec4>("color_albedo", { 1.f,1.f,1.f,1.f });
+		SetFragmentShaderAttribute<glm::vec4>("albedo", { 1.f,1.f,1.f,1.f });
 		SetFragmentShaderAttribute<float>("specular", 0.5f);
 
 		attributeBuffer = CreateBuffer(device->m_allocator, sizeof(glm::vec4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
