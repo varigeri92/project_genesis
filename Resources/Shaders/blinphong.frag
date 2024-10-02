@@ -1,5 +1,36 @@
 #version 460
-#include "include.frag.glsl"
+
+const int MAX_LIGHTS = 100;
+
+struct DirectionalLight{
+    vec3 direction;
+    float intensity;
+    vec4 color;
+};
+struct AmbientLight{
+    float intensity;
+    vec4 color;
+};
+struct PointLight{
+    vec3 position;
+    vec4 color;
+    float intensity;
+    float range;
+};
+
+struct SpotLight{
+    vec3 position;
+    vec3 direction;
+    vec4 color;
+    float intensity;
+    float range;
+    float angle;
+};
+//shader input
+layout (location = 0) in vec3 inColor;
+layout (location = 1) in vec2 inTexCoord;
+layout (location = 2) in vec3 inNormal;
+layout (location = 3) in vec3 inPos;
 
 //Scene
 layout(set = 0, binding = 1) uniform  SceneData{
@@ -32,24 +63,7 @@ void main()
 {
 	float ambientStrength = sceneData.ambientColor.w;
 	vec3 ambient = ambientStrength * sceneData.ambientColor.xyz;
-	
 	float diff = (dot(inNormal, sceneData.sunlightDirection.xyz) + 1) * 0.5;
-	vec3 diffuse = diff * sceneData.sunlightColor.xyz;
-
-	vec3 viewDir = normalize(sceneData.viewPos - inPos);
-	vec3 reflectDir = reflect(-sceneData.sunlightDirection.xyz, inNormal);
-
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-	vec3 specular = materialData.specular * spec * sceneData.sunlightColor.xyz;
-	
-	vec3 result = (ambient + diffuse + specular) * materialData.albedo.xyz;
-	outFragColor = vec4(0.61, 0.3, 0.3, 1.0);
-	
-	/*
-	float diff = max((dot(inNormal, sceneData.sunlightDirection.xyz) + 1) * 0.5, 0.0);
-	diff += sceneData.ambientColor.w;
-	vec3 diffuse = sceneData.sunlightColor.xyz * diff * sceneData.sunlightColor.w;
-	vec3 color = texture(tex_color, inTexCoord).xyz * materialData.albedo.xyz;
-	outFragColor = vec4((color * diffuse) * (sceneData.ambientColor.xyz),1.0f);
-	*/
+	vec3 result = (sceneData.sunlightColor.xyz + materialData.albedo.xyz + ambient) * diff * sceneData.sunlightColor.w;
+	outFragColor = vec4(result, 1.0);
 }
