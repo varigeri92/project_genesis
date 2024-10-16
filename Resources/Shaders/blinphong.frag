@@ -46,7 +46,7 @@ layout(set = 0, binding = 1) uniform  SceneData{
 
 //materialData
 layout(set = 1, binding = 0) uniform MaterialData{
-	vec4 albedo;
+	vec4 c_albedo;
 	float specular;
 } materialData;
 //textures
@@ -63,7 +63,9 @@ void main()
 {
 	float ambientStrength = sceneData.ambientColor.w;
 	vec3 ambient = ambientStrength * sceneData.ambientColor.xyz;
-	float diff = (dot(inNormal, sceneData.sunlightDirection.xyz) + 1) * 0.5;
-	vec3 result = (sceneData.sunlightColor.xyz + materialData.albedo.xyz + ambient) * diff * sceneData.sunlightColor.w;
+
+	float diff = max(dot(inNormal, sceneData.sunlightDirection.xyz), 0.0);
+    vec3 diffuse = diff * sceneData.sunlightColor.xyz;
+    vec3 result = (ambient + diffuse) * materialData.c_albedo.xyz;
 	outFragColor = vec4(result, 1.0);
 }

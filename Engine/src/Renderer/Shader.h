@@ -15,6 +15,14 @@ namespace gns::rendering
 			Float, Float2, Float3, Float4, Mat4, Color, Color4,
 			HdrColor4, Int, Flag, Texture
 		};
+		std::map<uint32_t, ShaderAttributeType>attributeTypeMap = {
+			{9,ShaderAttributeType::Float4},
+			{10,ShaderAttributeType::Float3},
+			{57,ShaderAttributeType::Float2},
+			{6,ShaderAttributeType::Float},
+			{21,ShaderAttributeType::Int},
+		};
+
 		struct AttributeInfo
 		{
 			std::string attributeName;
@@ -32,6 +40,7 @@ namespace gns::rendering
 		std::string m_vertexShaderPath;
 		std::string m_fragmentShaderPath;
 		void ReadAttributes();
+		ShaderAttributeType GetAttributeType(std::string& name, uint32_t typeID);
 		void AddAttribute(std::string& name, size_t offset, uint32_t type_ID, uint32_t set, uint32_t binding);
 	public:
 		Shader() = delete;

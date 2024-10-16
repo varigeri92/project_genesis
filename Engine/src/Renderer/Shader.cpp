@@ -25,49 +25,9 @@ void gns::rendering::Shader::Dispose()
 	Object::Dispose();
 }
 
-bool SpirvReflectExample(const void* spirv_code, size_t spirv_nbytes)
-{
-	bool sucess = false;
-	// Generate reflection data for a shader
-	SpvReflectShaderModule module = {};
-	SpvReflectResult result = spvReflectCreateShaderModule(spirv_nbytes, spirv_code, &module);
-	if(result != SPV_REFLECT_RESULT_SUCCESS)
-	{
-		LOG_ERROR("Failed to create Shader Module: " << result );
-		return sucess;
-	}
-	// Enumerate and extract shader's input variables
-	uint32_t var_count = 0;
-	result = spvReflectEnumerateInputVariables(&module, &var_count, NULL);
-	if (result != SPV_REFLECT_RESULT_SUCCESS)
-	{
-		sucess = false;
-		LOG_ERROR("Failed to Enumerate Varialbles: " << result);
-
-	}
-	else
-	{
-		SpvReflectInterfaceVariable** input_vars =
-			(SpvReflectInterfaceVariable**)malloc(var_count * sizeof(SpvReflectInterfaceVariable*));
-		result = spvReflectEnumerateInputVariables(&module, &var_count, input_vars);
-		if (result != SPV_REFLECT_RESULT_SUCCESS)
-		{
-			sucess = false;
-			LOG_ERROR("Failed to Enumerate Varialbles: " << result);
-		}
-	}
-	// Output variables, descriptor bindings, descriptor sets, and push constants
-	// can be enumerated and extracted using a similar mechanism.
-
-	// Destroy the reflection data when no longer required.
-	spvReflectDestroyShaderModule(&module);
-	return sucess;
-}
-
 void gns::rendering::Shader::ReadAttributes()
 {
-	//placeholder
-	//TODO: Get the Attributes from the shader code, Save it, and also package the data with the game.
+
 	std::vector<uint32_t> spirv = gns::AssetLoader::LoadShader(m_fragmentShaderPath);
 	spirv_cross::Compiler comp(std::move(spirv));
 	spirv_cross::ShaderResources res = comp.get_shader_resources();
@@ -109,7 +69,28 @@ void gns::rendering::Shader::ReadAttributes()
 	}
 }
 
+gns::rendering::Shader::ShaderAttributeType gns::rendering::Shader::GetAttributeType(std::string& name, uint32_t typeID)
+{
+	ShaderAttributeType type = attributeTypeMap[typeID];
+	if(type == ShaderAttributeType::Float4)
+	{
+		if (name.starts_with("c_"))
+		{
+			type = ShaderAttributeType::Color4;
+		}
+	}
+	else if (type == ShaderAttributeType::Float3)
+	{
+		if(name.starts_with("c_"))
+		{
+			type = ShaderAttributeType::Color;
+		}
+	}
+	return type;
+}
+
+
 void gns::rendering::Shader::AddAttribute(std::string& name, size_t offset, uint32_t type_ID, uint32_t set, uint32_t binding)
 {
-	m_fragmentShaderAttributes.emplace_back(name, ShaderAttributeType::Color4, offset, set, binding);
+	m_fragmentShaderAttributes.emplace_back(name, GetAttributeType(name, type_ID), offset, set, binding);
 }
