@@ -65,7 +65,7 @@ void main()
 	vec3 ambient = ambientStrength * sceneData.ambientColor.xyz;
 
 	float diff = max(dot(inNormal, sceneData.sunlightDirection.xyz), 0.0);
-    vec3 diffuse = diff * sceneData.sunlightColor.xyz;
+    vec3 diffuse = diff * sceneData.sunlightColor.xyz * sceneData.sunlightDirection.w;
     vec3 result = (ambient + diffuse) * materialData.c_albedo.xyz;
 	outFragColor = vec4(result, 1.0);
 }

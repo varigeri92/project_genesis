@@ -39,8 +39,8 @@ namespace gns
 			direction.forward.y *= -1;
 			direction.forward *= -1;
 
-			sceneData.sunlightDirection = { direction.forward.x, direction.forward.y, direction.forward.z, 0.5f };
-			sceneData.sunlightColor = { light.color.r, light.color.g, light.color.b, light.intensity };
+			sceneData.sunlightDirection = { direction.forward.x, direction.forward.y, direction.forward.z, light.intensity };
+			sceneData.sunlightColor = { light.color.r, light.color.g, light.color.b, 0.f };
 			glm::vec4 dl_direction = { direction.forward.x, direction.forward.y, direction.forward.z, light.intensity };
 			glm::vec4 dl_color = { light.color.r, light.color.g ,light.color.b ,light.color.a };
 			sceneLights.directionalLights.emplace_back(dl_direction, dl_color);
