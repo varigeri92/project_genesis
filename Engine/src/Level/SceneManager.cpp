@@ -220,8 +220,8 @@ namespace gns::core
 			gns::rendering::Mesh* mesh = Object::Get<rendering::Mesh>(meshMeta.guid);
 			rendering::Material* material = nullptr;
 			
-			AssetMetadata default_materialMeta = AssetDatabase::GetAssetByName("__default_material");
-			material = Object::Get<rendering::Material>(default_materialMeta.guid);
+			AssetMetadata materialMeta = AssetDatabase::GetAssetByName("__default_material");
+			material = Object::Get<rendering::Material>(materialMeta.guid);
 			for (const auto& subMesh : mesh->m_subMeshes)
 			{
 				static_cast<RendererComponent*>(component_ptr)->m_materials.push_back(material);

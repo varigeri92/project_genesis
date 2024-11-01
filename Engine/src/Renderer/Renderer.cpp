@@ -43,6 +43,14 @@ namespace gns::rendering
 		pipelineBuilder._shaderStages.push_back(
 			PipelineShaderStageCreateInfo(VK_SHADER_STAGE_FRAGMENT_BIT, fragShader));
 
+		if (shader->pipeline != VK_NULL_HANDLE)
+		{
+			vkDeviceWaitIdle(m_device->m_device);
+			vkDestroyPipeline(m_device->m_device, shader->pipeline, nullptr);
+			vkDestroyPipelineLayout(m_device->m_device, shader->pipelineLayout, nullptr);
+			vkDestroyDescriptorSetLayout(m_device->m_device, shader->shaderSetLayout, nullptr);
+			shader->pipeline = VK_NULL_HANDLE;
+		}
 		std::vector<VkDescriptorSetLayout> setLayouts = { m_device->m_globalSetLayout };
 		CreateSetLayoutBindings(shader);
 		setLayouts.push_back(shader->shaderSetLayout);
@@ -82,11 +90,12 @@ namespace gns::rendering
 		layoutInfo.setLayoutCount = static_cast<uint32_t>(setLayouts.size());
 		layoutInfo.pSetLayouts = setLayouts.data();
 
+
+
 		_VK_CHECK(vkCreatePipelineLayout(m_device->m_device, &layoutInfo, nullptr, &shader->pipelineLayout),
 			"Failed To create pipeline Layout");
 
 		pipelineBuilder._pipelineLayout = shader->pipelineLayout;
-
 		shader->pipeline = pipelineBuilder.Build(m_device->m_device, m_device->m_offscreenPass.renderPass);
 
 		vkDestroyShaderModule(m_device->m_device, vertShader, nullptr);

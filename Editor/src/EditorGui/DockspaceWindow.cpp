@@ -21,10 +21,14 @@ void gns::editor::DockspaceWindow::OnGUI()
     {
         if (ImGui::BeginMenu("File"))
         {
-            if(ImGui::MenuItem("Save Scene ...", "Ctrl + S", &dummy))
+            if(ImGui::MenuItem("Save Scene ...", "Shift + Ctrl + S", &dummy))
             {
                 std::string path = NativeFileBrowser::OpenBrowser(".gnsscene", NativeFileBrowser::FileBrowserMode::SaveFile);
 				core::SceneManager::SaveSceneToFile(path);
+            }
+            if (ImGui::MenuItem("Save All ...", "Ctrl + S", &dummy))
+            {
+
             }
             ImGui::Separator();
             if(ImGui::MenuItem("Open Scene ...", "Ctrl + O", &dummy))

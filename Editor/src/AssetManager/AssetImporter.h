@@ -21,6 +21,10 @@ namespace gns::editor
 		AssetMetadata CreateAsset(
 			const std::string& directory, 
 			const std::string& name, core::guid guid, AssetType assetType);
+
+		AssetMetadata CreateAssetFromObject(
+			const std::string& directory,
+			const std::string& name, core::guid guid, AssetType assetType, Object* gns_object);
 	private:
 		void ScanProjectForAssets();
 		bool IsImported(core::guid);
@@ -28,5 +32,10 @@ namespace gns::editor
 
 		bool IsImported(const std::string& path) const;
 		void CreateMeta(const std::string& path, const std::string& assetSourcePath, core::guid guid, AssetType assetType);
+		YAML::Emitter& CreateAssetBaseData(YAML::Emitter& out, const std::string& rel_path, const std::string& name, core::guid guid,
+			AssetType assetType);
+
+		YAML::Emitter& SerializeMaterialValues(YAML::Emitter& out, gns::rendering::Material* material, const std::string& attributeName,
+			rendering::Shader::ShaderAttributeType attributeType_id);
 	};
 }

@@ -14,8 +14,10 @@
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
+#include <yaml-cpp/yaml.h>
 
 #include "AssetDatabase.h"
+#include "../Renderer/Material.h"
 
 inline std::string GetFileName(const std::string& filePath) {
     std::filesystem::path path(filePath);
@@ -61,15 +63,42 @@ namespace gns
             for (size_t i = 0; i < scene->mNumMeshes; i++)
             {
                 MeshData* meshData = new MeshData();
-				ProcessImpoertedScene(scene->mMeshes[i], meshData);
+				ProcessImportedScene(scene->mMeshes[i], meshData);
                 mesh->m_subMeshes.push_back(meshData);
             }
         }
         return mesh;
     }
 
+    rendering::Material* AssetLoader::LoadMaterialFromFile(gns::core::guid guid, std::string path)
+    {
 
-    void AssetLoader::ProcessImpoertedScene(const void* _mesh, MeshData* outMesh)
+        YAML::Node root = YAML::LoadFile(GetAssetsPath()+path);
+        rendering::Shader* defaultShader = Object::Create<rendering::Shader>("blinphong.vert.spv", "blinphong.frag.spv");
+        const std::shared_ptr<rendering::Texture> defaultTexture = std::make_shared<rendering::Texture>(R"(Textures\uv_color_Grid.png)");
+        rendering::Material* material = Object::Create<rendering::Material>(guid,defaultShader, "Loaded_Material");
+        material->SetTexture(defaultTexture, 0);
+        const YAML::Node& attributes = root["attributes"];
+        for (std::size_t i = 0; i < attributes.size(); i++)
+        {
+            int type = attributes[i]["type"].as<int>();
+            if(type == 0)
+            {
+                std::string name = attributes[i]["name"].as<std::string>();
+                float value = attributes[i]["value"].as<float>();
+            	material->SetFragmentShaderAttribute(name, value);
+            }
+        	else
+            {
+	            glm::vec4 vec(0.5, 0.3, 0.2, 1);
+	            material->SetFragmentShaderAttribute(attributes[i]["name"].as<std::string>(), vec);
+            }
+        }
+	    return material;
+    }
+
+
+    void AssetLoader::ProcessImportedScene(const void* _mesh, MeshData* outMesh)
     {
         const aiMesh* mesh = static_cast<const aiMesh*>(_mesh);
         outMesh->name = mesh->mName.C_Str();
@@ -115,9 +144,17 @@ namespace gns
 	    switch (metaData.assetType)
 	    {
 	    case AssetType::mesh:
+		    {
             metaData.state = AssetState::loaded;
             Mesh* mesh = LoadMeshFile(metaData.guid, metaData.sourcePath);
             return mesh;
+		    }
+        case AssetType::material:
+		    {
+            metaData.state = AssetState::loaded;
+            Material* mat = LoadMaterialFromFile(metaData.guid, metaData.sourcePath);
+            return mat;
+		    }
 	    }
 	    return nullptr;
     }

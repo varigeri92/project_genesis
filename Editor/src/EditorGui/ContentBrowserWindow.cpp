@@ -45,7 +45,9 @@ void gns::editor::ContentBrowserWindow::FileCreationModal(std::string fileType)
 		if (ImGui::Button("Create"))
 		{
 			gns::editor::AssetImporter importer;
-			importer.CreateAsset(m_currentDirPath, buffer, gns::core::Guid::GetNewGuid(), AssetType::material);
+			AssetMetadata default_materialMeta = AssetDatabase::GetAssetByName("__default_material");
+			importer.CreateAssetFromObject(m_currentDirPath, buffer, gns::core::Guid::GetNewGuid(), 
+				AssetType::material, Object::Get<rendering::Material>(default_materialMeta.guid));
 			LOG_INFO("File created: " << buffer);
 			create_file = false;
 			ImGui::CloseCurrentPopup();

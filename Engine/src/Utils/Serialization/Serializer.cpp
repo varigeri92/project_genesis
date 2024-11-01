@@ -22,20 +22,26 @@ std::unordered_map<uint32_t, std::function<void* (Entity&)>> Serializer::AddComp
 	}},
 	{entt::type_hash<RendererComponent>().value(),[](Entity& entity)
 		{ return &entity.AddComponet<RendererComponent>(); }},
+
 	{entt::type_hash<Camera>().value(),[](Entity& entity)
 		{ return &entity.AddComponet<Camera>(); }},
 
 	{entt::type_hash<Light>().value(),[](Entity& entity)
 		{ return &entity.AddComponet<Light>(); }},
+
 	{entt::type_hash<SpotLight>().value(),[](Entity& entity)
 		{ return &entity.AddComponet<SpotLight>(); }},
+
 	{entt::type_hash<PointLight>().value(),[](Entity& entity)
 		{ return &entity.AddComponet<PointLight>(); }},
+
 	{entt::type_hash<LightDirection>().value(),[](Entity& entity)
 		{ return &entity.AddComponet<LightDirection>(); }},
+
 	{entt::type_hash<Ambient>().value(),[](Entity& entity)
 		{ return &entity.AddComponet<Ambient>(); }},
 };
+
 std::unordered_map<size_t, std::function<void(YAML::Emitter&, FieldData, char*)>> Serializer::TypeSerializationMap =
 { {typeid(float).hash_code(),
 	[](YAML::Emitter& out, FieldData data, char* ptr)
@@ -135,12 +141,9 @@ std::string Serializer::DeserializeScene(const std::string& src)
 	YAML::Node root = YAML::LoadFile(src);
 	if(root["version"].as<std::string>() != currentVersion)
 	{
-		LOG_WARNING("Serializer Version mismatch! your Scene will may load incorrectly");
+		LOG_WARNING("Serializer Version mismatch! your Scene may load incorrectly");
 	}
 	LOG_INFO(AQUA << "[Scene Serializer]:" << DEFAULT << "Serialized vith version: " << root["version"].as<std::string>());
-	LOG_INFO(AQUA << "[Scene Serializer]:" << DEFAULT << "Scene name: " << root["scene"].as<std::string>());
-
-
 	Scene* scene = gns::core::SceneManager::ActiveScene;
 
 	const YAML::Node& entities = root["entities"];
@@ -150,23 +153,24 @@ std::string Serializer::DeserializeScene(const std::string& src)
 		for (std::size_t j = 0; j < entities[i].size(); j++)
 		{
 			const YAML::Node& component = entities[i][j];
-			LOG_INFO(AQUA << "\t[Scene Serializer]:" << DEFAULT << "entity-component name: " << component["component_name"].as<std::string>());
 			uint32_t componentID = component["component_id"].as<uint32_t>();
-			LOG_INFO(AQUA << "\t[Scene Serializer]:" << DEFAULT << "entity-component id: " << componentID);
 			void* component_ptr = AddComponentFromSavedData(deserializedEntity, componentID);
-
-			LOG_INFO(AQUA << "\t[Scene Serializer]:" << DEFAULT << "entity-component fields: ");
 			const YAML::Node& fields = component["component_fields"];
+			LOG_INFO(AQUA << "Reading Component:" << component["component_name"].as<std::string>() << ", field Count: " << fields.size());
 			for (std::size_t k = 0; k < fields.size(); k++)
 			{
-				LOG_INFO(AQUA << "\t\t[Scene Serializer]:" << DEFAULT << "field_name: " << fields[k]["field_name"].as<std::string>());
-				LOG_INFO(AQUA << "\t\t[Scene Serializer]:" << DEFAULT << "field_type_id: " << fields[k]["field_type"].as<size_t>());
-				LOG_INFO(AQUA << "\t\t[Scene Serializer]:" << DEFAULT << "field_offset: " << fields[k]["field_offset"].as<size_t>());
-				LOG_INFO(AQUA << "\t\t[Scene Serializer]:" << DEFAULT << "field_size: " << fields[k]["field_size"].as<size_t>());
 				void* field_ptr = ReadFieldValue(fields[k]["field_type"].as<size_t>(), fields[k]["field_value"]);
 				if(component_ptr != nullptr && field_ptr != nullptr)
 				{
 					WriteFieldToComponent(component_ptr, ComponentData_Table[componentID].fields[k], field_ptr);
+				}
+				else
+				{
+					if(field_ptr == nullptr)
+						LOG_ERROR("Field pointer is 'nullptr' ...");
+					else if(component_ptr == nullptr)
+						LOG_ERROR("Component pointer is 'nullptr' ...");
+
 				}
 			}
 		}
@@ -186,9 +190,7 @@ void* Serializer::ReadFieldValue(size_t field_typeId, const YAML::Node& node)
 	if (field_typeId == typeid(float).hash_code())
 	{
 		float* f = new float(node.as<float>());
-		LOG_INFO("field has the value of: " << f);
 		return f;
-
 	}
 	if (field_typeId == typeid(glm::vec3).hash_code())
 	{
@@ -197,7 +199,6 @@ void* Serializer::ReadFieldValue(size_t field_typeId, const YAML::Node& node)
 		{
 			(*vector)[i] = node[i].as<float>();
 		}
-		LOG_INFO("field has the value of: " << vector->x << "/" << vector->y << "/" << vector->z);
 		return vector;
 	}
 
@@ -208,28 +209,29 @@ void* Serializer::ReadFieldValue(size_t field_typeId, const YAML::Node& node)
 		{
 			(*col)[i] = node[i].as<float>();
 		}
-		LOG_INFO("field has the value of: " << col->r << "/" << col->g << "/" << col->b);
 		return col;
 	}
 
 	if (field_typeId == typeid(std::string).hash_code())
 	{
 		std::string* string = new std::string(node.as<std::string>());
-		LOG_INFO("field has the value of: " << node.as<std::string>());
 		return string;
 	}
 
 	if (field_typeId == typeid(gns::rendering::Mesh).hash_code())
 	{
 		gns::core::guid* guid = new gns::core::guid(node.as<uint64_t>());
-		LOG_INFO("field has the value of: " << node.as<std::string>());
+		return guid;
+	}
+	if (field_typeId == typeid(std::vector<rendering::Material*>).hash_code())
+	{
+		gns::core::guid* guid = new gns::core::guid(node.as<uint64_t>());
 		return guid;
 	}
 
 	if (field_typeId == typeid(gns::core::guid).hash_code())
 	{
 		gns::core::guid* guid = new gns::core::guid(node.as<uint64_t>());
-		LOG_INFO("field has the value of: " << node.as<std::string>());
 		return guid;
 	}
 
@@ -252,9 +254,10 @@ void* Serializer::AddComponentFromSavedData(Entity& entity, uint32_t Component_t
 void Serializer::WriteFieldToComponent(void* component_ptr, const FieldData& fieldData,
 	void* fieldValuer_ptr)
 {
-	LOG_INFO("Writing field " << fieldData.name << "Data to the Component");
+	LOG_INFO(GREEN << "Writing field '" << fieldData.name << "' Data to the Component");
 	if (fieldData.typeID == typeid(gns::rendering::Mesh).hash_code())
 	{
+		
 		core::guid guid;
 		memcpy(&guid, fieldValuer_ptr, fieldData.size);
 
@@ -262,7 +265,15 @@ void Serializer::WriteFieldToComponent(void* component_ptr, const FieldData& fie
 		SystemsAPI::GetSystem<RenderSystem>()->UploadMesh(mesh);
 		RendererComponent* renderer = static_cast<RendererComponent*>(component_ptr);
 		renderer->AssignMesh(guid);
-		renderer->AssignMaterial(0);
+
+	}
+	else if(fieldData.typeID == typeid(std::vector<rendering::Material*>).hash_code())
+	{
+		core::guid guid;
+		memcpy(&guid, fieldValuer_ptr, sizeof(guid));
+		RendererComponent* renderer = static_cast<RendererComponent*>(component_ptr);
+		auto* mat = AssetLoader::LoadAssetFromFile<rendering::Material>(guid);
+		renderer->AssignMaterial(guid);
 	}
 	else
 	{

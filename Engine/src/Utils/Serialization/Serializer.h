@@ -27,15 +27,6 @@ namespace gns
 		void* ReadFieldValue(size_t field_typeId, const YAML::Node& node);
 		GNS_API YAML::Emitter& SerializeField(YAML::Emitter& out, const FieldData& field, void* componentPtr);
 
-		/* 
-		template<typename T>
-		T* GetFieldValue(FieldData field, void* component_ptr)
-		{
-			char* cmpPtr = static_cast<char*>(component_ptr);
-			T* t_ptr = static_cast<T*>(TypeSerializationMap[field.typeID](field, cmpPtr));
-			return *t_ptr;
-		}
-		*/
 	private:
 		void* GetPointerToField(void* data_ptr, size_t offset);
 		void* AddComponentFromSavedData(Entity& entity, uint32_t Component_typeId);

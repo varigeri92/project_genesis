@@ -51,7 +51,7 @@ namespace gns
 			}
 			return nullptr;
 		}
-
+		
 		GNS_API static bool IsValid(const Object* object);
 		virtual void Dispose() override;
 	};

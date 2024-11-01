@@ -13,6 +13,7 @@ gns::rendering::Shader::Shader(const std::string vertexShaderPath, const std::st
 	m_vertexShaderPath(vertexShaderPath),
 	m_fragmentShaderPath(fragmentShaderPath)
 {
+	pipeline = VK_NULL_HANDLE;
 	ReadAttributes();
 	RenderSystem* renderSystem = SystemsAPI::GetSystem<RenderSystem>();
 	renderSystem->CreatePipeline(this);

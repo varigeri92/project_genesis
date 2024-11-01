@@ -48,8 +48,8 @@ namespace gns::rendering
 		GNS_API ~Shader() = default;
 		void Dispose() override;
 
-		std::string vertexShaderPath;
-		std::string fragmentShaderPath;
+		const std::string& GetVertexShaderPath() const { return m_vertexShaderPath; };
+		const std::string& GetFragmentShaderPath() const { return m_fragmentShaderPath; };
 
 		std::vector<AttributeInfo> m_vertexShaderAttributes;
 		std::vector<AttributeInfo> m_fragmentShaderAttributes;
