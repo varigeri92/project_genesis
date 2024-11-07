@@ -66,6 +66,7 @@ void main()
 
 	float diff = max(dot(inNormal, sceneData.sunlightDirection.xyz), 0.0);
     vec3 diffuse = diff * sceneData.sunlightColor.xyz * sceneData.sunlightDirection.w;
-    vec3 result = (ambient + diffuse) * materialData.c_albedo.xyz;
-	outFragColor = vec4(result, 1.0);
+    vec4 texColor = texture(tex_color, inTexCoord);
+    vec3 result = (ambient + diffuse) * (texColor.xyz * materialData.c_albedo.xyz);
+    outFragColor = vec4(result, 1.0);
 }

@@ -74,7 +74,12 @@ namespace gns
     {
 
         YAML::Node root = YAML::LoadFile(GetAssetsPath()+path);
-        rendering::Shader* defaultShader = Object::Create<rendering::Shader>("blinphong.vert.spv", "blinphong.frag.spv");
+    	
+        rendering::Shader* defaultShader = Object::Create<rendering::Shader>(
+            root["V_shader"].as<std::string>(), 
+            root["F_shader"].as<std::string>()
+        );
+
         const std::shared_ptr<rendering::Texture> defaultTexture = std::make_shared<rendering::Texture>(R"(Textures\uv_color_Grid.png)");
         rendering::Material* material = Object::Create<rendering::Material>(guid,defaultShader, "Loaded_Material");
         material->SetTexture(defaultTexture, 0);
