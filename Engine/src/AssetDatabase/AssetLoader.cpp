@@ -140,22 +140,31 @@ namespace gns
 
     void* AssetLoader::LoadAssetFromFile_internal(AssetMetadata& metaData)
     {
-        if (metaData.state == AssetState::loaded)
-        {
-            LOG_INFO("Asset: " << metaData.guid << " is already loaded!");
-            return Object::Get<Mesh>(metaData.guid);
-        }
 
 	    switch (metaData.assetType)
 	    {
+
+        case AssetType::null_Asset:
+            break;
 	    case AssetType::mesh:
 		    {
+	        if (metaData.state == AssetState::loaded)
+	        {
+	            LOG_INFO("Asset: " << metaData.guid << " is already loaded!");
+	            return Object::Get<Mesh>(metaData.guid);
+	        }
             metaData.state = AssetState::loaded;
             Mesh* mesh = LoadMeshFile(metaData.guid, metaData.sourcePath);
             return mesh;
 		    }
         case AssetType::material:
 		    {
+
+            if (metaData.state == AssetState::loaded)
+            {
+                LOG_INFO("Asset: " << metaData.guid << " is already loaded!");
+                return Object::Get<Material>(metaData.guid);
+            }
             metaData.state = AssetState::loaded;
             Material* mat = LoadMaterialFromFile(metaData.guid, metaData.sourcePath);
             return mat;

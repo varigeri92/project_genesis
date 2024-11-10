@@ -23,7 +23,8 @@ namespace gns
 		system_graph,
 		//--
 		audioClip,
-		prefab
+		prefab,
+		null_Asset
 	};
 
 	enum class AssetState

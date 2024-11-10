@@ -30,6 +30,6 @@ namespace gns
 	private:
 		void* GetPointerToField(void* data_ptr, size_t offset);
 		void* AddComponentFromSavedData(Entity& entity, uint32_t Component_typeId);
-		void WriteFieldToComponent(void* component_ptr, const FieldData& fieldData, void* fieldValuer_ptr);
+		void WriteFieldToComponent(void* component_ptr, const FieldData& fieldData, void* fieldValuer_ptr, const YAML::Node& node);
 	};
 }

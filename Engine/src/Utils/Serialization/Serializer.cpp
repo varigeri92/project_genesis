@@ -7,7 +7,7 @@
 #include "yaml-cpp/yaml.h"
 #include "../../src/Renderer/Lights/Lights.h"
 
-static std::string currentVersion = "0.4.0";
+static std::string currentVersion = "0.5.0";
 namespace gns
 {
 std::unordered_map<uint32_t, ComponentData> Serializer::ComponentData_Table = {};
@@ -59,7 +59,6 @@ std::unordered_map<size_t, std::function<void(YAML::Emitter&, FieldData, char*)>
 	[](YAML::Emitter& out, FieldData data, char* ptr)
 	{
 		const auto value = *reinterpret_cast<std::string*>(ptr += data.offset);
-		LOG_INFO("Entity name? " << value);
 		out << value;
 	}},
 	{typeid(glm::vec3).hash_code(),
@@ -79,7 +78,16 @@ std::unordered_map<size_t, std::function<void(YAML::Emitter&, FieldData, char*)>
 	{typeid(std::vector<gns::rendering::Material*>).hash_code(),
 	[](YAML::Emitter& out, FieldData data, char* ptr)
 	{
-		out << 0;
+		const auto value = reinterpret_cast<std::vector<gns::rendering::Material*>*>(ptr += data.offset);
+		std::vector<gns::rendering::Material*> m = *value;
+		out << YAML::Flow << YAML::BeginSeq;
+		for (size_t i = 0; i< m.size(); i++ )
+		{
+			gns::core::guid guid = m[i]->GetGuid();
+			out << guid;
+			LOG_INFO("Serialize_material: " << guid);
+		}
+		out << YAML::EndSeq;
 	}},
 	{typeid(Color).hash_code(),
 	[](YAML::Emitter& out, FieldData data, char* ptr)
@@ -141,7 +149,8 @@ std::string Serializer::DeserializeScene(const std::string& src)
 	YAML::Node root = YAML::LoadFile(src);
 	if(root["version"].as<std::string>() != currentVersion)
 	{
-		LOG_WARNING("Serializer Version mismatch! your Scene may load incorrectly");
+		LOG_ERROR("Serializer Version mismatch!");
+		return "";
 	}
 	LOG_INFO(AQUA << "[Scene Serializer]:" << DEFAULT << "Serialized vith version: " << root["version"].as<std::string>());
 	Scene* scene = gns::core::SceneManager::ActiveScene;
@@ -162,7 +171,7 @@ std::string Serializer::DeserializeScene(const std::string& src)
 				void* field_ptr = ReadFieldValue(fields[k]["field_type"].as<size_t>(), fields[k]["field_value"]);
 				if(component_ptr != nullptr && field_ptr != nullptr)
 				{
-					WriteFieldToComponent(component_ptr, ComponentData_Table[componentID].fields[k], field_ptr);
+					WriteFieldToComponent(component_ptr, ComponentData_Table[componentID].fields[k], field_ptr, fields[k]["field_value"]);
 				}
 				else
 				{
@@ -225,8 +234,8 @@ void* Serializer::ReadFieldValue(size_t field_typeId, const YAML::Node& node)
 	}
 	if (field_typeId == typeid(std::vector<rendering::Material*>).hash_code())
 	{
-		gns::core::guid* guid = new gns::core::guid(node.as<uint64_t>());
-		return guid;
+		std::vector<gns::rendering::Material*>* field_ptr = new std::vector<gns::rendering::Material*>();
+		return field_ptr;
 	}
 
 	if (field_typeId == typeid(gns::core::guid).hash_code())
@@ -252,12 +261,13 @@ void* Serializer::AddComponentFromSavedData(Entity& entity, uint32_t Component_t
 }
 
 void Serializer::WriteFieldToComponent(void* component_ptr, const FieldData& fieldData,
-	void* fieldValuer_ptr)
+	void* fieldValuer_ptr, const YAML::Node& node)
 {
 	LOG_INFO(GREEN << "Writing field '" << fieldData.name << "' Data to the Component");
 	if (fieldData.typeID == typeid(gns::rendering::Mesh).hash_code())
 	{
-		
+		LOG_INFO(GREEN << "Mesh!");
+
 		core::guid guid;
 		memcpy(&guid, fieldValuer_ptr, fieldData.size);
 
@@ -269,11 +279,15 @@ void Serializer::WriteFieldToComponent(void* component_ptr, const FieldData& fie
 	}
 	else if(fieldData.typeID == typeid(std::vector<rendering::Material*>).hash_code())
 	{
-		core::guid guid;
-		memcpy(&guid, fieldValuer_ptr, sizeof(guid));
+
+		LOG_INFO(GREEN << "Material!");
 		RendererComponent* renderer = static_cast<RendererComponent*>(component_ptr);
-		auto* mat = AssetLoader::LoadAssetFromFile<rendering::Material>(guid);
-		renderer->AssignMaterial(guid);
+		for (std::size_t i = 0; i < node.size(); i++)
+		{
+			core::guid guid = node[i].as<uint64_t>();
+			AssetLoader::LoadAssetFromFile<rendering::Material>(guid);
+			renderer->AssignMaterial(guid);
+		}
 	}
 	else
 	{

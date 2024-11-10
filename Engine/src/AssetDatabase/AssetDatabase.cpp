@@ -6,11 +6,20 @@
 #include "../Utils/FileSystem/FileSystem.h"
 #include "yaml-cpp/yaml.h"
 
-std::unordered_map<gns::core::guid, gns::AssetMetadata> gns::AssetDatabase::S_AssetDatabase = {};
+std::unordered_map<gns::core::guid, gns::AssetMetadata> gns::AssetDatabase::S_AssetDatabase = {
+{0,{0, "" ,"missing_asset", AssetType::null_Asset, AssetState::unloaded} }
+};
 
 gns::AssetMetadata& gns::AssetDatabase::GetAssetByGuid(const gns::core::guid guid)
 {
-	LOG_INFO("Getting asset from database: " << guid);
+	LOG_INFO("Getting asset from database: " << guid << " '" << S_AssetDatabase[guid].name << "'");
+
+	if(!S_AssetDatabase.contains(guid) || guid == 0)
+	{
+		LOG_WARNING("[Asset Database]: No asset found with Guid: '"<< guid <<"'");
+		return S_AssetDatabase[0];
+	}
+
 	return S_AssetDatabase[guid];
 }
 
