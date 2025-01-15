@@ -85,7 +85,7 @@ std::unordered_map<size_t, std::function<void(YAML::Emitter&, FieldData, char*)>
 		{
 			gns::core::guid guid = m[i]->GetGuid();
 			out << guid;
-			LOG_INFO("Serialize_material: " << guid);
+			LOG_INFO("Serialize_material_field: " << guid);
 		}
 		out << YAML::EndSeq;
 	}},

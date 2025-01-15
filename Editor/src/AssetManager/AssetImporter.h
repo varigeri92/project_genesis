@@ -25,6 +25,9 @@ namespace gns::editor
 		AssetMetadata CreateAssetFromObject(
 			const std::string& directory,
 			const std::string& name, core::guid guid, AssetType assetType, Object* gns_object);
+
+		static gns::core::guid GetGuidFromMetaFile(const std::string& asset_path);
+
 	private:
 		void ScanProjectForAssets();
 		bool IsImported(core::guid);

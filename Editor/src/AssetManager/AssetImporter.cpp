@@ -89,11 +89,11 @@ namespace gns::editor
 	{
 		YAML::Emitter out;
 		out << YAML::BeginMap
-		<< "asset_name" << "asssetName"
-		<< "source_path" << assetSourcePath
-		<< "asset_guid" << guid
-		<< "asset_type" << static_cast<int>(assetType)
-		<< YAML::EndMap;
+			<< "asset_name" << fileSystem::FileSystem::GetFileName(assetSourcePath)
+			<< "source_path" << assetSourcePath
+			<< "asset_guid" << guid
+			<< "asset_type" << static_cast<int>(assetType)
+			<< YAML::EndMap;
 		gns::fileSystem::FileSystem::WriteFile(out.c_str(), path);
 	}
 
@@ -218,5 +218,17 @@ namespace gns::editor
 			return assetMetadata;
 		}
 		return assetMetadata;
+	}
+
+	gns::core::guid AssetImporter::GetGuidFromMetaFile(const std::string& asset_path)
+	{
+		std::string path = asset_path;
+		if(!gns::fileSystem::FileSystem::HasExtension(asset_path, metaFileExtension))
+		{
+			path += metaFileExtension;
+		}
+		YAML::Node root = YAML::LoadFile(path);
+		return root["asset_guid"].as<gns::core::guid>();
+		
 	}
 }

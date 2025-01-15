@@ -147,8 +147,7 @@ namespace gns
 				}
 				return;
 			}
-			AssetMetadata materialMeta = AssetDatabase::GetAssetByGuid(materialReferenceGuid);
-			material = Object::Get<rendering::Material>(materialMeta.guid);
+			material = Object::Get<rendering::Material>(materialReferenceGuid);
 			for (const auto& subMesh : m_mesh->m_subMeshes)
 			{
 				m_materials.push_back(material);

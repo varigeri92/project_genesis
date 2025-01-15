@@ -4,6 +4,7 @@
 #include "DockspaceWindow.h"
 #include "../DragDropManager.h"
 #include "../../../Engine/src/Gui/ImGui/imgui_stdlib.h"
+#include "../AssetManager/AssetImporter.h"
 using namespace gns::gui;
 namespace gns::editor
 {
@@ -398,7 +399,12 @@ namespace gns::editor
 	{
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_FILE"))
 		{
-			LOG_INFO("Dragdrop operation accepted! source: " << gns::editor::DragDropManager::GetCurrentPayload()->path);
+			gns::core::guid guid = AssetImporter::GetGuidFromMetaFile(gns::editor::DragDropManager::GetCurrentPayload()->path);
+			LOG_INFO("Dragdrop operation accepted! source: " 
+				<< gns::editor::DragDropManager::GetCurrentPayload()->path 
+				<< "guid: " << guid);
+			
 		}
 	}
+
 }
