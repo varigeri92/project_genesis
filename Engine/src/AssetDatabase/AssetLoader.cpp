@@ -18,6 +18,7 @@
 
 #include "AssetDatabase.h"
 #include "../Renderer/Material.h"
+#include "../Utils/FileSystem/FileSystem.h"
 
 inline std::string GetFileName(const std::string& filePath) {
     std::filesystem::path path(filePath);
@@ -81,7 +82,8 @@ namespace gns
         );
 
         const std::shared_ptr<rendering::Texture> defaultTexture = std::make_shared<rendering::Texture>(R"(Textures\uv_color_Grid.png)");
-        rendering::Material* material = Object::Create<rendering::Material>(guid,defaultShader, "Loaded_Material");
+        
+        rendering::Material* material = Object::Create<rendering::Material>(guid,defaultShader, gns::fileSystem::FileSystem::GetFileName(path));
         material->SetTexture(defaultTexture, 0);
         const YAML::Node& attributes = root["attributes"];
         for (std::size_t i = 0; i < attributes.size(); i++)

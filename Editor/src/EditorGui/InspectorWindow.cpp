@@ -259,7 +259,7 @@ namespace gns::editor
 				{
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_FILE"))
 					{
-						DropToField();
+						DropToField("MATERIAL");
 					}
 					ImGui::EndDragDropTarget();
 				}
@@ -311,7 +311,7 @@ namespace gns::editor
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_FILE"))
 			{
-				DropToField();
+				DropToField("V_SHADER");
 			}
 			ImGui::EndDragDropTarget();
 		}
@@ -324,7 +324,7 @@ namespace gns::editor
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_FILE"))
 			{
-				DropToField();
+				DropToField("F_SHADER");
 			}
 			ImGui::EndDragDropTarget();
 		}
@@ -395,15 +395,23 @@ namespace gns::editor
 		ImGui::PopItemWidth();
 	}
 
-	void InspectorWindow::DropToField()
+	void InspectorWindow::DropToField(std::string field_Type, size_t arrayFieldIndex/* = 0*/)
 	{
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_FILE"))
 		{
 			gns::core::guid guid = AssetImporter::GetGuidFromMetaFile(gns::editor::DragDropManager::GetCurrentPayload()->path);
+			if(field_Type == "MATERIAL")
+			{
+				AssetLoader::LoadMaterialFromFile(
+					guid,
+					gns::fileSystem::FileSystem::GetRelativePath(gns::editor::DragDropManager::GetCurrentPayload()->path)
+				);
+
+				inspectedEntity.GetComponent<gns::RendererComponent>().AssignMaterial(guid);
+			}
 			LOG_INFO("Dragdrop operation accepted! source: " 
 				<< gns::editor::DragDropManager::GetCurrentPayload()->path 
-				<< "guid: " << guid);
-			
+				<< " guid: " << guid);
 		}
 	}
 

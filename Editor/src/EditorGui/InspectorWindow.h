@@ -24,7 +24,7 @@ namespace gns::editor
 		void DrawMaterialAttribute(gns::rendering::Shader::AttributeInfo info,
 			gns::rendering::Material* material, size_t index);
 
-		void DropToField();
+		void DropToField(std::string field_Type, size_t arrayFieldIndex = 0);
 
 		gns::EventFunction<void, entt::entity>* onEntitySelected;
 		gns::Entity inspectedEntity;

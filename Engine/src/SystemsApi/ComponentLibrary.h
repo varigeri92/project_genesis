@@ -134,7 +134,7 @@ namespace gns
 			AssetMetadata meshMeta = AssetDatabase::GetAssetByGuid(meshReferenceGuid);
 			m_mesh = Object::Get<rendering::Mesh>(meshMeta.guid);
 		}
-		void AssignMaterial(core::guid materialReferenceGuid)
+		void AssignMaterial(core::guid materialReferenceGuid, size_t materialIndex = 0)
 		{
 			rendering::Material* material = nullptr;
 			if(materialReferenceGuid == 0)
@@ -150,7 +150,19 @@ namespace gns
 			material = Object::Get<rendering::Material>(materialReferenceGuid);
 			for (const auto& subMesh : m_mesh->m_subMeshes)
 			{
-				m_materials.push_back(material);
+				if(materialIndex == m_materials.size() )
+				{
+					m_materials.push_back(material);
+				}
+				else if(materialIndex > m_materials.size())
+				{
+					LOG_ERROR("Cant push Back material! the Array size is too small!");
+					assert(true);
+				}
+				else
+				{
+					m_materials[materialIndex] = material;
+				}
 			}
 			
 		}

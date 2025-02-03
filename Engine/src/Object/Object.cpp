@@ -16,6 +16,11 @@ namespace gns
 		for (auto it = s_objectMap.begin(); it != s_objectMap.end(); ++it) {
 			if(IsValid(it->second))
 				it->second->Dispose();
+			else
+			{
+				LOG_WARNING("trying to dispose null_object!");
+			}
+				
 		}
 	}
 
